@@ -1,4 +1,3 @@
-```markdown
 # AI Evaluation QA Framework
 
 <p align="center">
@@ -17,14 +16,14 @@ The **AI Evaluation QA Framework** is a production-grade Python library designed
 
 ## Key Features
 
-- 🚀 **Multi-Provider Support**: Seamlessly evaluate against OpenAI, Anthropic, and Azure OpenAI.
-- ⚖️ **Rubric-Based Scoring**: Score responses across dimensions like **Accuracy**, **Reasoning**, **Tone**, and **Completeness** (1–5 scale).
-- 🔍 **Automated Defect Detection**: Built-in detection for hallucinations, logical flaws, redundancy, and more.
-- 📊 **Rich Analytics**: Generates interactive HTML dashboards, executive summaries, and detailed CSV exports.
-- 🛡️ **Robust Validation**: Comprehensive pre-execution checks for environment, configuration, and prompt schemas.
-- 💰 **Cost Telemetry**: Precision token counting and cost estimation per model.
-- 🔄 **Fault-Tolerant**: Mid-batch checkpointing ensures no progress is lost.
-- ⚡ **Asynchronous & Fast**: Built with `asyncio` for high-concurrency API requests.
+* 🚀 **Multi-Provider Support**: Seamlessly evaluate against OpenAI, Anthropic, and Azure OpenAI.
+* ⚖️ **Rubric-Based Scoring**: Score responses across dimensions like **Accuracy**, **Reasoning**, **Tone**, and **Completeness** (1–5 scale).
+* 🔍 **Automated Defect Detection**: Built-in detection for hallucinations, logical flaws, redundancy, and more.
+* 📊 **Rich Analytics**: Generates interactive HTML dashboards, executive summaries, and detailed CSV exports.
+* 🛡️ **Robust Validation**: Comprehensive pre-execution checks for environment, configuration, and prompt schemas.
+* 💰 **Cost Telemetry**: Precision token counting and cost estimation per model.
+* 🔄 **Fault-Tolerant**: Mid-batch checkpointing ensures no progress is lost.
+* ⚡ **Asynchronous & Fast**: Built with `asyncio` for high-concurrency API requests.
 
 ---
 
@@ -32,18 +31,16 @@ The **AI Evaluation QA Framework** is a production-grade Python library designed
 
 ```bash
 # Clone the repository
-git clone https://github.com/darshil0/AI-Evaluation-QA.git
+git clone [https://github.com/darshil0/AI-Evaluation-QA.git](https://github.com/darshil0/AI-Evaluation-QA.git)
 cd AI-Evaluation-QA
 
 # Create a virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate
 
-# Install production dependencies
+# Install dependencies
 pip install -e .
 
-# Or install with development dependencies
-pip install -e ".[dev]"
 ```
 
 ---
@@ -52,19 +49,19 @@ pip install -e ".[dev]"
 
 ### 1. Configure Environment
 
-Create a `.env` file with your API keys (or copy `.env.example`):
+Create a `.env` file with your API keys:
 
-```bash
+```env
 OPENAI_API_KEY='your-key-here'
 ANTHROPIC_API_KEY='your-key-here'
-```
 
-The framework automatically loads environment variables from `.env` using `python-dotenv`.
+```
 
 ### 2. Run Evaluation
 
 ```bash
 ai-eval evaluate --prompts data/prompts/reasoning_tests.json
+
 ```
 
 ---
@@ -74,7 +71,7 @@ ai-eval evaluate --prompts data/prompts/reasoning_tests.json
 The framework provides a unified CLI entry point `ai-eval` (or `python main.py`):
 
 | Command | Description | Example |
-|:---|:---|:---|
+| --- | --- | --- |
 | `evaluate` | Full pipeline: Run prompts, score, and report | `ai-eval evaluate --prompts tests.json` |
 | `score` | Score an existing raw results CSV | `ai-eval score --results raw.csv --output scored.csv` |
 | `report` | Generate reports from scored results | `ai-eval report --results scored.csv --output-dir reports/` |
@@ -82,46 +79,28 @@ The framework provides a unified CLI entry point `ai-eval` (or `python main.py`)
 | `validate` | Validate system configuration and setup | `ai-eval validate` |
 | `lint-prompts` | Validate and lint a prompt JSON file | `ai-eval lint-prompts prompts.json` |
 
-**Optional flags**: Use `--save-baseline` with `check-regression` to save current results as the new baseline.
-
 ---
 
 ## Project Structure
 
-```
-AI-Evaluation-QA/
-├── evaluation/       # Core logic (pipeline, runner, scoring, reporting)
-├── config/           # System configuration and strict validation
-├── scripts/          # Utility scripts (validation, prompt loading, regression)
-├── tests/            # Comprehensive test suite
-├── data/             # Sample prompts and execution checkpoints
-├── reports/          # Generated HTML/CSV reports
-├── main.py           # CLI entry point
-├── pyproject.toml    # Package metadata and dependencies
-└── README.md         # This file
-```
+* `evaluation/`: Core logic (pipeline, runner, scoring, reporting).
+* `config/`: System configuration and strict validation.
+* `scripts/`: Utility scripts (data validation, prompt loading, regression checks).
+* `tests/`: Comprehensive test suite.
+* `data/`: Sample prompts and execution checkpoints.
 
 ---
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please see [CONTRIBUTING.md](https://www.google.com/search?q=CONTRIBUTING.md) for guidelines.
 
 ---
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+MIT License. See [LICENSE](https://www.google.com/search?q=LICENSE) for details.
 
 **Version**: 2.3.8
 
----
-
-## Coverage Badge
-
-The coverage badge is auto-generated by CI/CD. Run `pytest --cov` locally to generate a local `coverage.svg`:
-
-```bash
-pytest --cov=evaluation --cov-report=html --cov-report=term-missing
-coverage-badge -o coverage.svg
 ```
