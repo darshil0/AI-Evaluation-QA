@@ -1,7 +1,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional
 
 import yaml
 
@@ -43,7 +43,6 @@ class ConfigLoader:
     CURRENT_VERSION = "2.3"
     MIN_COMPATIBLE_VERSION = "2.0"
     
-    # Azure typically uses AZURE_OPENAI_API_KEY
     ENV_KEY_MAP = {
         "openai": "OPENAI_API_KEY",
         "anthropic": "ANTHROPIC_API_KEY",
@@ -67,7 +66,6 @@ class ConfigLoader:
         """
         path = Path(config_path)
         
-        # Try to read file directly (handles atomicity better)
         try:
             with path.open("r", encoding="utf-8") as f:
                 config = yaml.safe_load(f) or {}
@@ -81,16 +79,9 @@ class ConfigLoader:
         if not isinstance(config, dict):
             raise ConfigError("Configuration root must be a mapping/dictionary")
 
-        # Check version compatibility before migration
         cls._check_version_compatibility(config)
-        
-        # Migrate old configuration formats
         config = cls._migrate_config(config)
-        
-        # Validate all required fields and constraints
         cls._validate_config(config)
-        
-        # Load and inject environment variables into config
         cls._load_env_variables(config)
 
         logger.info("Configuration loaded and validated successfully")
@@ -102,14 +93,12 @@ class ConfigLoader:
         version = config.get("version")
         
         if version is None:
-            # No version specified - assume legacy, will be migrated
             logger.warning("No version specified in configuration. Assuming legacy format.")
             return
         
         if version == cls.CURRENT_VERSION:
             return
         
-        # Simple version comparison (assumes X.Y format)
         try:
             current_major, current_minor = map(int, cls.MIN_COMPATIBLE_VERSION.split("."))
             version_major, version_minor = map(int, version.split("."))
@@ -132,7 +121,6 @@ class ConfigLoader:
         """
         version = config.get("version")
         
-        # Migrate from v1.x format (scoring.dimensions -> scoring.criteria)
         if version is None or version.startswith("1."):
             scoring = config.get("scoring")
             if isinstance(scoring, dict):
@@ -140,7 +128,6 @@ class ConfigLoader:
                     logger.info("Migrating configuration: 'scoring.dimensions' -> 'scoring.criteria'")
                     scoring["criteria"] = scoring.pop("dimensions")
             
-            # Update version to current
             config["version"] = cls.CURRENT_VERSION
             logger.info(f"Configuration migrated to version {cls.CURRENT_VERSION}")
 
@@ -149,37 +136,31 @@ class ConfigLoader:
     @classmethod
     def _validate_config(cls, config: Dict[str, Any]) -> None:
         """Validate all configuration fields and constraints."""
-        # Check required fields
         for field_path in cls.REQUIRED_FIELDS:
-            value = cls._get_nested_value(config, field_path, require_exists=True)
+            value = cls._get_nested_value(config, field_path)
             if value is None:
                 raise ConfigError(f"Missing required field: {field_path}")
 
-        # Validate provider
         provider = cls._get_nested_value(config, "models.primary.provider")
         if provider not in cls.VALID_PROVIDERS:
             raise ConfigError(
                 f"Invalid provider '{provider}'. Must be one of: {sorted(cls.VALID_PROVIDERS)}"
             )
 
-        # Validate model_name is non-empty string
         model_name = cls._get_nested_value(config, "models.primary.model_name")
         if not isinstance(model_name, str) or not model_name.strip():
             raise ConfigError("models.primary.model_name must be a non-empty string")
 
-        # Validate scoring.criteria
         criteria = cls._get_nested_value(config, "scoring.criteria")
         if not isinstance(criteria, dict) or not criteria:
             raise ConfigError("scoring.criteria must be a non-empty dictionary")
 
-        total_weight = cls._validate_scoring_criteria(criteria)
+        cls._validate_scoring_criteria(criteria)
 
-        # Validate max_retries
         max_retries = cls._get_nested_value(config, "api.max_retries")
         if not isinstance(max_retries, int) or isinstance(max_retries, bool) or not 1 <= max_retries <= 10:
             raise ConfigError(f"max_retries must be an integer between 1 and 10, got {max_retries}")
 
-        # Validate temperature (optional but has constraints if set)
         temperature = cls._get_nested_value(config, "models.primary.temperature")
         if temperature is not None:
             if not isinstance(temperature, (int, float)) or isinstance(temperature, bool):
@@ -208,22 +189,19 @@ class ConfigLoader:
             
             total_weight += float(weight)
 
-        # Check weights sum to 1.0 with tolerance
         if abs(total_weight - 1.0) > 0.01:
             raise ConfigError(f"Scoring criteria weights must sum to 1.0, got {round(total_weight, 3)}")
         
         return total_weight
 
-    @classmethod
-    def _get_nested_value(cls, d: Dict[str, Any], path: str, require_exists: bool = False) -> Optional[Any]:
+    @staticmethod
+    def _get_nested_value(d: Dict[str, Any], path: str) -> Optional[Any]:
         """
         Get a value from a nested dictionary using dot notation path.
         
         Args:
             d: Dictionary to search
             path: Dot-separated path (e.g., "models.primary.provider")
-            require_exists: If True, returns (value, False) if intermediate key missing;
-                          if False, returns None silently
             
         Returns:
             The value at the path, or None if not found
@@ -232,9 +210,7 @@ class ConfigLoader:
         value: Any = d
         
         for key in keys:
-            if not isinstance(value, dict):
-                return None
-            if key not in value:
+            if not isinstance(value, dict) or key not in value:
                 return None
             value = value[key]
         
@@ -250,7 +226,7 @@ class ConfigLoader:
         provider = cls._get_nested_value(config, "models.primary.provider")
         
         if provider not in cls.ENV_KEY_MAP:
-            return  # Should not happen if validation passed
+            return
 
         env_key = cls.ENV_KEY_MAP[provider]
         api_key = os.getenv(env_key)
@@ -261,12 +237,7 @@ class ConfigLoader:
                 f"Please set it in your environment before running."
             )
         
-        # Inject the API key into config for use by the application
-        # This ensures the key is available without exposing it in the YAML file
-        if "models" not in config:
-            config["models"] = {}
-        if "primary" not in config["models"]:
-            config["primary"] = {}
-        
+        # Use setdefault for cleaner nested dict creation
+        config.setdefault("models", {}).setdefault("primary", {})
         config["models"]["primary"]["api_key"] = api_key
         logger.debug(f"API key loaded from {env_key} environment variable")
