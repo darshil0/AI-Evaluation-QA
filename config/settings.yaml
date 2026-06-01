@@ -1,0 +1,63 @@
+models:
+  primary:
+    provider: "openai"
+    model_name: "gpt-4"
+    temperature: 0.7
+    max_tokens: 2000
+
+  fallback:
+    provider: "anthropic"
+    model_name: "claude-sonnet-4-6"
+    temperature: 0.7
+    max_tokens: 2000
+
+  judge:
+    provider: "openai"
+    model_name: "gpt-4"
+    temperature: 0.3
+
+api:
+  max_retries: 3
+  rate_limit_rpm: 60
+  timeout: 60
+  enable_caching: true
+  max_concurrent_requests: 5
+
+scoring:
+  criteria:
+    accuracy:
+      weight: 0.4
+      type: "rule"
+      params: {}
+    reasoning:
+      weight: 0.3
+      type: "rule"
+      params: {}
+    tone:
+      weight: 0.15
+      type: "rule"
+      params: {}
+    completeness:
+      weight: 0.15
+      type: "rule"
+      params: {}
+
+  automated_scoring:
+    enabled: true
+    use_llm_judge: true
+
+  thresholds:
+    excellent: 4.5
+    good: 3.5
+    acceptable: 2.5
+    poor: 1.5
+
+logging:
+  level: "INFO"
+  enable_file_logging: true
+  enable_json_logging: false
+  log_dir: "logs"
+
+budget:
+  limit_usd: 100.00
+  alert_threshold: 0.8
