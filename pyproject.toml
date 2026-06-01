@@ -1,0 +1,103 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-evaluation-qa"
+version = "2.3.8"
+description = "A production-grade framework for evaluating AI model responses"
+readme = "README.md"
+authors = [{ name = "Darshil Shah" }]
+requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = [
+    "ai",
+    "evaluation",
+    "qa",
+    "testing",
+    "llm",
+    "quality-assurance",
+    "prompt-testing",
+    "model-evaluation",
+    "gpt",
+    "claude",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "openai>=2.40.0",
+    "pandas>=3.0.3",
+    "plotly>=6.7.0",
+    "click>=8.4.1",
+    "tiktoken>=0.13.0",
+    "pyyaml>=6.0.3",
+    "aiohttp>=3.14.0",
+    "jsonschema>=4.26.0",
+    "python-dotenv>=1.2.2",
+    "numpy>=2.4.6",
+    "scipy>=1.17.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-asyncio>=1.4.0",
+    "pytest-cov>=7.1.0",
+    "pytest-xdist>=3.8.0",
+    "black>=24.0.0",
+    "isort>=5.13.0",
+    "flake8>=7.0.0",
+    "flake8-bugbear>=24.0.0",
+    "mypy>=1.9.0",
+    "pylint>=3.1.0",
+    "bandit>=1.7.0",
+    "safety>=3.0.0",
+    "pre-commit>=3.6.0",
+]
+pdf = ["reportlab>=3.6.0", "weasyprint>=54.0"]
+ml = ["scipy>=1.13.0", "scikit-learn>=1.1.0"]
+
+[project.urls]
+"Bug Reports" = "https://github.com/darshil0/AI-Evaluation-QA/issues"
+"Source" = "https://github.com/darshil0/AI-Evaluation-QA"
+
+[project.scripts]
+ai-eval = "main:cli"
+
+[tool.setuptools.packages.find]
+include = ["evaluation*", "config*", "scripts*"]
+exclude = ["tests*", "docs*", "examples*"]
+
+[tool.setuptools.package-data]
+evaluation = ["*.yaml", "*.json"]
+config = ["*.yaml"]
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311", "py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+py_version = 39
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+    "unit: unit tests",
+    "integration: integration tests",
+]

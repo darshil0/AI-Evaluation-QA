@@ -1,0 +1,36 @@
+# AI Evaluation QA Framework - Dependencies
+# Hardened Baseline v2.3.8
+
+# Core dependencies
+openai>=2.40.0
+aiohttp>=3.14.0
+jsonschema>=4.26.0
+pyyaml>=6.0.3
+matplotlib>=3.10.9
+plotly>=6.7.0
+click>=8.4.1
+python-dotenv>=1.2.2
+tiktoken>=0.13.0
+
+# Data processing
+numpy>=2.4.6
+pandas>=3.0.3
+scipy>=1.17.1
+
+# Testing
+pytest>=9.0.3
+pytest-cov>=7.1.0
+pytest-html>=4.2.0
+pytest-xdist>=3.8.0
+coverage>=7.14.1
+coverage-badge>=1.1.2
+
+# Development
+black>=24.0.0
+flake8>=7.0.0
+mypy>=1.9.0
+pylint>=3.1.0
+pytest-asyncio>=1.4.0
+bandit>=1.7.0
+safety>=3.0.0
+pre-commit>=3.6.0
