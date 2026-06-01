@@ -1,20 +1,4 @@
-from pathlib import Path
-
 from setuptools import find_packages, setup
-
-# Read README for long description
-readme_file = Path(__file__).parent / "README.md"
-long_description = readme_file.read_text(encoding="utf-8") if readme_file.exists() else ""
-
-# Read requirements
-requirements_file = Path(__file__).parent / "requirements.txt"
-requirements = []
-if requirements_file.exists():
-    requirements = [
-        line.strip()
-        for line in requirements_file.read_text(encoding="utf-8").splitlines()
-        if line.strip() and not line.startswith("#")
-    ]
 
 setup(
     name="ai-evaluation-qa",
@@ -22,7 +6,11 @@ setup(
     author="Darshil",
     author_email="",
     description="Production-grade framework for evaluating AI model responses",
-    long_description=long_description,
+    long_description=(
+        open("README.md", encoding="utf-8").read()
+        if __import__("pathlib").Path("README.md").exists()
+        else ""
+    ),
     long_description_content_type="text/markdown",
     url="https://github.com/darshil0/AI-Evaluation-QA",
     packages=find_packages(exclude=["tests*", "docs", "scripts", "examples"]),
@@ -39,7 +27,20 @@ setup(
         "Programming Language :: Python :: 3.12",
     ],
     python_requires=">=3.9",
-    install_requires=requirements,
+    install_requires=[
+        "openai>=2.40.0",
+        "aiohttp>=3.14.0",
+        "jsonschema>=4.26.0",
+        "pyyaml>=6.0.3",
+        "matplotlib>=3.10.9",
+        "plotly>=6.7.0",
+        "click>=8.4.1",
+        "python-dotenv>=1.2.2",
+        "tiktoken>=0.13.0",
+        "numpy>=2.4.6",
+        "pandas>=3.0.3",
+        "scipy>=1.17.1",
+    ],
     extras_require={
         "dev": [
             "pytest>=9.0.3",
@@ -51,6 +52,12 @@ setup(
             "flake8>=7.0.0",
             "mypy>=1.9.0",
             "pylint>=3.1.0",
+            "bandit>=1.7.0",
+            "safety>=3.0.0",
+            "pre-commit>=3.6.0",
+            "coverage>=7.14.1",
+            "coverage-badge>=1.1.2",
+            "pytest-html>=4.2.0",
         ],
     },
     entry_points={
