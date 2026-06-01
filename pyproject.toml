@@ -49,6 +49,7 @@ dependencies = [
     "python-dotenv>=1.2.2",
     "numpy>=2.4.6",
     "scipy>=1.17.1",
+    "matplotlib>=3.10.9",
 ]
 
 [project.optional-dependencies]
@@ -57,6 +58,7 @@ dev = [
     "pytest-asyncio>=1.4.0",
     "pytest-cov>=7.1.0",
     "pytest-xdist>=3.8.0",
+    "pytest-html>=4.2.0",
     "black>=24.0.0",
     "isort>=5.13.0",
     "flake8>=7.0.0",
@@ -66,13 +68,16 @@ dev = [
     "bandit>=1.7.0",
     "safety>=3.0.0",
     "pre-commit>=3.6.0",
+    "coverage>=7.14.1",
+    "coverage-badge>=1.1.2",
 ]
 pdf = ["reportlab>=3.6.0", "weasyprint>=54.0"]
-ml = ["scipy>=1.13.0", "scikit-learn>=1.1.0"]
+ml = ["scikit-learn>=1.1.0"]
 
 [project.urls]
 "Bug Reports" = "https://github.com/darshil0/AI-Evaluation-QA/issues"
 "Source" = "https://github.com/darshil0/AI-Evaluation-QA"
+"Documentation" = "https://github.com/darshil0/AI-Evaluation-QA/blob/main/docs/"
 
 [project.scripts]
 ai-eval = "main:cli"
@@ -84,6 +89,7 @@ exclude = ["tests*", "docs*", "examples*"]
 [tool.setuptools.package-data]
 evaluation = ["*.yaml", "*.json"]
 config = ["*.yaml"]
+"" = ["*.yaml", "*.yml", "*.json"]
 
 [tool.black]
 line-length = 100
