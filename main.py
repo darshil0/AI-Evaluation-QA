@@ -14,6 +14,7 @@ Usage:
 import logging
 import os
 import sys
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Optional
 
@@ -21,11 +22,18 @@ import click
 
 from config.config_loader import ConfigLoader
 
-# Configure logging
+# Configure logging with rotation
+log_file = os.getenv("EVAL_LOG_FILE", "evaluation.log")
+max_bytes = int(os.getenv("EVAL_LOG_MAX_BYTES", 10_000_000))  # 10 MB
+backup_count = int(os.getenv("EVAL_LOG_BACKUP_COUNT", 5))
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout), logging.FileHandler("evaluation.log")],
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        RotatingFileHandler(log_file, maxBytes=max_bytes, backupCount=backup_count),
+    ],
 )
 
 logger = logging.getLogger(__name__)
@@ -49,7 +57,7 @@ def evaluate(config: str, prompts: str, model: Optional[str]) -> None:
     try:
         logger.info(f"Starting evaluation with prompts from {prompts}")
         conf = ConfigLoader.load(config) if os.path.exists(config) else {}
-        
+
         if model:
             if "models" not in conf:
                 conf["models"] = {"primary": {}}
@@ -62,10 +70,11 @@ def evaluate(config: str, prompts: str, model: Optional[str]) -> None:
         pipeline.run(prompts)
         logger.info("Evaluation completed successfully")
     except FileNotFoundError as e:
+        logger.exception("File not found")
         click.echo(f"Error: File not found - {e}", err=True)
         sys.exit(1)
     except Exception as e:
-        logger.error(f"Evaluation failed: {e}")
+        logger.exception("Evaluation failed")
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
@@ -101,13 +110,15 @@ def score(config: str, results: str, output: str) -> None:
             logger.warning("No results to score")
             click.echo("Warning: No results to score", err=True)
     except FileNotFoundError as e:
+        logger.exception("File not found")
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
     except pd.errors.ParserError as e:
+        logger.exception("CSV parsing failed")
         click.echo(f"Error: Failed to parse CSV file - {e}", err=True)
         sys.exit(1)
     except Exception as e:
-        logger.error(f"Scoring failed: {e}")
+        logger.exception("Scoring failed")
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
@@ -136,13 +147,15 @@ def report(results: str, output_dir: str) -> None:
         click.echo(f"Reports generated in {output_dir}/")
         logger.info(f"Reports successfully generated in {output_dir}/")
     except FileNotFoundError as e:
+        logger.exception("File not found")
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
     except pd.errors.ParserError as e:
+        logger.exception("CSV parsing failed")
         click.echo(f"Error: Failed to parse CSV file - {e}", err=True)
         sys.exit(1)
     except Exception as e:
-        logger.error(f"Report generation failed: {e}")
+        logger.exception("Report generation failed")
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
@@ -154,6 +167,7 @@ def report(results: str, output_dir: str) -> None:
 def check_regression(current_results: str, baseline: str, save_baseline: bool) -> None:
     """Check for performance regressions."""
     import pandas as pd
+
     from scripts.check_regression import RegressionDetector
 
     try:
@@ -171,7 +185,7 @@ def check_regression(current_results: str, baseline: str, save_baseline: bool) -
         if results.get("has_regression"):
             sys.exit(1)
     except Exception as e:
-        logger.error(f"Regression check failed: {e}")
+        logger.exception("Regression check failed")
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
@@ -198,7 +212,6 @@ def validate(config: str) -> None:
             logger.info(f"Directory exists: {dir_path}")
 
     # Check environment variables
-    import os
     required_env = ["OPENAI_API_KEY", "ANTHROPIC_API_KEY"]
     env_found = any(os.getenv(env_var) for env_var in required_env)
 
@@ -231,7 +244,7 @@ def lint_prompts(prompt_file: str) -> None:
 
         # Additional semantic checks could be added here
     except Exception as e:
-        logger.error(f"Linting failed: {e}")
+        logger.exception("Linting failed")
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
 
