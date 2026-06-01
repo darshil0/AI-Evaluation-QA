@@ -1,0 +1,113 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2024-01-01",
+    "description": "Comprehensive reasoning test prompts for AI evaluation"
+  },
+  "prompts": [
+    {
+      "id": "RT001",
+      "version": "1.0",
+      "category": "logical_reasoning",
+      "difficulty": "medium",
+      "tags": ["conditional", "deductive"],
+      "text": "If all cats are animals, and some animals are pets, can we conclude that some cats are pets? Explain your reasoning.",
+      "expected_criteria": {
+        "min_tokens": 50,
+        "must_include": ["logical", "conclusion"],
+        "format": "structured"
+      }
+    },
+    {
+      "id": "RT002",
+      "version": "1.0",
+      "category": "mathematical_reasoning",
+      "difficulty": "easy",
+      "tags": ["arithmetic", "word_problem"],
+      "text": "A train leaves Station A at 10 AM traveling at 60 mph. Another train leaves Station B at 11 AM traveling at 80 mph toward Station A. If the stations are 200 miles apart, at what time will the trains meet?",
+      "expected_criteria": {
+        "min_tokens": 80,
+        "must_include": ["calculation", "time"],
+        "format": "step-by-step"
+      }
+    },
+    {
+      "id": "RT003",
+      "version": "1.0",
+      "category": "causal_reasoning",
+      "difficulty": "hard",
+      "tags": ["cause-effect", "analysis"],
+      "text": "A company's sales increased by 30% after launching a new marketing campaign. However, at the same time, their main competitor went out of business. What can we conclude about the effectiveness of the marketing campaign?",
+      "expected_criteria": {
+        "min_tokens": 100,
+        "must_include": ["confounding", "analysis"],
+        "format": "analytical"
+      }
+    },
+    {
+      "id": "RT004",
+      "version": "1.0",
+      "category": "ethical_reasoning",
+      "difficulty": "hard",
+      "tags": ["ethics", "dilemma"],
+      "text": "A self-driving car must choose between swerving into a wall (injuring its passenger) or continuing straight (hitting a pedestrian). What factors should inform this decision?",
+      "expected_criteria": {
+        "min_tokens": 150,
+        "must_include": ["ethical", "considerations"],
+        "format": "balanced"
+      }
+    },
+    {
+      "id": "RT005",
+      "version": "1.0",
+      "category": "factual_knowledge",
+      "difficulty": "easy",
+      "tags": ["science", "biology"],
+      "text": "Explain the process of photosynthesis in simple terms that a 10-year-old could understand.",
+      "expected_criteria": {
+        "min_tokens": 80,
+        "must_include": ["sunlight", "energy"],
+        "format": "simple"
+      }
+    },
+    {
+      "id": "RT006",
+      "version": "1.0",
+      "category": "creative_problem_solving",
+      "difficulty": "medium",
+      "tags": ["creativity", "innovation"],
+      "text": "Design a system to help elderly people who live alone stay connected with their families without requiring technical knowledge.",
+      "expected_criteria": {
+        "min_tokens": 120,
+        "must_include": ["solution", "user-friendly"],
+        "format": "descriptive"
+      }
+    },
+    {
+      "id": "RT007",
+      "version": "1.0",
+      "category": "empathy_communication",
+      "difficulty": "medium",
+      "tags": ["empathy", "communication"],
+      "text": "A friend tells you they just lost their job and are feeling devastated. How would you respond?",
+      "expected_criteria": {
+        "min_tokens": 60,
+        "must_include": ["support", "empathy"],
+        "format": "conversational"
+      }
+    },
+    {
+      "id": "RT008",
+      "version": "1.0",
+      "category": "analytical_reasoning",
+      "difficulty": "hard",
+      "tags": ["analysis", "data"],
+      "text": "You notice that website traffic increases every Tuesday but conversions remain flat. What hypotheses might explain this pattern, and how would you test them?",
+      "expected_criteria": {
+        "min_tokens": 120,
+        "must_include": ["hypothesis", "testing"],
+        "format": "analytical"
+      }
+    }
+  ]
+}
