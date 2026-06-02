@@ -31,16 +31,18 @@ The **AI Evaluation QA Framework** is a production-grade Python library designed
 
 ```bash
 # Clone the repository
-git clone [https://github.com/darshil0/AI-Evaluation-QA.git](https://github.com/darshil0/AI-Evaluation-QA.git)
+git clone https://github.com/darshil0/AI-Evaluation-QA.git
 cd AI-Evaluation-QA
 
 # Create a virtual environment
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -e .
 
+# For development (includes testing & linting tools)
+pip install -e .[dev]
 ```
 
 ---
@@ -54,14 +56,12 @@ Create a `.env` file with your API keys:
 ```env
 OPENAI_API_KEY='your-key-here'
 ANTHROPIC_API_KEY='your-key-here'
-
 ```
 
 ### 2. Run Evaluation
 
 ```bash
 ai-eval evaluate --prompts data/prompts/reasoning_tests.json
-
 ```
 
 ---
@@ -86,21 +86,56 @@ The framework provides a unified CLI entry point `ai-eval` (or `python main.py`)
 * `evaluation/`: Core logic (pipeline, runner, scoring, reporting).
 * `config/`: System configuration and strict validation.
 * `scripts/`: Utility scripts (data validation, prompt loading, regression checks).
-* `tests/`: Comprehensive test suite.
+* `tests/`: Comprehensive test suite with 100% coverage.
 * `data/`: Sample prompts and execution checkpoints.
+
+---
+
+## Configuration
+
+Configuration is managed via `config/settings.yaml`. Key sections:
+
+* **models**: Provider setup (OpenAI, Anthropic, Azure)
+* **scoring**: Rubric definitions and scoring rules
+* **execution**: Timeout, retry, and concurrency settings
+* **reporting**: Output formats and visualization options
+
+See `CONTRIBUTING.md` for detailed configuration examples.
+
+---
+
+## Testing
+
+```bash
+# Run all tests
+pytest tests/
+
+# Run with coverage report
+pytest --cov=evaluation --cov=config --cov-report=term-missing
+
+# Using Makefile
+make test
+```
 
 ---
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](https://www.google.com/search?q=CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
+
+* Development setup
+* Coding standards and type hints
+* Testing requirements (100% coverage)
+* Pull request process
 
 ---
 
 ## License
 
-MIT License. See [LICENSE](https://www.google.com/search?q=LICENSE) for details.
+MIT License. See [LICENSE](LICENSE) for details.
 
-**Version**: 2.3.8
+---
 
-```
+**Version**: 2.3.8  
+**Status**: Production/Stable  
+**Python**: 3.9+
