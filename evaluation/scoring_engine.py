@@ -1,10 +1,13 @@
 from __future__ import annotations
+
+import csv
 import json
 import logging
+import math
 import os
 import re
 from dataclasses import dataclass
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 logger = logging.getLogger(__name__)
 
@@ -44,20 +47,6 @@ class ScoreReport:
 class ScoringEngine:
     """
     Core engine for scoring model responses against rubrics and heuristics.
-
-    EDGE CASES & FAILURE MODES:
-
-    ┌─────────────────────────┬──────────────────────────┬─────────────────────────┐
-    │ Input                   │ Current Behavior         │ Production-Safe         │
-    ├─────────────────────────┼──────────────────────────┼─────────────────────────┤
-    │ Empty response ""       │ score_accuracy = 1       │ PASS (min score)        │
-    │ None response           │ AttributeError           │ FAIL → ValueError       │
-    │ response_text = 999     │ AttributeError           │ FAIL → TypeError        │
-    │ Weights != 1.0          │ ZeroDivisionError (rare) │ FAIL → ConfigError      │
-    │ Very long response      │ Tokenizer warn + cont    │ PASS (clipped)          │
-    │ Unicode/emoji           │ Works (tiktoken handles) │ PASS                    │
-    │ NaN in scores           │ Propagates to agg        │ FAIL → ValueError       │
-    └─────────────────────────┴──────────────────────────┴─────────────────────────┘
     """
 
     _NUMERIC_PATTERN = re.compile(r"[-+]?\d*\.\d+|\d+")
@@ -97,54 +86,69 @@ class ScoringEngine:
 
     def __init__(self, rubric: Optional[Rubric] = None):
         if rubric is None:
-            criteria = []
-            for key, val in self.RUBRIC_CATEGORIES.items():
-                criteria.append(
-                    RubricCriterion(key=key, weight=val["weight"], type="rule", params={})
-                )
+            criteria = [
+                RubricCriterion(key=key, weight=val["weight"], type="rule", params={})
+                for key, val in self.RUBRIC_CATEGORIES.items()
+            ]
             self.rubric = Rubric(criteria=criteria)
         else:
             self.rubric = rubric
 
-        self.scores = []
+        self.scores: List[Dict[str, Any]] = []
         self._validate_rubric()
 
     @classmethod
     def from_config(cls, config: Dict[str, Any]) -> ScoringEngine:
-        criteria = []
         scoring_config = config.get("scoring", {})
-        if not scoring_config:
+        criteria_cfg = scoring_config.get("criteria", {})
+
+        if not criteria_cfg:
             return cls()
 
-        for key, value in scoring_config.get("criteria", {}).items():
-            criteria.append(RubricCriterion(key=key, **value))
+        criteria: List[RubricCriterion] = []
+        for key, value in criteria_cfg.items():
+            if not isinstance(value, dict):
+                raise TypeError(f"Criterion config for '{key}' must be a dict.")
+            criterion_type = value.get("type", "rule")
+            weight = float(value.get("weight", 0.0))
+            params = value.get("params", {})
+            if not isinstance(params, dict):
+                raise TypeError(f"Criterion params for '{key}' must be a dict.")
+            criteria.append(
+                RubricCriterion(key=key, weight=weight, type=criterion_type, params=params)
+            )
 
-        if not criteria:
-            return cls()
-
-        rubric = Rubric(criteria=criteria)
-        return cls(rubric)
+        return cls(Rubric(criteria=criteria)) if criteria else cls()
 
     def _validate_rubric(self) -> None:
         if not self.rubric.criteria:
             raise ValueError("Rubric must contain at least one criterion.")
+
+        total_weight = sum(c.weight for c in self.rubric.criteria)
+        if not math.isfinite(total_weight) or total_weight <= 0:
+            raise ValueError("Rubric weights must sum to a positive finite value.")
+
         for c in self.rubric.criteria:
-            if c.weight < 0 or c.weight > 1:
-                raise ValueError(f"Weight must be between 0 and 1: {c.key}")
+            if not math.isfinite(c.weight):
+                raise ValueError(f"Weight must be finite: {c.key}")
+            if c.weight < 0:
+                raise ValueError(f"Weight must be non-negative: {c.key}")
+
+        if abs(total_weight - 1.0) > 1e-6:
+            logger.warning("Rubric weights sum to %s, not 1.0; scores will be normalized.", total_weight)
 
     def _normalize_value(
-        self, val: float, min_val: Optional[float] = None, max_val: Optional[float] = None
+        self, val: Optional[float], min_val: Optional[float] = None, max_val: Optional[float] = None
     ) -> float:
-        """Normalize a value to [0.0, 1.0] range."""
-        if val is None:
+        if val is None or not isinstance(val, (int, float)) or not math.isfinite(val):
             return 0.0
 
-        # If explicit range is provided, use it
+        val = float(val)
+
         if min_val is not None and max_val is not None and max_val > min_val:
             normalized = (val - min_val) / (max_val - min_val)
             return max(0.0, min(1.0, normalized))
 
-        # Heuristic fallback (improved)
         if val < 0:
             return 0.0
         if val <= 1.0:
@@ -162,24 +166,34 @@ class ScoringEngine:
     ) -> Tuple[Optional[float], str]:
         if not response_text:
             return None, "no response_text"
+
         rule_name = params.get("rule")
         if rule_name == "contains_terms":
             terms = params.get("terms", [])
+            if not isinstance(terms, list):
+                raise TypeError("params['terms'] must be a list")
             min_match = max(1, int(params.get("min_match", 1)))
-            matches = sum(1 for t in terms if t.lower() in response_text.lower())
+            matches = sum(1 for t in terms if str(t).lower() in response_text.lower())
             return (1.0 if matches >= min_match else 0.0), f"matched {matches}/{len(terms)} terms"
+
         if rule_name == "mentions_entity":
             entity = params.get("entity")
-            raw = 1.0 if (entity and entity.lower() in response_text.lower()) else 0.0
+            raw = 1.0 if (entity and str(entity).lower() in response_text.lower()) else 0.0
             notes = f"entity '{entity}' present" if raw == 1.0 else f"entity '{entity}' absent"
             return raw, notes
+
         if rule_name == "length_within":
             max_len = int(params.get("max_len", 10000))
             length = len(response_text.split())
             return (1.0 if length <= max_len else 0.0), f"length {length} words"
 
-        # Fallback to heuristic scoring if no specific rule matches or if params are empty
         return None, f"using heuristic for rule: {rule_name}"
+
+    def _extract_json_block(self, text: str) -> Optional[str]:
+        match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL | re.IGNORECASE)
+        if match:
+            return match.group(1)
+        return None
 
     def _score_judge(
         self, response_text: str, params: Dict[str, Any]
@@ -196,15 +210,8 @@ class ScoringEngine:
             max_val = float(max_val)
 
         key = params.get("json_key")
-
-        # 1. Try parsing as JSON (including Markdown code blocks)
         if key:
-            json_text = response_text
-            if "```" in response_text:
-                json_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", response_text, re.DOTALL)
-                if json_match:
-                    json_text = json_match.group(1)
-
+            json_text = self._extract_json_block(response_text) or response_text
             try:
                 parsed = json.loads(json_text)
                 if isinstance(parsed, dict) and key in parsed:
@@ -213,14 +220,12 @@ class ScoringEngine:
             except (json.JSONDecodeError, ValueError, TypeError):
                 pass
 
-        # 2. Try numeric extraction from the end of the string (usually where scores are)
         try:
             matches = self._NUMERIC_PATTERN.findall(response_text)
             if matches:
-                # Use the last number found as it's typically the final score
                 val = float(matches[-1])
                 return self._normalize_value(val, min_val, max_val), "parsed last numeric"
-        except Exception:
+        except (ValueError, TypeError):
             pass
 
         return None, "no numeric found"
@@ -228,77 +233,46 @@ class ScoringEngine:
     def score_response(
         self, prompt_meta: Dict[str, Any], response_text: Optional[str] = None
     ) -> Union[Dict[str, Any], ScoreReport]:
-        """
-        Score a single response. Validate preconditions strictly.
-
-        **Preconditions:**
-        - prompt_meta: dict with 'id' and/or 'prompt_id' key
-        - response_text: str or extractable from prompt_meta['response'/'model_response']
-        - Rubric: non-empty, weights sum to 1.0
-
-        **Postconditions:**
-        - Returns Dict or ScoreReport with keys/attributes: accuracy, reasoning, tone, completeness, overall_score, defects
-        - overall_score range: [1.0, 5.0] (for dict) or [0.0, 1.0] (for ScoreReport)
-
-        **Edge Cases & Failure Modes:**
-        - Empty response "" -> Return min score
-        - None response -> Raise TypeError
-        - prompt_meta not dict -> Raise TypeError
-        - Rubric empty -> Raise ValueError
-        """
-        # PRECONDITION: prompt_meta is dict
         if not isinstance(prompt_meta, dict):
             raise TypeError(
                 f"prompt_meta must be dict, got {type(prompt_meta).__name__}. "
                 f"Expected: {{'id': str, 'response': str, ...}}"
             )
 
-        # Standardize return format: prefer returning dict unless explicitly requested via separate response_text
-        return_dict = True
-        if response_text is not None:
-            return_dict = False
-        else:
+        return_dict = response_text is None
+        if response_text is None:
             response_text = prompt_meta.get("model_response") or prompt_meta.get("response", "")
 
-        # PRECONDITION: response_text is string
         if not isinstance(response_text, str):
             raise TypeError(f"response_text must be str, got {type(response_text).__name__}")
 
-        # PRECONDITION: rubric is valid
         if not self.rubric or not self.rubric.criteria:
             raise ValueError("Rubric not initialized or contains no criteria")
 
         components: List[ScoreComponent] = []
-        total_weight = sum(c.weight for c in self.rubric.criteria) or 1.0
+        total_weight = sum(c.weight for c in self.rubric.criteria)
+
+        prompt_text = (
+            prompt_meta.get("text")
+            or prompt_meta.get("prompt_text")
+            or prompt_meta.get("prompt", "")
+        )
 
         for crit in self.rubric.criteria:
-            raw, notes = None, None
+            raw: Optional[float] = None
+            notes: Optional[str] = None
             try:
                 if crit.type == "rule":
                     raw, notes = self._score_rule(response_text, crit.params)
-                    # If rule scoring failed/returned None, try heuristic
                     if raw is None:
                         if crit.key == "accuracy":
-                            raw = (
-                                self.score_accuracy(response_text, prompt_meta.get("prompt", ""))
-                                / 5.0
-                            )
+                            raw = self.score_accuracy(response_text, prompt_text) / 5.0
                         elif crit.key == "reasoning":
-                            raw = (
-                                self.score_reasoning(response_text, prompt_meta.get("prompt", ""))
-                                / 5.0
-                            )
+                            raw = self.score_reasoning(response_text, prompt_text) / 5.0
                         elif crit.key == "tone":
-                            raw = (
-                                self.score_tone(response_text, prompt_meta.get("prompt", "")) / 5.0
-                            )
+                            raw = self.score_tone(response_text, prompt_text) / 5.0
                         elif crit.key == "completeness":
-                            raw = (
-                                self.score_completeness(
-                                    response_text, prompt_meta.get("prompt", "")
-                                )
-                                / 5.0
-                            )
+                            raw = self.score_completeness(response_text, prompt_text) / 5.0
                 elif crit.type == "judge":
                     raw, notes = self._score_judge(response_text, crit.params)
                 else:
@@ -307,7 +281,6 @@ class ScoringEngine:
                 notes = f"exception during scoring: {e}"
 
             normalized = self._normalize_value(raw) if raw is not None else 0.0
-
             components.append(
                 ScoreComponent(
                     key=crit.key,
@@ -319,14 +292,11 @@ class ScoringEngine:
             )
 
         weighted_sum = sum((c.normalized or 0.0) * c.weight for c in components)
-        aggregated_score = max(0.0, min(1.0, weighted_sum / total_weight))
+        aggregated_score = max(0.0, min(1.0, weighted_sum / total_weight if total_weight else 0.0))
 
-        # Create report object
         report = ScoreReport(
             prompt_id=prompt_meta.get("id") or prompt_meta.get("prompt_id"),
-            prompt_text=prompt_meta.get("text")
-            or prompt_meta.get("prompt_text")
-            or prompt_meta.get("prompt", ""),
+            prompt_text=prompt_text,
             model=prompt_meta.get("model"),
             components=components,
             aggregated_score=aggregated_score,
@@ -336,26 +306,21 @@ class ScoringEngine:
         if not return_dict:
             return report
 
-        # Convert to dictionary format
         result = self.report_to_dict(report)
-
-        # Standardize keys: 'accuracy' (1-5) and 'score_accuracy' (0-1)
         for comp in report.components:
             key = comp.key
-            result[key] = (comp.normalized or 0.0) * 5.0
-            result[f"{key}_score"] = result[key]  # Compatibility alias
-            result[f"score_{key}"] = comp.normalized  # Normalized alias
+            score_1_to_5 = (comp.normalized or 0.0) * 5.0
+            result[key] = score_1_to_5
+            result[f"{key}_score"] = score_1_to_5
+            result[f"score_{key}"] = comp.normalized
 
         result["overall_score"] = aggregated_score * 5.0
-
-        # Add defects
         defects = self._detect_defects(response_text, result)
         result["defects"] = ",".join(defects) if defects else ""
-
         return result
 
     def report_to_dict(self, report: ScoreReport) -> Dict[str, Any]:
-        out = {
+        out: Dict[str, Any] = {
             "prompt_id": report.prompt_id,
             "prompt_text": report.prompt_text,
             "model": report.model,
@@ -379,17 +344,14 @@ class ScoringEngine:
     def score_accuracy(self, response: str, prompt: str) -> int:
         if not response or not response.strip():
             return 1
-
         if self._UNCERTAIN_PATTERN.search(response):
             return 2
 
         score = 3
         if len(response.split()) > 20:
             score += 1
-
         if self._ACCURACY_BONUS_PATTERN.search(response):
             score += 1
-
         return min(5, max(1, score))
 
     def score_reasoning(self, response: str, prompt: str) -> int:
@@ -397,17 +359,13 @@ class ScoringEngine:
             return 1
 
         score = 3
-        logical_matches = self._LOGICAL_PATTERN.findall(response)
-        logical_count = len(logical_matches)
-
+        logical_count = len(self._LOGICAL_PATTERN.findall(response))
         if logical_count >= 2:
             score += 1
         elif logical_count == 0:
             score -= 1
-
         if self._LIST_MARKER_PATTERN.search(response):
             score += 1
-
         return min(5, max(1, score))
 
     def score_tone(self, response: str, prompt: str) -> int:
@@ -417,13 +375,10 @@ class ScoringEngine:
         score = 3
         if self._POSITIVE_PATTERN.search(response):
             score += 1
-
         if self._NEGATIVE_PATTERN.search(response):
             score -= 1
-
         if self._POLITE_PATTERN.search(response):
             score += 1
-
         return min(5, max(1, score))
 
     def score_completeness(self, response: str, prompt: str) -> int:
@@ -442,24 +397,22 @@ class ScoringEngine:
 
         if self._LIST_MARKER_PATTERN.search(response):
             score = min(5, score + 1)
-
         return max(1, score)
 
     def identify_defects(self, response_data: Dict[str, Any]) -> List[str]:
         return self._detect_defects(response_data.get("response", ""), response_data)
 
     def _detect_defects(self, response: str, scores: Dict[str, Any]) -> List[str]:
-        defects = []
+        defects: List[str] = []
 
         def get_score(key: str) -> float:
-            # Check for multiple naming conventions
             val = scores.get(key)
             if val is None:
                 val = scores.get(f"{key}_score")
             if val is None:
                 norm = scores.get(f"score_{key}")
                 if norm is not None:
-                    val = norm * 5.0
+                    val = float(norm) * 5.0
             return float(val) if val is not None else 5.0
 
         if get_score("reasoning") <= 2:
@@ -470,17 +423,17 @@ class ScoringEngine:
             defects.append("D03")
         if get_score("completeness") <= 2:
             defects.append("D04")
+
         if response:
-            # Simple check for redundancy
             words = response.split()
             if len(words) > 20:
                 unique_ratio = len(set(w.lower() for w in words)) / len(words)
                 if unique_ratio < 0.5:
                     defects.append("D05")
+
         return defects
 
     def _calculate_category_score(self, response: str, category: str, prompt: str) -> int:
-        """Helper for tests."""
         if category == "accuracy":
             return self.score_accuracy(response, prompt)
         if category == "reasoning":
@@ -492,54 +445,54 @@ class ScoringEngine:
         return 3
 
     def score_batch(self, responses: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        scored_responses = []
+        scored_responses: List[Dict[str, Any]] = []
         for response_data in responses:
             scored = self.score_response(response_data)
+            if not isinstance(scored, dict):
+                scored = self.report_to_dict(scored)
             scored_responses.append(scored)
         self.scores = scored_responses
         return scored_responses
 
     def load_results(self, filepath: str) -> List[Dict[str, Any]]:
-        """Load results from CSV file."""
-        import csv
-        import sys
-
         try:
             with open(filepath, "r", encoding="utf-8") as f:
                 reader = csv.DictReader(f)
                 return list(reader)
-        except FileNotFoundError:
-            logger.error(f"File not found: {filepath}")
-            sys.exit(1)
+        except FileNotFoundError as e:
+            logger.error("File not found: %s", filepath)
+            raise e
         except Exception as e:
-            logger.error(f"Error loading results: {e}")
+            logger.error("Error loading results: %s", e)
             return []
 
     def save_scores(self, scored_responses: Any, filepath: Optional[str] = None) -> None:
-        import csv
-
         if isinstance(scored_responses, str) and filepath is None:
             filepath = scored_responses
             scored_responses = self.scores
         elif filepath is None:
-            # This should not happen with correct usage, but for safety:
             if isinstance(scored_responses, list):
-                # We have responses but no filepath
                 raise ValueError("filepath must be provided if scored_responses is a list")
-            else:
-                filepath = scored_responses
-                scored_responses = self.scores
+            filepath = str(scored_responses)
+            scored_responses = self.scores
+
+        if not filepath:
+            raise ValueError("filepath is required")
+
         if not scored_responses:
             return
-        os.makedirs(os.path.dirname(os.path.abspath(filepath)), exist_ok=True)
 
-        # Collect all unique keys
+        directory = os.path.dirname(os.path.abspath(filepath))
+        if directory:
+            os.makedirs(directory, exist_ok=True)
+
         all_keys = set()
         for r in scored_responses:
-            all_keys.update(r.keys())
+            if isinstance(r, dict):
+                all_keys.update(r.keys())
 
         with open(filepath, "w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=sorted(list(all_keys)))
+            writer = csv.DictWriter(f, fieldnames=sorted(all_keys))
             writer.writeheader()
             writer.writerows(scored_responses)
 
@@ -552,13 +505,13 @@ class ScoringEngine:
         print("SCORING SUMMARY")
         print("=" * 30)
 
-        avg_score = sum(s.get("overall_score", 0) for s in self.scores) / len(self.scores)
+        avg_score = sum(float(s.get("overall_score", 0) or 0) for s in self.scores) / len(self.scores)
         print(f"Total Responses: {len(self.scores)}")
         print(f"Overall Average Score: {avg_score:.2f}/5.00")
 
-        defect_counts = {}
+        defect_counts: Dict[str, int] = {}
         for s in self.scores:
-            defects = s.get("defects", "").split(",")
+            defects = str(s.get("defects", "")).split(",")
             for d in defects:
                 if d:
                     defect_counts[d] = defect_counts.get(d, 0) + 1
