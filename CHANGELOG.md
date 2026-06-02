@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.8-patch] - 2026-06-02
+
+### Fixed
+- **Critical: Dependency Version Conflicts** — Unified conflicting version specifications across `setup.py`, `pyproject.toml`, and `requirements.txt` that would cause installation failures. Standardized on stable versions: `openai>=1.60.0`, `plotly>=5.24.0`, `click>=8.1.0`, `matplotlib>=3.10.0`, `scipy>=1.14.0`, `python-dotenv>=1.0.0`, `aiohttp>=3.10.0`.
+- **Critical: Package Discovery Mismatch** — Fixed `setup.py` inadvertently excluding `scripts/` package while `pyproject.toml` attempted to include it. This caused `from scripts.*` imports to fail after installation. Corrected `find_packages()` to include evaluation, config, and scripts packages.
+- **Critical: Import Error Handling** — Added try-except blocks to all top-level imports in `main.py` to provide helpful error messages instead of silent crashes when packages are missing. Implemented proper ImportError logging with installation instructions.
+- **Major: Documentation Links** — Fixed broken links in `README.md` that pointed to Google search instead of actual files (CONTRIBUTING.md, LICENSE). Updated to relative paths for proper GitHub rendering.
+- **Code Quality: setup.py Style** — Replaced awkward `__import__("pathlib")` pattern with clean `from pathlib import Path` import for better maintainability.
+- **Configuration: Coverage Config** — Added comprehensive `[tool.coverage.*]` configuration to `pyproject.toml` for proper test coverage exclusion and reporting.
+- **Configuration: pyproject.toml Package Discovery** — Added explicit `[tool.setuptools]` section with correct package discovery rules matching setup.py.
+- **Documentation: pytest Configuration** — Enhanced `[tool.pytest.ini_options]` with `--strict-markers` flag to catch typos in test markers.
+- **Security: Bandit Configuration** — Added `[tool.bandit]` section to exclude tests directory from security scanning.
+- **Consistency: All Dependency Specs** — Audit and unified all version specifications across three config files following QA best practices (Given/When/Then validation).
+- **Validation: Pre-commit hooks support** — Enhanced `pyproject.toml` isort configuration with `skip_gitignore = true` to work correctly with pre-commit setup.
+
+### Changed
+- **Refactored**: `setup.py` now uses `find_packages()` with explicit excludes for cleaner, more maintainable package discovery.
+- **Improved**: Error messages in `main.py` CLI now include explicit installation instructions (e.g., "Run: pip install -e . or pip install -e .[dev]").
+- **Standardized**: All three configuration files (setup.py, pyproject.toml, requirements.txt) now reference identical dependency versions as source of truth.
+
+### Added
+- **Documentation**: New `FIXES_SUMMARY.md` with complete QA audit trail including:
+  - 11 critical issues mapped to components
+  - Given/When/Then validation format
+  - Risk matrix and edge cases
+  - Deployment checklist
+  - Failure modes and mitigation strategies
+  - Traceability matrix for all fixes
+
+### Removed
+- **Technical Debt**: Removed implicit package discovery ambiguity by making `scripts/` explicit in both setup.py and pyproject.toml.
+
+---
+
 ## [2.3.8] - 2026-06-02
 
 ### Changed
@@ -188,6 +222,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial production release with core pipeline functionality.
 
+[2.3.8-patch]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.3.8...v2.3.8-patch
 [2.3.8]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.3.7...v2.3.8
 [2.3.7]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.3.6...v2.3.7
 [2.3.6]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.3.5...v2.3.6
