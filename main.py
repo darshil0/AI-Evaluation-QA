@@ -20,9 +20,7 @@ from typing import Optional
 
 import click
 
-from config.config_loader import ConfigLoader
-
-# Configure logging with rotation
+# Configure logging with rotation before any imports that might log
 log_file = os.getenv("EVAL_LOG_FILE", "evaluation.log")
 max_bytes = int(os.getenv("EVAL_LOG_MAX_BYTES", 10_000_000))  # 10 MB
 backup_count = int(os.getenv("EVAL_LOG_BACKUP_COUNT", 5))
@@ -38,6 +36,17 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+# Fixed: Lazy imports for heavy dependencies with try-catch for ImportError
+try:
+    from config.config_loader import ConfigLoader
+except ImportError as e:
+    logger.error(f"Failed to import ConfigLoader: {e}")
+    logger.error(
+        "Please ensure config package is installed. "
+        "Run: pip install -e . or pip install -e .[dev]"
+    )
+    sys.exit(1)
+
 
 @click.group()
 @click.version_option(version="2.3.8")
@@ -52,10 +61,24 @@ def cli() -> None:
 @click.option("--model", default=None, help="Model to use (overrides config)")
 def evaluate(config: str, prompts: str, model: Optional[str]) -> None:
     """Run the full evaluation pipeline (Execute -> Score -> Report)."""
-    from evaluation.evaluation_pipeline import EvaluationPipeline
+    try:
+        from evaluation.evaluation_pipeline import EvaluationPipeline
+    except ImportError as e:
+        logger.error(f"Failed to import EvaluationPipeline: {e}")
+        click.echo(
+            "Error: Required evaluation module not found. "
+            "Run: pip install -e . or pip install -e .[dev]",
+            err=True,
+        )
+        sys.exit(1)
 
     try:
         logger.info(f"Starting evaluation with prompts from {prompts}")
+        
+        # Fixed: Validate prompts file exists before proceeding
+        if not os.path.exists(prompts):
+            raise FileNotFoundError(f"Prompts file not found: {prompts}")
+        
         conf = ConfigLoader.load(config) if os.path.exists(config) else {}
 
         if model:
@@ -85,9 +108,14 @@ def evaluate(config: str, prompts: str, model: Optional[str]) -> None:
 @click.option("--output", default="scored_results.csv", help="Output path for scored results")
 def score(config: str, results: str, output: str) -> None:
     """Score existing raw results from a CSV file."""
-    import pandas as pd
+    try:
+        import pandas as pd
 
-    from evaluation.evaluation_pipeline import EvaluationPipeline
+        from evaluation.evaluation_pipeline import EvaluationPipeline
+    except ImportError as e:
+        logger.error(f"Failed to import required modules: {e}")
+        click.echo("Error: Required modules not found. Run: pip install -e .[dev]", err=True)
+        sys.exit(1)
 
     try:
         logger.info(f"Scoring results from {results}")
@@ -128,14 +156,19 @@ def score(config: str, results: str, output: str) -> None:
 @click.option("--output-dir", default="reports", help="Output directory for reports")
 def report(results: str, output_dir: str) -> None:
     """Generate reports from scored results."""
-    import pandas as pd
+    try:
+        import pandas as pd
+
+        from evaluation.report_generator import ReportGenerator
+    except ImportError as e:
+        logger.error(f"Failed to import required modules: {e}")
+        click.echo("Error: Required modules not found. Run: pip install -e .[dev]", err=True)
+        sys.exit(1)
 
     try:
         logger.info(f"Generating reports from {results} to {output_dir}")
         if not os.path.exists(results):
             raise FileNotFoundError(f"Results file not found: {results}")
-
-        from evaluation.report_generator import ReportGenerator
 
         df = pd.read_csv(results)
 
@@ -166,9 +199,14 @@ def report(results: str, output_dir: str) -> None:
 @click.option("--save-baseline", is_flag=True, help="Save current as new baseline")
 def check_regression(current_results: str, baseline: str, save_baseline: bool) -> None:
     """Check for performance regressions."""
-    import pandas as pd
+    try:
+        import pandas as pd
 
-    from scripts.check_regression import RegressionDetector
+        from scripts.check_regression import RegressionDetector
+    except ImportError as e:
+        logger.error(f"Failed to import required modules: {e}")
+        click.echo("Error: Required modules not found. Run: pip install -e .[dev]", err=True)
+        sys.exit(1)
 
     try:
         current_df = pd.read_csv(current_results)
@@ -233,7 +271,12 @@ def validate(config: str) -> None:
 @click.argument("prompt_file", type=click.Path(exists=True))
 def lint_prompts(prompt_file: str) -> None:
     """Validate and lint prompt file."""
-    from scripts.prompt_loader import PromptLoader
+    try:
+        from scripts.prompt_loader import PromptLoader
+    except ImportError as e:
+        logger.error(f"Failed to import PromptLoader: {e}")
+        click.echo("Error: Required modules not found. Run: pip install -e .[dev]", err=True)
+        sys.exit(1)
 
     try:
         loader = PromptLoader()
