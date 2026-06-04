@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-06-04
+### Fixed
+- **Deadlock Bug**: Fixed recursive `acquire()` call inside `async with self.lock` in `evaluation/rate_limiter.py` that would cause deadlocks.
+- **Python Built-in Shadowing**: Renamed `format` parameter to `file_format` in `evaluation/prompt_runner.py`'s `save_responses()` to prevent shadowing Python's built-in.
+- **Type Hints**: Fixed incorrect `Optional[callable]` hint to `Optional[Callable]` in `evaluation/prompt_runner.py`. Added type hints to `scripts/prompt_loader.py`.
+- **Bare Except**: Fixed bare `except:` clause in `evaluation/report_generator.py`'s `calculate_statistics` method.
+- **File Encodings**: Added explicit `encoding="utf-8"` to file open calls in `evaluation/report_generator.py` and `scripts/prompt_loader.py` to prevent platform-specific decode errors.
+- **Unnecessary Import**: Removed spurious `asyncio` import inside a synchronous method in `evaluation/report_generator.py`.
+- **Incomplete Execution Guard**: Fixed incomplete `main()` function in `config/prompt_validator.py` by adding `asyncio.run()` and a proper `if __name__ == "__main__":` guard.
+- **Fragile Logging Config**: Removed fragile module-level `logging.basicConfig` guard in `config/config_loader.py` that checked child logger handlers but configured the root logger.
+- **Missing Init Files**: Added missing `__init__.py` files to `config/`, `evaluation/clients/`, and `scripts/` directories to ensure proper Python package discovery.
+- **Dependency Constraints**: Updated unrealistic, futuristic dependency versions for `numpy`, `pandas`, `jsonschema`, `scipy`, and `matplotlib` across `pyproject.toml`, `setup.py`, and `requirements.txt` to align with stable reality.
+
 ## [2.3.8-patch] - 2026-06-02
 
 ### Fixed
