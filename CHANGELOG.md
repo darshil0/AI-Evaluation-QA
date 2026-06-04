@@ -236,6 +236,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial production release with core pipeline functionality.
 
+[2.4.0]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.3.8-patch...v2.4.0
 [2.3.8-patch]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.3.8...v2.3.8-patch
 [2.3.8]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.3.7...v2.3.8
 [2.3.7]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.3.6...v2.3.7
