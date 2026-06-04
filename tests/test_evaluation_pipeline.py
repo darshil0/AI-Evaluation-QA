@@ -169,7 +169,7 @@ class TestPromptRunner:
         runner = PromptRunner()
         output_file = temp_dir / "test_results.csv"
 
-        runner.save_responses(sample_responses, str(output_file), format="csv")
+        runner.save_responses(sample_responses, str(output_file), file_format="csv")
 
         assert output_file.exists()
         with open(output_file, "r") as f:
@@ -182,7 +182,7 @@ class TestPromptRunner:
         runner = PromptRunner()
         output_file = temp_dir / "test_results.json"
 
-        runner.save_responses(sample_responses, str(output_file), format="json")
+        runner.save_responses(sample_responses, str(output_file), file_format="json")
 
         assert output_file.exists()
         with open(output_file, "r") as f:
