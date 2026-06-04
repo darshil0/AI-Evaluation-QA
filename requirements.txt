@@ -1,5 +1,5 @@
 # AI Evaluation QA Framework - Dependencies
-# Hardened Baseline v2.3.8
+# Hardened Baseline v2.4.0
 
 # Core dependencies
 openai>=1.60.0
