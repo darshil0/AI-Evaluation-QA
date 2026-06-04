@@ -1,4 +1,5 @@
 AI Evaluation QA Framework
+
 <p align="center">
   <img src="https://img.shields.io/badge/version-2.4.0-green.svg" alt="Version">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
@@ -6,8 +7,10 @@ AI Evaluation QA Framework
   <img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="Python">
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/contributing-welcome-orange.svg" alt="Contributing"></a>
 </p>
+
 Overview
 The AI Evaluation QA Framework is a production-grade Python library designed for evaluating, scoring, and comparing AI model responses at scale. It provides a robust pipeline to run structured prompt suites against major LLM providers (OpenAI, Anthropic, Azure OpenAI), score them using customizable rubrics and heuristics, and generate professional HTML dashboards and executive summaries.
+
 ---
 Key Features
 🚀 Multi-Provider Support: Seamlessly evaluate against OpenAI, Anthropic, and Azure OpenAI.
@@ -18,7 +21,9 @@ Key Features
 💰 Cost Telemetry: Precision token counting and cost estimation per model.
 🔄 Fault-Tolerant: Mid-batch checkpointing ensures no progress is lost.
 ⚡ Asynchronous & Fast: Built with `asyncio` for high-concurrency API requests.
+
 ---
+
 Installation
 ```bash
 # Clone the repository
@@ -49,6 +54,7 @@ ai-eval evaluate --prompts data/prompts/reasoning_tests.json
 ```
 ---
 CLI Reference
+
 The framework provides a unified CLI entry point `ai-eval` (or `python main.py`):
 Command	Description	Example
 `evaluate`	Full pipeline: Run prompts, score, and report	`ai-eval evaluate --prompts tests.json`
@@ -57,6 +63,7 @@ Command	Description	Example
 `check-regression`	Compare current results against a baseline	`ai-eval check-regression current.csv --baseline baseline.csv`
 `validate`	Validate system configuration and setup	`ai-eval validate`
 `lint-prompts`	Validate and lint a prompt JSON file	`ai-eval lint-prompts prompts.json`
+
 ---
 Project Structure
 `evaluation/`: Core logic (pipeline, runner, scoring, reporting).
@@ -64,6 +71,7 @@ Project Structure
 `scripts/`: Utility scripts (data validation, prompt loading, regression checks).
 `tests/`: Comprehensive test suite with 100% coverage.
 `data/`: Sample prompts and execution checkpoints.
+
 ---
 Configuration
 Configuration is managed via `config/settings.yaml`. Key sections:
@@ -73,6 +81,7 @@ execution: Timeout, retry, and concurrency settings
 reporting: Output formats and visualization options
 See `CONTRIBUTING.md` for detailed configuration examples.
 ---
+
 Testing
 ```bash
 # Run all tests
