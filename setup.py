@@ -10,7 +10,7 @@ long_description = readme_path.read_text(encoding="utf-8") if readme_path.exists
 
 setup(
     name="ai-evaluation-qa",
-    version="2.3.8",
+    version="2.4.0",
     author="Darshil",
     author_email="",
     description="Production-grade framework for evaluating AI model responses",
@@ -39,16 +39,16 @@ setup(
     install_requires=[
         "openai>=1.60.0",  # Fixed: Was 2.40.0 in setup.py, unified to 1.60.0
         "aiohttp>=3.10.0",  # Fixed: Was 3.14.0, unified to 3.10.0
-        "jsonschema>=4.26.0",
+        "jsonschema>=4.21.0",
         "pyyaml>=6.0.3",
-        "matplotlib>=3.10.0",  # Fixed: Was 3.10.9, unified
+        "matplotlib>=3.8.0",  # Fixed: Was 3.10.9, unified
         "plotly>=5.24.0",  # Fixed: Was 6.7.0, unified to 5.24.0
         "click>=8.1.0",  # Fixed: Was 8.4.1, unified to 8.1.0
         "python-dotenv>=1.0.0",  # Fixed: Was 1.2.2, unified to 1.0.0
         "tiktoken>=0.7.0",  # Fixed: Was 0.13.0, unified
-        "numpy>=2.4.6",
-        "pandas>=3.0.3",
-        "scipy>=1.14.0",  # Fixed: Was 1.17.1, unified to 1.14.0
+        "numpy>=1.26.0",
+        "pandas>=2.2.0",
+        "scipy>=1.13.0",  # Fixed: Was 1.17.1, unified to 1.14.0
     ],
     extras_require={
         "dev": [

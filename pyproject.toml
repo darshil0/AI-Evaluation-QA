@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ai-evaluation-qa"
-version = "2.3.8"
+version = "2.4.0"
 description = "A production-grade framework for evaluating AI model responses"
 readme = "README.md"
 authors = [{ name = "Darshil Shah" }]
@@ -40,17 +40,17 @@ classifiers = [
 # Fixed: Unified versions across pyproject.toml, setup.py, and requirements.txt
 dependencies = [
     "openai>=1.60.0",
-    "pandas>=3.0.3",
+    "pandas>=2.2.0",
     "plotly>=5.24.0",
     "click>=8.1.0",
     "tiktoken>=0.7.0",
     "pyyaml>=6.0.3",
     "aiohttp>=3.10.0",
-    "jsonschema>=4.26.0",
+    "jsonschema>=4.21.0",
     "python-dotenv>=1.0.0",
-    "numpy>=2.4.6",
-    "scipy>=1.14.0",
-    "matplotlib>=3.10.0",
+    "numpy>=1.26.0",
+    "scipy>=1.13.0",
+    "matplotlib>=3.8.0",
 ]
 
 [project.optional-dependencies]
