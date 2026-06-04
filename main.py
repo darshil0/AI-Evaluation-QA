@@ -74,11 +74,11 @@ def evaluate(config: str, prompts: str, model: Optional[str]) -> None:
 
     try:
         logger.info(f"Starting evaluation with prompts from {prompts}")
-        
+
         # Fixed: Validate prompts file exists before proceeding
         if not os.path.exists(prompts):
             raise FileNotFoundError(f"Prompts file not found: {prompts}")
-        
+
         conf = ConfigLoader.load(config) if os.path.exists(config) else {}
 
         if model:
