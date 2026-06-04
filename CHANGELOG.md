@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Fragile Logging Config**: Removed fragile module-level `logging.basicConfig` guard in `config/config_loader.py` that checked child logger handlers but configured the root logger.
 - **Missing Init Files**: Added missing `__init__.py` files to `config/`, `evaluation/clients/`, and `scripts/` directories to ensure proper Python package discovery.
 - **Dependency Constraints**: Updated unrealistic, futuristic dependency versions for `numpy`, `pandas`, `jsonschema`, `scipy`, and `matplotlib` across `pyproject.toml`, `setup.py`, and `requirements.txt` to align with stable reality.
+- **Test Compatibility**: Updated `tests/test_evaluation_pipeline.py` and `tests/test_prompt_runner_coverage.py` to use `file_format=` instead of `format=` to align with the parameter renaming in `PromptRunner`, restoring 100% test coverage.
 
 ## [2.3.8-patch] - 2026-06-02
 
