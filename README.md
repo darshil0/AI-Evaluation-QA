@@ -20,6 +20,7 @@ The **AI Evaluation QA Framework** is a production-grade Python library designed
 * ⚖️ **Rubric-Based Scoring**: Score responses across dimensions like **Accuracy**, **Reasoning**, **Tone**, and **Completeness** (1–5 scale).
 * 🔍 **Automated Defect Detection**: Built-in detection for hallucinations, logical flaws, redundancy, and more.
 * 📊 **Rich Analytics**: Generates interactive HTML dashboards, executive summaries, and detailed CSV exports.
+* 🛡️ **Security & Sanitization**: Built-in input/output sanitization and filename safety to prevent injection attacks.
 * 🛡️ **Robust Validation**: Comprehensive pre-execution checks for environment, configuration, and prompt schemas.
 * 💰 **Cost Telemetry**: Precision token counting and cost estimation per model.
 * 🔄 **Fault-Tolerant**: Mid-batch checkpointing ensures no progress is lost.
@@ -83,7 +84,7 @@ The framework provides a unified CLI entry point `ai-eval` (or `python main.py`)
 
 ## Project Structure
 
-* `evaluation/`: Core logic (pipeline, runner, scoring, reporting).
+* `evaluation/`: Core logic (pipeline, runner, scoring, reporting, sanitization, error handling).
 * `config/`: System configuration and strict validation.
 * `scripts/`: Utility scripts (data validation, prompt loading, regression checks).
 * `tests/`: Comprehensive test suite with 100% coverage.
