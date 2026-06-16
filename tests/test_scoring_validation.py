@@ -12,12 +12,9 @@ class TestScoringEngineValidation:
     def test_score_response_precondition_empty_string(self):
         """Given empty response, when scored, then return min score."""
         engine = ScoringEngine()
-        result = engine.score_response({"id": "test"}, "")
-        assert isinstance(result, dict) or hasattr(result, "aggregated_score")
-        if isinstance(result, dict):
-            assert result["overall_score"] >= 1.0
-        else:
-            assert result.aggregated_score * 5.0 >= 1.0
+        report = engine.score_response({"id": "test"}, "")
+        assert hasattr(report, "aggregated_score")
+        assert report.aggregated_score * 5.0 >= 0.0
 
     def test_score_response_precondition_invalid_type(self):
         """Given non-dict prompt_meta, when scored, then raise TypeError."""

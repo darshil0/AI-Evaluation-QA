@@ -87,11 +87,6 @@ ai-eval = "main:cli"
 # Fixed: Use package discovery for evaluation, config, scripts
 packages = ["evaluation", "config", "scripts"]
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["evaluation*", "config*", "scripts*"]
-exclude = ["tests*", "docs*", "examples*"]
-
 [tool.setuptools.package-data]
 evaluation = ["*.yaml", "*.yml", "*.json"]
 config = ["*.yaml", "*.yml"]

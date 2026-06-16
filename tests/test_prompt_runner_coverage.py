@@ -102,7 +102,7 @@ class TestPromptRunnerEdgeCases:
             temp_file = f.name
 
         try:
-            runner.save_responses(results, temp_file, file_format="json")
+            runner.save_responses(results, temp_file, format="json")
 
             with open(temp_file, "r") as f:
                 loaded = json.load(f)
@@ -118,7 +118,7 @@ class TestPromptRunnerEdgeCases:
         results = [{"test": "data"}]
 
         with pytest.raises(ValueError) as exc_info:
-            runner.save_responses(results, "test.txt", file_format="invalid")
+            runner.save_responses(results, "test.txt", format="invalid")
 
         assert "Unsupported format" in str(exc_info.value)
 

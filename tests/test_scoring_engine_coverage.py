@@ -131,8 +131,9 @@ class TestScoringEngineEdgeCases:
 
     def test_score_response_dict_output(self):
         engine = self.make_engine()
-        result = engine.score_response({"prompt": "Q", "response": "Answer"})
-        assert isinstance(result, dict)
+        report = engine.score_response({"prompt": "Q", "response": "Answer"})
+        assert isinstance(report, ScoreReport)
+        result = engine.report_to_dict(report, include_defects=True)
         assert "overall_score" in result
         assert "defects" in result
 

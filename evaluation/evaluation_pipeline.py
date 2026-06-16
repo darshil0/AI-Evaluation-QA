@@ -43,6 +43,23 @@ class EvaluationPipeline:
         return self.run(prompt_file)
 
     def run(self, prompt_file: str) -> Any:
+        """
+        Main entry point for running the evaluation pipeline.
+
+        Preconditions:
+            - prompt_file must be a valid path to a JSON prompt file.
+            - Valid configuration must be initialized.
+
+        Postconditions:
+            - Returns a pandas DataFrame with scored results, or None if failed.
+
+        Edge Cases:
+            - prompt_file missing: Raised FileNotFoundError.
+            - Empty prompts: Returns None.
+
+        Failure Modes:
+            - RuntimeError: If called from an active event loop.
+        """
         try:
             return asyncio.run(self._run_async(prompt_file))
         except RuntimeError:
@@ -120,6 +137,19 @@ class EvaluationPipeline:
             return loop.run_until_complete(self.process_results_async(results))
 
     async def process_results_async(self, results: List[Dict[str, Any]]) -> Any:
+        """
+        Asynchronously processes and scores raw evaluation results.
+
+        Preconditions:
+            - results must be a list of dictionaries with status 'success'.
+
+        Postconditions:
+            - Returns a pandas DataFrame containing original results and calculated scores/costs.
+
+        Edge Cases:
+            - Empty results: Returns None.
+            - Mixed success/error: Only successful results are processed.
+        """
         try:
             import pandas as pd
         except ImportError:
@@ -152,9 +182,18 @@ class EvaluationPipeline:
             )
             for _, row in results_df.iterrows()
         ]
-        scored_outputs = await asyncio.gather(*scoring_tasks)
+        scored_reports = await asyncio.gather(*scoring_tasks)
 
-        scored_df = pd.json_normalize(scored_outputs)
+        scored_dicts = []
+        for i, report in enumerate(scored_reports):
+            # Ensure response text is available for defect detection
+            row_dict = results_df.iloc[i].to_dict()
+            if "response" not in report.metadata:
+                report.metadata["response"] = row_dict.get("model_response") or row_dict.get("response", "")
+
+            scored_dicts.append(self.scoring_engine.report_to_dict(report, include_defects=True))
+
+        scored_df = pd.json_normalize(scored_dicts)
         results_df = results_df.reset_index(drop=True)
         final_df = pd.concat([results_df, scored_df], axis=1)
 
