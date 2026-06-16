@@ -62,14 +62,13 @@ class TestScoringEngineCoverage:
         with pytest.raises(TypeError):
             engine.score_response({"prompt": "Q"}, response_text=123)
 
-    def test_score_response_returns_dict_by_default(self):
+    def test_score_response_returns_report(self):
         engine = self.make_engine()
         result = engine.score_response({"prompt": "Q", "response": "This is a response."})
-        assert isinstance(result, dict)
-        assert "overall_score" in result
-        assert "defects" in result
+        assert isinstance(result, ScoreReport)
+        assert result.components
 
-    def test_score_response_returns_report_when_response_text_passed(self):
+    def test_score_response_with_explicit_text(self):
         engine = self.make_engine()
         report = engine.score_response({"prompt": "Q"}, response_text="This is a response.")
         assert isinstance(report, ScoreReport)

@@ -42,6 +42,9 @@ def config():
 @pytest.mark.asyncio
 async def test_async_execution(sample_prompts, config, monkeypatch):
     class FakeResponse:
+        def __init__(self):
+            self.status = 200
+
         async def __aenter__(self):
             return self
 
@@ -79,6 +82,9 @@ async def test_async_execution(sample_prompts, config, monkeypatch):
 @pytest.mark.asyncio
 async def test_save_results_and_summary(sample_prompts, config, monkeypatch):
     class FakeResponse:
+        def __init__(self):
+            self.status = 200
+
         async def __aenter__(self):
             return self
 

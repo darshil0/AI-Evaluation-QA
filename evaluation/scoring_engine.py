@@ -232,14 +232,31 @@ class ScoringEngine:
 
     def score_response(
         self, prompt_meta: Dict[str, Any], response_text: Optional[str] = None
-    ) -> Union[Dict[str, Any], ScoreReport]:
+    ) -> ScoreReport:
+        """
+        Scores a single model response against the rubric.
+
+        Preconditions:
+            - prompt_meta must be a dictionary containing at least the prompt and response.
+            - ScoringEngine must have a valid rubric initialized.
+
+        Postconditions:
+            - Returns a ScoreReport object containing detailed scoring breakdown.
+
+        Edge Cases:
+            - Empty response_text: Scores will reflect a failure to respond.
+            - Missing metadata: Uses defaults for prompt_id and model.
+
+        Failure Modes:
+            - TypeError: If prompt_meta is not a dict or response_text is not a str.
+            - ValueError: If the rubric is not initialized.
+        """
         if not isinstance(prompt_meta, dict):
             raise TypeError(
                 f"prompt_meta must be dict, got {type(prompt_meta).__name__}. "
                 f"Expected: {{'id': str, 'response': str, ...}}"
             )
 
-        return_dict = response_text is None
         if response_text is None:
             response_text = prompt_meta.get("model_response") or prompt_meta.get("response", "")
 
@@ -303,35 +320,47 @@ class ScoringEngine:
             metadata={"prompt_id": prompt_meta.get("id"), "model": prompt_meta.get("model")},
         )
 
-        if not return_dict:
-            return report
+        return report
 
-        result = self.report_to_dict(report)
-        for comp in report.components:
-            key = comp.key
-            score_1_to_5 = (comp.normalized or 0.0) * 5.0
-            result[key] = score_1_to_5
-            result[f"{key}_score"] = score_1_to_5
-            result[f"score_{key}"] = comp.normalized
+    def report_to_dict(self, report: ScoreReport, include_defects: bool = False) -> Dict[str, Any]:
+        """
+        Converts a ScoreReport object to a flattened dictionary.
 
-        result["overall_score"] = aggregated_score * 5.0
-        defects = self._detect_defects(response_text, result)
-        result["defects"] = ",".join(defects) if defects else ""
-        return result
+        Preconditions:
+            - report must be a valid ScoreReport object.
 
-    def report_to_dict(self, report: ScoreReport) -> Dict[str, Any]:
+        Postconditions:
+            - Returns a dictionary with flattened score components and aggregated metrics.
+        """
         out: Dict[str, Any] = {
             "prompt_id": report.prompt_id,
             "prompt_text": report.prompt_text,
             "model": report.model,
             "aggregated_score": report.aggregated_score,
+            "overall_score": report.aggregated_score * 5.0,
         }
         for comp in report.components:
             prefix = f"score_{comp.key}"
             out[prefix] = comp.normalized
             out[f"{prefix}_raw"] = comp.raw
             out[f"{prefix}_notes"] = comp.notes
+
+            # Also include 1-5 scale scores for backward compatibility
+            score_1_to_5 = (comp.normalized or 0.0) * 5.0
+            out[comp.key] = score_1_to_5
+            out[f"{comp.key}_score"] = score_1_to_5
+
         out.update(report.metadata or {})
+
+        if include_defects:
+            # We need the response text to detect defects.
+            # In some cases we might not have it in the report object directly
+            # but it might be in metadata or we might have passed it.
+            # For simplicity, if it's missing, defect detection will be limited.
+            response_text = report.metadata.get("response") or ""
+            defects = self._detect_defects(response_text, out)
+            out["defects"] = ",".join(defects) if defects else ""
+
         return out
 
     def validate_report_integrity(self, report: Any) -> bool:
@@ -445,11 +474,23 @@ class ScoringEngine:
         return 3
 
     def score_batch(self, responses: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Scores a batch of responses and returns a list of flattened dictionaries.
+
+        Preconditions:
+            - responses must be a list of dictionaries.
+
+        Postconditions:
+            - Returns a list of dictionaries with scoring results.
+        """
         scored_responses: List[Dict[str, Any]] = []
         for response_data in responses:
-            scored = self.score_response(response_data)
-            if not isinstance(scored, dict):
-                scored = self.report_to_dict(scored)
+            report = self.score_response(response_data)
+            # Ensure response text is available for defect detection
+            if "response" not in report.metadata:
+                report.metadata["response"] = response_data.get("model_response") or response_data.get("response", "")
+
+            scored = self.report_to_dict(report, include_defects=True)
             scored_responses.append(scored)
         self.scores = scored_responses
         return scored_responses

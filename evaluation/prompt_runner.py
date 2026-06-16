@@ -43,7 +43,24 @@ class PromptRunner:
             raise ValueError(f"Unsupported provider: {provider}")
 
     def execute_prompt(self, prompt: str) -> str:
-        """Execute a single prompt synchronously with retries."""
+        """
+        Execute a single prompt synchronously with retries.
+
+        Preconditions:
+            - prompt must be a non-empty string.
+            - Valid API key must be available in environment or config.
+
+        Postconditions:
+            - Returns the model's response text.
+
+        Edge Cases:
+            - Empty prompt: May result in API error or empty response.
+            - Network instability: Handled by retries with exponential backoff.
+
+        Failure Modes:
+            - ValueError: If API key is missing.
+            - Exception: If all retry attempts fail.
+        """
         self.total_count += 1
         last_exception = Exception("No attempts made")
 
@@ -73,7 +90,19 @@ class PromptRunner:
         raise last_exception
 
     def execute_prompts(self, prompts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Execute multiple prompts."""
+        """
+        Execute multiple prompts.
+
+        Preconditions:
+            - prompts must be a list of dictionaries, each containing 'prompt' or 'text'.
+
+        Postconditions:
+            - Returns a list of result dictionaries with status 'success' or 'error'.
+
+        Edge Cases:
+            - Empty list: Returns an empty list.
+            - Mixed valid/invalid prompts: Valid prompts are executed; invalid ones are marked as 'error'.
+        """
         if not prompts:
             return []
 
@@ -135,7 +164,21 @@ class PromptRunner:
     async def run_prompts(
         self, prompts: List[Dict[str, Any]], checkpoint_callback: Optional[callable] = None
     ) -> List[Dict[str, Any]]:
-        """Execute prompts asynchronously with concurrency control and optional checkpointing."""
+        """
+        Execute prompts asynchronously with concurrency control and optional checkpointing.
+
+        Preconditions:
+            - prompts must be a list of dictionaries.
+            - Async-capable provider must be configured.
+
+        Postconditions:
+            - Returns a list of results as they complete.
+            - Calls checkpoint_callback (if provided) after each result.
+
+        Edge Cases:
+            - High concurrency: Controlled by semaphore.
+            - Partial failures: Individual errors are captured in results.
+        """
         results = []
         async with aiohttp.ClientSession() as session:
             tasks = [self._execute_with_semaphore(prompt, session) for prompt in prompts]

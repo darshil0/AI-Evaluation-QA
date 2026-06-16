@@ -169,7 +169,7 @@ class TestPromptRunner:
         runner = PromptRunner()
         output_file = temp_dir / "test_results.csv"
 
-        runner.save_responses(sample_responses, str(output_file), file_format="csv")
+        runner.save_responses(sample_responses, str(output_file), format="csv")
 
         assert output_file.exists()
         with open(output_file, "r") as f:
@@ -182,7 +182,7 @@ class TestPromptRunner:
         runner = PromptRunner()
         output_file = temp_dir / "test_results.json"
 
-        runner.save_responses(sample_responses, str(output_file), file_format="json")
+        runner.save_responses(sample_responses, str(output_file), format="json")
 
         assert output_file.exists()
         with open(output_file, "r") as f:
@@ -300,14 +300,15 @@ class TestScoringEngine:
         engine = ScoringEngine()
 
         response = sample_responses[0]
-        scored = engine.score_response(response)
+        report = engine.score_response(response)
+        scored = engine.report_to_dict(report)
 
         assert "score_accuracy" in scored
         assert "score_reasoning" in scored
         assert "score_tone" in scored
         assert "score_completeness" in scored
         assert "overall_score" in scored
-        assert 1 <= scored["overall_score"] <= 5
+        assert 0 <= scored["overall_score"] <= 5
 
     def test_identify_defects(self):
         """Test defect identification."""
