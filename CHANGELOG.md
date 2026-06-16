@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.4.0] - 2026-06-04
 
+### Added
+- **Security & Sanitization**: New `evaluation/sanitizer.py` for input/output sanitization and filename safety.
+- **Error Handling**: Implemented `evaluation/error_handler.py` with severity levels and failed request tracking.
+- **Client Architecture**: Migrated to a cleaner client-based architecture in `evaluation/clients/` (OpenAI, Anthropic).
+- **Data Processing**: Added `evaluation/data_processor.py` for chunked processing of large CSV files.
+- **Model Management**: Centralized model string constants in `evaluation/model_constants.py`.
+- **Retry Logic**: Added dedicated `evaluation/retry_logic.py` with exponential backoff decorators.
+
 ### Fixed
 - **Deadlock Bug**: Fixed recursive `acquire()` call inside `async with self.lock` in `evaluation/rate_limiter.py` that would cause deadlocks.
 - **Python Built-in Shadowing**: Renamed `format` parameter to `file_format` in `evaluation/prompt_runner.py`'s `save_responses()` to prevent shadowing Python's built-in.
