@@ -32,6 +32,7 @@ To maintain a high-quality, professional codebase, please adhere to these standa
 - **Formatting**: Use [Black](https://github.com/psf/black) for code formatting and [isort](https://pycqa.github.io/isort/) for imports.
 - **Linting**: Ensure `flake8` and `pylint` pass without errors.
 - **Type Safety**: All new functions must include type hints.
+- **Sanitization**: Use `DataSanitizer` in `evaluation/sanitizer.py` for any new user-controlled inputs or file outputs.
 - **Validation**: Any new core functionality or configuration changes must include corresponding validation logic in `config/`.
 - **Documentation**: All public classes and methods must have descriptive Google-style docstrings.
 
