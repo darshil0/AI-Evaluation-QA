@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.4.0] - 2026-06-04
 
 ### Added
+- **Foundational Documentation**: Added `Skills.MD`, `BUSINESS_LOGIC.MD`, and `PROMPT_ENGINEERING.MD` detailing project expertise, internal mechanics, and architectural intent.
+- **CI/CD Pipeline**: Established automated GitHub Actions workflows for testing, linting, security scanning (Trivy, Bandit, Safety), and regression monitoring.
 - **Security & Sanitization**: New `evaluation/sanitizer.py` for input/output sanitization and filename safety.
 - **Error Handling**: Implemented `evaluation/error_handler.py` with severity levels and failed request tracking.
 - **Client Architecture**: Migrated to a cleaner client-based architecture in `evaluation/clients/` (OpenAI, Anthropic).

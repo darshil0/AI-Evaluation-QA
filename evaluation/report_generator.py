@@ -14,19 +14,31 @@ class ReportGenerator:
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def load_data(self, filepath: str) -> List[Dict[str, Any]]:
-        """Load scored data from CSV file.
+        """
+        Load scored data from CSV file.
 
-        Args:
-            filepath: Path to CSV file
+        Preconditions:
+            - filepath must be a valid path to a readable CSV file.
 
-        Returns:
-            List of dictionaries containing scored data
+        Postconditions:
+            - Returns a list of dictionaries where each dict represents a row in the CSV.
+
+        Edge Cases:
+            - File not found: Raises FileNotFoundError.
+            - Empty file: Returns an empty list.
         """
         data = []
-        with open(filepath, "r", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                data.append(row)
+        try:
+            with open(filepath, "r", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    data.append(row)
+        except FileNotFoundError:
+            logger.error(f"Failed to load data: File not found at {filepath}")
+            raise
+        except Exception as e:
+            logger.error(f"Error loading data from {filepath}: {e}")
+            return []
         return data
 
     def calculate_statistics(self, scored_responses: List[Dict[str, Any]]) -> Dict[str, Any]:

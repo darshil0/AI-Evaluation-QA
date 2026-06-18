@@ -25,6 +25,16 @@ The **AI Evaluation QA Framework** is a production-grade Python library designed
 * 💰 **Cost Telemetry**: Precision token counting and cost estimation per model.
 * 🔄 **Fault-Tolerant**: Mid-batch checkpointing ensures no progress is lost.
 * ⚡ **Asynchronous & Fast**: Built with `asyncio` for high-concurrency API requests.
+* 🛠️ **CI/CD Integrated**: Automated testing, security scanning, and regression monitoring.
+
+---
+
+## Documentation
+
+* [Project Skills & Expertise](Skills.MD)
+* [Business Logic & Workflow](BUSINESS_LOGIC.MD)
+* [Prompt Engineering Architecture](PROMPT_ENGINEERING.MD)
+* [Contributing Guide](CONTRIBUTING.md)
 
 ---
 
