@@ -2,7 +2,7 @@ import json
 import pytest
 from jsonschema import ValidationError
 
-from config.validation import validate_config, validate_prompt_file
+from config.validator import validate_config, validate_prompt_file
 
 
 class TestPromptValidation:

@@ -1,11 +1,44 @@
 """Environment and configuration validation module."""
 
+import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
+
+from jsonschema import validate, ValidationError
 
 logger = logging.getLogger(__name__)
+
+PROMPT_SCHEMA = {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "required": ["metadata", "prompts"],
+    "properties": {
+        "metadata": {
+            "type": "object",
+            "required": ["version", "description"],
+            "properties": {"version": {"type": "string"}, "description": {"type": "string"}},
+        },
+        "prompts": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["id", "category", "text"],
+                "properties": {
+                    "id": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$"},
+                    "version": {"type": "string"},
+                    "category": {"type": "string"},
+                    "difficulty": {"type": "string", "enum": ["easy", "medium", "hard"]},
+                    "tags": {"type": "array", "items": {"type": "string"}},
+                    "text": {"type": "string", "minLength": 10},
+                    "expected_criteria": {"type": "object"},
+                },
+            },
+            "minItems": 1,
+        },
+    },
+}
 
 
 class ConfigurationValidator:
@@ -99,6 +132,94 @@ class ConfigurationValidator:
         if not Path(file_path).exists():
             raise FileNotFoundError(f"Prompts file not found: {file_path}")
         return True
+
+
+class PromptValidator:
+    """Validates prompt files against schema."""
+
+    @staticmethod
+    def validate_schema(data: Dict[str, Any]) -> Tuple[bool, List[str]]:
+        """Validate prompt data against JSON schema."""
+        try:
+            validate(instance=data, schema=PROMPT_SCHEMA)
+            logger.info("✓ Prompt schema validation passed")
+            return True, []
+        except ValidationError as e:
+            error_msg = (
+                f"Schema validation error at {'.'.join(str(p) for p in e.path)}: " f"{e.message}"
+            )
+            logger.error(error_msg)
+            return False, [error_msg]
+
+
+def validate_prompt_file(filepath: str) -> Dict:
+    """
+    Validate prompt JSON file against schema.
+
+    Args:
+        filepath: Path to prompt JSON file
+
+    Returns:
+        Validated prompt data
+
+    Raises:
+        ValidationError: If file doesn't match schema
+        FileNotFoundError: If file doesn't exist
+        json.JSONDecodeError: If file is not valid JSON
+    """
+    filepath_path = Path(filepath)
+
+    if not filepath_path.exists():
+        raise FileNotFoundError(f"Prompt file not found: {filepath}")
+
+    try:
+        with open(filepath_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except json.JSONDecodeError as e:
+        raise json.JSONDecodeError(f"Invalid JSON in {filepath}: {str(e)}", e.doc, e.pos)
+
+    # Validate against schema
+    try:
+        validate(instance=data, schema=PROMPT_SCHEMA)
+    except ValidationError as e:
+        raise ValidationError(f"Schema validation failed: {e.message}")
+
+    # Additional validation: check for duplicate IDs
+    prompt_ids = [p["id"] for p in data["prompts"]]
+    if len(prompt_ids) != len(set(prompt_ids)):
+        duplicates = [pid for pid in prompt_ids if prompt_ids.count(pid) > 1]
+        raise ValidationError(f"Duplicate prompt IDs found: {set(duplicates)}")
+
+    return data
+
+
+def validate_config(config: Dict[str, Any]) -> None:
+    """
+    Validate configuration dictionary.
+
+    Args:
+        config: Configuration dictionary to validate
+
+    Raises:
+        ValueError: If configuration is invalid
+    """
+    required_keys = ["models", "api", "scoring"]
+
+    for key in required_keys:
+        if key not in config:
+            raise ValueError(f"Missing required config key: {key}")
+
+    # Validate models config
+    if "primary" not in config["models"]:
+        raise ValueError("Missing 'primary' model configuration")
+
+    # Validate API config
+    api_config = config["api"]
+    if "max_retries" in api_config and api_config["max_retries"] < 0:
+        raise ValueError("max_retries must be non-negative")
+
+    if "rate_limit_rpm" in api_config and api_config["rate_limit_rpm"] <= 0:
+        raise ValueError("rate_limit_rpm must be positive")
 
 
 def validate_before_execution(

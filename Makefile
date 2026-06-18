@@ -149,10 +149,10 @@ report:  ## Generate reports from latest scored results
 
 regression:  ## Check for performance regression
 	@echo "Checking for performance regression..."
-	@if [ -f scripts/check_regression.py ]; then \
-		$(PYTHON) scripts/check_regression.py; \
+	@if [ -f scripts/regression_checker.py ]; then \
+		$(PYTHON) scripts/regression_checker.py; \
 	else \
-		echo "Error: scripts/check_regression.py is missing."; \
+		echo "Error: scripts/regression_checker.py is missing."; \
 		exit 1; \
 	fi
 

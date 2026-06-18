@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 from pathlib import Path
-from scripts.check_regression import RegressionDetector
+from scripts.regression_checker import RegressionDetector
 
 
 @pytest.fixture
