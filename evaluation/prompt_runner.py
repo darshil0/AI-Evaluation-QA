@@ -224,7 +224,11 @@ class PromptRunner:
             return results
 
     def save_responses(
-        self, results: List[Dict[str, Any]], filepath: str, file_format: str = "csv"
+        self,
+        results: List[Dict[str, Any]],
+        filepath: str,
+        file_format: str = "csv",
+        **kwargs: Any,
     ) -> None:
         """
         Save responses to file.
@@ -233,7 +237,17 @@ class PromptRunner:
             results: List of result dictionaries
             filepath: Path to save the file
             file_format: File format ('csv' or 'json')
+            **kwargs: Backward compatibility for legacy 'format' parameter
         """
+        # Support legacy 'format' parameter for backward compatibility
+        if "format" in kwargs:
+            warnings.warn(
+                "The 'format' parameter is deprecated; use 'file_format' instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            file_format = kwargs["format"]
+
         if file_format == "csv":
             # Collect all unique keys
             all_keys = set()

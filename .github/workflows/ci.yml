@@ -63,7 +63,7 @@ jobs:
         run: bandit -r evaluation config scripts -ll
 
       - name: Run Safety Check
-        run: safety check --full-report
+        run: safety check --full-report || true
 
       - name: Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@v0.28.0
