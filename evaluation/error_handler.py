@@ -121,6 +121,18 @@ class EvaluationErrorHandler:
         else:
             return ErrorSeverity.LOW
 
+    async def handle_async_error(self, error: Exception) -> None:
+        """Handle errors in async context safely."""
+        try:
+            # Check if we are in an active event loop
+            asyncio.get_running_loop()
+            # If so, we can just log it or do other async things
+            # In this simple implementation, we just log it
+            logger.error(f"Async error handled: {error}")
+        except RuntimeError:
+            # Fallback to sync if not in event loop
+            logger.error(f"Error handled (no event loop): {error}")
+
     def get_summary(self) -> Dict[str, Any]:
         """Get error handling summary."""
         return {

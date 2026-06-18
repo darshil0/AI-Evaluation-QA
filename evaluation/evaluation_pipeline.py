@@ -10,6 +10,7 @@ import asyncio
 import csv
 import logging
 import os
+import math
 from typing import Optional, Dict, Any, List, Union
 
 from evaluation.prompt_runner import PromptRunner
@@ -103,6 +104,7 @@ class EvaluationPipeline:
         return None
 
     def _save_checkpoint(self, results: List[Dict[str, Any]], filename: str) -> None:
+        """Save checkpoint with fault reporting."""
         checkpoint_dir = self.config.get("output", {}).get(
             "checkpoint_directory", "data/checkpoints"
         )
@@ -116,14 +118,21 @@ class EvaluationPipeline:
             all_keys = sorted(
                 {key for row in results if isinstance(row, dict) for key in row.keys()}
             )
+            rows_written = 0
             with open(filepath, "w", newline="", encoding="utf-8") as f:
                 writer = csv.DictWriter(f, fieldnames=all_keys, extrasaction="ignore")
                 writer.writeheader()
-                for row in results:
-                    writer.writerow(row if isinstance(row, dict) else {})
-            logger.info(f"Checkpoint saved to {filepath}")
+                for idx, row in enumerate(results):
+                    try:
+                        writer.writerow(row if isinstance(row, dict) else {})
+                        rows_written += 1
+                    except (TypeError, ValueError) as e:
+                        logger.error(f"Row {idx} serialization failed: {e}. Skipping row.")
+
+            logger.info(f"Checkpoint saved: {rows_written}/{len(results)} rows to {filepath}")
         except Exception as e:
             logger.error(f"Failed to save checkpoint {filepath}: {e}")
+            raise
 
     def process_results(self, results: List[Dict[str, Any]]) -> Any:
         try:
@@ -206,6 +215,24 @@ class EvaluationPipeline:
 
         return final_df
 
+    def _safe_int_conversion(self, value: Any, default: int = 0) -> int:
+        """Safely convert token count to integer."""
+        try:
+            try:
+                import pandas as pd
+            except ImportError:
+                return int(float(value)) if value is not None else default
+
+            if value is None or (isinstance(value, float) and pd.isna(value)):
+                return default
+            if isinstance(value, float) and math.isinf(value):
+                logger.warning(f"Infinite token count detected, using default: {default}")
+                return default
+            return int(float(value))  # Convert via float for string numbers
+        except (ValueError, TypeError, OverflowError) as e:
+            logger.error(f"Failed to convert token count: {e}")
+            return default
+
     def _calculate_row_cost(self, row: Any) -> float:
         try:
             import pandas as pd
@@ -225,8 +252,8 @@ class EvaluationPipeline:
 
         return self.cost_tracker.add_request(
             model=row.get("model", self.cost_tracker.model_name),
-            input_tokens=int(input_tokens),
-            output_tokens=int(output_tokens),
+            input_tokens=self._safe_int_conversion(input_tokens),
+            output_tokens=self._safe_int_conversion(output_tokens),
             prompt_id=row.get("prompt_id"),
         )
 

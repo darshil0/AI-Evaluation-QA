@@ -127,6 +127,13 @@ class ConfigLoader:
                 if "dimensions" in scoring and "criteria" not in scoring:
                     logger.info("Migrating configuration: 'scoring.dimensions' -> 'scoring.criteria'")
                     scoring["criteria"] = scoring.pop("dimensions")
+
+                    # VALIDATE IMMEDIATELY to catch issues early
+                    try:
+                        cls._validate_scoring_criteria(scoring["criteria"])
+                        logger.info("Migration validated successfully")
+                    except ConfigError as e:
+                        raise ConfigError(f"Migration failed validation: {e}") from e
             
             config["version"] = cls.CURRENT_VERSION
             logger.info(f"Configuration migrated to version {cls.CURRENT_VERSION}")
