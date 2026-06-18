@@ -13,67 +13,9 @@ from config.validator import PromptValidator as BasePromptValidator
 from config.validator import validate_before_execution, validate_prompt_file
 from evaluation.cost_tracker import CostTracker
 from evaluation.error_handler import EvaluationErrorHandler
-from evaluation.prompt_runner import PromptRunner
+from evaluation.prompt_runner import PromptRunner, execute_prompts_with_tracking
 
 logger = logging.getLogger(__name__)
-
-
-async def execute_prompts_with_tracking(
-    prompts: List[Dict],
-    error_handler: EvaluationErrorHandler,
-    cost_tracker: CostTracker,
-    config: Dict,
-) -> Dict[str, Any]:
-    """Execute prompts with error and cost tracking."""
-    results = {"successful": [], "failed": [], "summary": {}}
-
-    runner = PromptRunner(config=config)
-
-    async with aiohttp.ClientSession() as session:
-        for prompt in prompts:
-            try:
-                success, result, failed_req = await error_handler.execute_with_retry(
-                    runner.execute_prompt_async, prompt["id"], prompt, session
-                )
-
-                if success:
-                    results["successful"].append(result)
-
-                    # Track costs
-                    cost_tracker.add_request(
-                        model=result.get("model", config.get("model", "gpt-4")),
-                        input_tokens=result.get("prompt_tokens", 0),
-                        output_tokens=result.get("response_tokens", 0),
-                        prompt_id=prompt["id"],
-                    )
-                else:
-                    results["failed"].append(
-                        {
-                            "prompt_id": prompt["id"],
-                            "error": failed_req.error_message if failed_req else "Unknown error",
-                            "timestamp": datetime.now().isoformat(),
-                        }
-                    )
-            except Exception as e:
-                logger.error(f"Failed to execute prompt {prompt['id']}: {str(e)}")
-                results["failed"].append(
-                    {
-                        "prompt_id": prompt["id"],
-                        "error": str(e),
-                        "timestamp": datetime.now().isoformat(),
-                    }
-                )
-
-    results["summary"] = {
-        "total": len(prompts),
-        "success": len(results["successful"]),
-        "failed": len(results["failed"]),
-        "success_rate": (len(results["successful"]) / len(prompts) * 100) if prompts else 0,
-        "costs": cost_tracker.get_summary(),
-        "errors": error_handler.get_summary(),
-    }
-
-    return results
 
 
 class PromptValidator:

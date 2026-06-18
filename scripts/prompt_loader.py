@@ -1,6 +1,7 @@
 import json
 import os
-from jsonschema import validate, ValidationError
+
+from jsonschema import ValidationError, validate
 
 
 class PromptLoader:

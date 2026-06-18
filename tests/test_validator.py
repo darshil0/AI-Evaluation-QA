@@ -4,8 +4,8 @@ import tempfile
 
 import pytest
 
-from config.validator import ConfigurationValidator
 from config.prompt_validator import PromptValidator
+from config.validator import ConfigurationValidator
 from evaluation.cost_tracker import CostTracker
 from evaluation.error_handler import EvaluationErrorHandler
 
@@ -48,7 +48,9 @@ class TestPromptValidator:
             ],
         }
 
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as f:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False, encoding="utf-8"
+        ) as f:
             json.dump(valid_data, f)
             temp_file = f.name
 
@@ -65,7 +67,9 @@ class TestPromptValidator:
             "prompts": [],
         }
 
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as f:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False, encoding="utf-8"
+        ) as f:
             json.dump(invalid_data, f)
             temp_file = f.name
 
@@ -79,8 +83,16 @@ class TestPromptValidator:
         data_with_duplicates = {
             "metadata": {"version": "1.0", "description": "Test prompts"},
             "prompts": [
-                {"id": "test_001", "text": "First prompt with sufficient text length", "category": "reasoning"},
-                {"id": "test_001", "text": "Duplicate ID prompt with sufficient text length", "category": "reasoning"},
+                {
+                    "id": "test_001",
+                    "text": "First prompt with sufficient text length",
+                    "category": "reasoning",
+                },
+                {
+                    "id": "test_001",
+                    "text": "Duplicate ID prompt with sufficient text length",
+                    "category": "reasoning",
+                },
             ],
         }
 

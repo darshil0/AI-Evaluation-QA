@@ -3,6 +3,7 @@ Unit tests for data sanitizer.
 """
 
 import pytest
+
 from evaluation.sanitizer import DataSanitizer
 
 

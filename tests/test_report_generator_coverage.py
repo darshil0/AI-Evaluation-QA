@@ -4,11 +4,13 @@ Additional tests for 100% coverage of report_generator.py
 These tests cover all methods and edge cases for complete coverage.
 """
 
-import pytest
-import tempfile
 import os
 import shutil
+import tempfile
 from pathlib import Path
+
+import pytest
+
 from evaluation.report_generator import ReportGenerator, generate_reports
 
 

@@ -4,9 +4,11 @@ Additional tests for 100% coverage of prompt_runner.py
 These tests cover edge cases and error paths that weren't covered in the main test suite.
 """
 
-import pytest
 import os
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
+
 from evaluation.prompt_runner import PromptRunner, execute_prompts
 
 
@@ -89,8 +91,8 @@ class TestPromptRunnerEdgeCases:
 
     def test_save_responses_json_format(self):
         """Test save_responses with JSON format."""
-        import tempfile
         import json
+        import tempfile
 
         runner = PromptRunner()
         results = [

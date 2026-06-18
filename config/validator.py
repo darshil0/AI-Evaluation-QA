@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from jsonschema import validate, ValidationError
+from jsonschema import ValidationError, validate
 
 logger = logging.getLogger(__name__)
 

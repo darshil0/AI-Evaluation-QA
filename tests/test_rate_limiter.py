@@ -2,9 +2,11 @@
 Unit tests for rate limiter.
 """
 
-import pytest
 import asyncio
 from datetime import datetime
+
+import pytest
+
 from evaluation.rate_limiter import RateLimiter
 
 

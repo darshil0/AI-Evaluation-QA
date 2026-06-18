@@ -1,9 +1,9 @@
-from pathlib import Path
-import logging
-import json
-from typing import Dict, Optional, List, Any
 import csv
 import html
+import json
+import logging
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -398,8 +398,9 @@ def generate_reports(
 # CLI entrypoint
 if __name__ == "__main__":
     import sys
-    from dotenv import load_dotenv
     from datetime import datetime
+
+    from dotenv import load_dotenv
 
     load_dotenv()
 

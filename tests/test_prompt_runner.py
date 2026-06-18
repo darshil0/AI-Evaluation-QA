@@ -9,9 +9,11 @@ Covers:
 - Progress tracking
 """
 
-import pytest
 import asyncio
 from pathlib import Path
+
+import pytest
+
 from evaluation.prompt_runner import PromptRunner
 
 TMP_DIR = Path("tests/tmp_reports")

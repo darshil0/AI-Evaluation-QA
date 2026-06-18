@@ -6,10 +6,12 @@ import os
 import time
 import warnings
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Callable, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import aiohttp
 import openai
+
+from evaluation.cost_tracker import CostTracker
 from evaluation.error_handler import EvaluationErrorHandler
 
 logger = logging.getLogger(__name__)
@@ -33,7 +35,7 @@ class PromptRunner:
         self.semaphore = asyncio.Semaphore(self.config.get("max_concurrent_requests", 5))
         self.error_handler = EvaluationErrorHandler(
             max_retries=retry_attempts,
-            backoff_factor=float(self.config.get("execution", {}).get("backoff_factor", 2.0))
+            backoff_factor=float(self.config.get("execution", {}).get("backoff_factor", 2.0)),
         )
 
     def _get_api_client(self, provider: str):
@@ -168,10 +170,7 @@ class PromptRunner:
 
         async with self.semaphore:
             success, result, failed_req = await self.error_handler.execute_with_retry(
-                self.execute_prompt_async,
-                prompt_id,
-                prompt,
-                session
+                self.execute_prompt_async, prompt_id, prompt, session
             )
 
             if success:
@@ -186,7 +185,7 @@ class PromptRunner:
                     "model": self.model,
                     "timestamp": datetime.now().isoformat(),
                     "status": "error",
-                    "error": failed_req.error_message if failed_req else "Unknown error"
+                    "error": failed_req.error_message if failed_req else "Unknown error",
                 }
 
     async def run_prompts(
@@ -273,3 +272,73 @@ def execute_prompts(
     """Standalone function to execute prompts."""
     runner = PromptRunner(config=config)
     return runner.execute_prompts(prompts)
+
+
+async def execute_prompts_with_tracking(
+    prompts: List[Dict[str, Any]],
+    error_handler: EvaluationErrorHandler,
+    cost_tracker: CostTracker,
+    config: Dict[str, Any],
+) -> Dict[str, Any]:
+    """
+    Execute prompts with comprehensive error and cost tracking.
+
+    Args:
+        prompts: List of prompt dictionaries
+        error_handler: EvaluationErrorHandler instance
+        cost_tracker: CostTracker instance
+        config: Configuration dictionary
+
+    Returns:
+        Dictionary with successful/failed results and summary statistics
+    """
+    results: Dict[str, Any] = {"successful": [], "failed": [], "summary": {}}
+
+    runner = PromptRunner(config=config)
+
+    async with aiohttp.ClientSession() as session:
+        for prompt in prompts:
+            prompt_id = str(prompt.get("id", "unknown"))
+            try:
+                success, result, failed_req = await error_handler.execute_with_retry(
+                    runner.execute_prompt_async, prompt_id, prompt, session
+                )
+
+                if success:
+                    results["successful"].append(result)
+
+                    # Track costs
+                    cost_tracker.add_request(
+                        model=result.get("model", config.get("model", "gpt-4")),
+                        input_tokens=result.get("prompt_tokens", 0),
+                        output_tokens=result.get("response_tokens", 0),
+                        prompt_id=prompt_id,
+                    )
+                else:
+                    results["failed"].append(
+                        {
+                            "prompt_id": prompt_id,
+                            "error": failed_req.error_message if failed_req else "Unknown error",
+                            "timestamp": datetime.now().isoformat(),
+                        }
+                    )
+            except Exception as e:
+                logger.error(f"Failed to execute prompt {prompt_id}: {str(e)}")
+                results["failed"].append(
+                    {
+                        "prompt_id": prompt_id,
+                        "error": str(e),
+                        "timestamp": datetime.now().isoformat(),
+                    }
+                )
+
+    results["summary"] = {
+        "total": len(prompts),
+        "success": len(results["successful"]),
+        "failed": len(results["failed"]),
+        "success_rate": (len(results["successful"]) / len(prompts) * 100) if prompts else 0,
+        "costs": cost_tracker.get_summary(),
+        "errors": error_handler.get_summary(),
+    }
+
+    return results

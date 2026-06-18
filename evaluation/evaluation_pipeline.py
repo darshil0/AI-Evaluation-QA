@@ -9,15 +9,15 @@ stages into a unified, robust pipeline.
 import asyncio
 import csv
 import logging
-import os
 import math
-from typing import Optional, Dict, Any, List, Union
+import os
+from typing import Any, Dict, List, Optional, Union
 
-from evaluation.prompt_runner import PromptRunner
-from evaluation.scoring_engine import ScoringEngine
-from evaluation.report_generator import ReportGenerator
-from scripts.prompt_loader import PromptLoader
 from evaluation.cost_tracker import CostTracker
+from evaluation.prompt_runner import PromptRunner
+from evaluation.report_generator import ReportGenerator
+from evaluation.scoring_engine import ScoringEngine
+from scripts.prompt_loader import PromptLoader
 
 logger = logging.getLogger(__name__)
 
@@ -198,7 +198,9 @@ class EvaluationPipeline:
             # Ensure response text is available for defect detection
             row_dict = results_df.iloc[i].to_dict()
             if "response" not in report.metadata:
-                report.metadata["response"] = row_dict.get("model_response") or row_dict.get("response", "")
+                report.metadata["response"] = row_dict.get("model_response") or row_dict.get(
+                    "response", ""
+                )
 
             scored_dicts.append(self.scoring_engine.report_to_dict(report, include_defects=True))
 

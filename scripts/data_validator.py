@@ -1,7 +1,8 @@
-import pandas as pd
-from typing import List, Dict, Tuple, Optional, Union
-import numpy as np
 import logging
+from typing import Dict, List, Optional, Tuple, Union
+
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -184,7 +185,9 @@ class DataValidator:
         for col in string_columns:
             try:
                 # Use series.apply to facilitate easier mocking in tests
-                df_clean[col] = df_clean[col].apply(lambda x: x.strip() if isinstance(x, str) else x)
+                df_clean[col] = df_clean[col].apply(
+                    lambda x: x.strip() if isinstance(x, str) else x
+                )
             except (TypeError, ValueError) as e:
                 logger.warning(f"Could not trim column '{col}': {e}")
 
