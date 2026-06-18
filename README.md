@@ -274,16 +274,16 @@ make lint          # Run linting and type checks
 ```
 ai-evaluation-qa/
 ├── evaluation/              # Core library
-│   ├── pipeline.py         # Main evaluation workflow
-│   ├── runner.py           # Model API executor
-│   ├── scoring.py          # Rubric-based scoring engine
-│   ├── defect_detector.py  # Automated issue detection
-│   ├── reporting.py        # Report generation
-│   └── sanitizer.py        # Input/output safety
+│   ├── evaluation_pipeline.py # Main evaluation workflow
+│   ├── prompt_runner.py     # Model API executor
+│   ├── scoring_engine.py    # Rubric-based scoring engine
+│   ├── defect_detector.py   # Automated issue detection
+│   ├── report_generator.py  # Report generation
+│   └── sanitizer.py         # Input/output safety
 ├── config/
-│   ├── settings.yaml       # Main configuration
-│   ├── rubric.json         # Scoring definitions
-│   └── validation.py       # Config schema validation
+│   ├── settings.yaml        # Main configuration
+│   ├── logging_config.py    # Logging configuration
+│   └── validator.py         # Config and prompt schema validation
 ├── scripts/
 │   ├── validate_prompts.py
 │   ├── load_baseline.py
