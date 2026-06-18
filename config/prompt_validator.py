@@ -1,52 +1,21 @@
 """Prompt file validation and schema checking."""
 
+import json
 import logging
 import os
-import asyncio
-import aiohttp
-from typing import Dict, Any, List, Tuple
-from pathlib import Path
-from jsonschema import validate, ValidationError
-from config.validator import validate_before_execution
-from evaluation.error_handler import EvaluationErrorHandler
-from evaluation.cost_tracker import CostTracker
-from evaluation.prompt_runner import PromptRunner
-from config.logging_config import setup_logging
 from datetime import datetime
-import json
+from typing import Any, Dict, List, Tuple
+
+import aiohttp
+
+from config.logging_config import setup_logging
+from config.validator import PromptValidator as BasePromptValidator
+from config.validator import validate_before_execution, validate_prompt_file
+from evaluation.cost_tracker import CostTracker
+from evaluation.error_handler import EvaluationErrorHandler
+from evaluation.prompt_runner import PromptRunner
 
 logger = logging.getLogger(__name__)
-
-
-PROMPT_SCHEMA = {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "object",
-    "properties": {
-        "metadata": {
-            "type": "object",
-            "properties": {"version": {"type": "string"}, "description": {"type": "string"}},
-            "required": ["version", "description"],
-        },
-        "prompts": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "id": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$"},
-                    "version": {"type": "string"},
-                    "category": {"type": "string"},
-                    "difficulty": {"type": "string", "enum": ["easy", "medium", "hard"]},
-                    "tags": {"type": "array", "items": {"type": "string"}},
-                    "text": {"type": "string", "minLength": 10},
-                    "expected_criteria": {"type": "object"},
-                },
-                "required": ["id", "text", "category"],
-            },
-            "minItems": 1,
-        },
-    },
-    "required": ["metadata", "prompts"],
-}
 
 
 async def execute_prompts_with_tracking(
@@ -113,19 +82,7 @@ class PromptValidator:
     @staticmethod
     def validate_schema(data: Dict[str, Any]) -> Tuple[bool, List[str]]:
         """Validate prompt data against JSON schema."""
-        errors = []
-
-        try:
-            validate(instance=data, schema=PROMPT_SCHEMA)
-            logger.info("✓ Prompt schema validation passed")
-            return True, []
-        except ValidationError as e:
-            error_msg = (
-                f"Schema validation error at {'.'.join(str(p) for p in e.path)}: " f"{e.message}"
-            )
-            errors.append(error_msg)
-            logger.error(error_msg)
-            return False, errors
+        return BasePromptValidator.validate_schema(data)
 
     @staticmethod
     def validate_semantic(data: Dict[str, Any]) -> Tuple[bool, List[str]]:
@@ -159,30 +116,21 @@ class PromptValidator:
     @staticmethod
     def load_and_validate(file_path: str) -> Dict[str, Any]:
         """Load JSON file and validate it completely."""
-        path = Path(file_path)
-
-        if not path.exists():
-            raise FileNotFoundError(f"Prompts file not found: {file_path}")
-
         try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-        except json.JSONDecodeError as e:
-            raise json.JSONDecodeError(f"Invalid JSON in {file_path}: {e.msg}", e.doc, e.pos)
+            data = validate_prompt_file(file_path)
 
-        is_valid, schema_errors = PromptValidator.validate_schema(data)
-        if not is_valid:
-            raise ValueError(f"Schema validation failed: {schema_errors[0]}")
+            _, warnings = PromptValidator.validate_semantic(data)
+            if warnings:
+                for warning in warnings:
+                    logger.warning(f"⚠ {warning}")
 
-        _, warnings = PromptValidator.validate_semantic(data)
-        if warnings:
-            for warning in warnings:
-                logger.warning(f"⚠ {warning}")
+            logger.info(f"✓ Successfully loaded and validated {file_path}")
+            logger.info(f"  Prompts: {len(data.get('prompts', []))}")
 
-        logger.info(f"✓ Successfully loaded and validated {file_path}")
-        logger.info(f"  Prompts: {len(data.get('prompts', []))}")
-
-        return data
+            return data
+        except Exception as e:
+            logger.error(f"✗ Failed to load or validate prompts: {str(e)}")
+            raise
 
 
 def main():

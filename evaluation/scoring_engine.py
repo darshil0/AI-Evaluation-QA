@@ -8,6 +8,7 @@ import os
 import re
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple, Union
+from evaluation.defect_detector import DefectDetector
 
 logger = logging.getLogger(__name__)
 
@@ -74,14 +75,6 @@ class ScoringEngine:
         "reasoning": {"weight": 0.30, "name": "Reasoning"},
         "tone": {"weight": 0.15, "name": "Tone"},
         "completeness": {"weight": 0.15, "name": "Completeness"},
-    }
-
-    DEFECT_TYPES = {
-        "D01": "Logical Defect",
-        "D02": "Factual Defect",
-        "D03": "Tone Defect",
-        "D04": "Incomplete Response",
-        "D05": "Redundancy Defect",
     }
 
     def __init__(self, rubric: Optional[Rubric] = None):
@@ -429,38 +422,10 @@ class ScoringEngine:
         return max(1, score)
 
     def identify_defects(self, response_data: Dict[str, Any]) -> List[str]:
-        return self._detect_defects(response_data.get("response", ""), response_data)
+        return DefectDetector.detect_defects(response_data.get("response", ""), response_data)
 
     def _detect_defects(self, response: str, scores: Dict[str, Any]) -> List[str]:
-        defects: List[str] = []
-
-        def get_score(key: str) -> float:
-            val = scores.get(key)
-            if val is None:
-                val = scores.get(f"{key}_score")
-            if val is None:
-                norm = scores.get(f"score_{key}")
-                if norm is not None:
-                    val = float(norm) * 5.0
-            return float(val) if val is not None else 5.0
-
-        if get_score("reasoning") <= 2:
-            defects.append("D01")
-        if get_score("accuracy") <= 2:
-            defects.append("D02")
-        if get_score("tone") <= 2:
-            defects.append("D03")
-        if get_score("completeness") <= 2:
-            defects.append("D04")
-
-        if response:
-            words = response.split()
-            if len(words) > 20:
-                unique_ratio = len(set(w.lower() for w in words)) / len(words)
-                if unique_ratio < 0.5:
-                    defects.append("D05")
-
-        return defects
+        return DefectDetector.detect_defects(response, scores)
 
     def _calculate_category_score(self, response: str, category: str, prompt: str) -> int:
         if category == "accuracy":

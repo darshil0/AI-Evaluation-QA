@@ -202,7 +202,7 @@ def check_regression(current_results: str, baseline: str, save_baseline: bool) -
     try:
         import pandas as pd
 
-        from scripts.check_regression import RegressionDetector
+        from scripts.regression_checker import RegressionDetector
     except ImportError as e:
         logger.error(f"Failed to import required modules: {e}")
         click.echo("Error: Required modules not found. Run: pip install -e .[dev]", err=True)

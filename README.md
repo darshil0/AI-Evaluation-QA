@@ -285,9 +285,10 @@ ai-evaluation-qa/
 │   ├── logging_config.py    # Logging configuration
 │   └── validator.py         # Config and prompt schema validation
 ├── scripts/
-│   ├── validate_prompts.py
-│   ├── load_baseline.py
-│   └── batch_evaluate.py
+│   ├── regression_checker.py # Check for performance regressions
+│   ├── setup_verifier.py     # Verify installation and setup
+│   ├── prompt_loader.py      # Logic for loading/validating prompts
+│   └── data_validator.py     # Data cleaning and validation utilities
 ├── tests/                  # 100% coverage test suite
 ├── data/
 │   └── prompts/           # Sample prompt files
