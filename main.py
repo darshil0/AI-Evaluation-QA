@@ -139,7 +139,7 @@ def score(config: str, results: str, output: str) -> None:
             click.echo("Warning: No results to score", err=True)
     except FileNotFoundError as e:
         logger.exception("File not found")
-        click.echo(f"Error: {e}", err=True)
+        click.echo(f"Error: File not found - {e}", err=True)
         sys.exit(1)
     except pd.errors.ParserError as e:
         logger.exception("CSV parsing failed")
@@ -181,7 +181,7 @@ def report(results: str, output_dir: str) -> None:
         logger.info(f"Reports successfully generated in {output_dir}/")
     except FileNotFoundError as e:
         logger.exception("File not found")
-        click.echo(f"Error: {e}", err=True)
+        click.echo(f"Error: File not found - {e}", err=True)
         sys.exit(1)
     except pd.errors.ParserError as e:
         logger.exception("CSV parsing failed")

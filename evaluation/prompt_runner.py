@@ -4,8 +4,9 @@ import json
 import logging
 import os
 import time
+import warnings
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Callable
 
 import aiohttp
 import openai
@@ -162,7 +163,7 @@ class PromptRunner:
             return await self.execute_prompt_async(prompt, session)
 
     async def run_prompts(
-        self, prompts: List[Dict[str, Any]], checkpoint_callback: Optional[callable] = None
+        self, prompts: List[Dict[str, Any]], checkpoint_callback: Optional[Callable] = None
     ) -> List[Dict[str, Any]]:
         """
         Execute prompts asynchronously with concurrency control and optional checkpointing.
@@ -219,6 +220,11 @@ class PromptRunner:
 
     def save_results(self, results: List[Dict[str, Any]], filepath: str) -> None:
         """Save results to CSV file (legacy method)."""
+        warnings.warn(
+            "save_results() is deprecated. Use save_responses(..., format='csv') instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.save_responses(results, filepath, format="csv")
 
     def print_summary(self) -> None:
