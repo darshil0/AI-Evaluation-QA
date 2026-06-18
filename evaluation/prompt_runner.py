@@ -6,10 +6,11 @@ import os
 import time
 import warnings
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Callable
+from typing import Any, Dict, List, Optional, Callable, Union
 
 import aiohttp
 import openai
+from evaluation.error_handler import EvaluationErrorHandler
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +31,10 @@ class PromptRunner:
         self.failure_count = 0
         self.total_count = 0
         self.semaphore = asyncio.Semaphore(self.config.get("max_concurrent_requests", 5))
+        self.error_handler = EvaluationErrorHandler(
+            max_retries=retry_attempts,
+            backoff_factor=float(self.config.get("execution", {}).get("backoff_factor", 2.0))
+        )
 
     def _get_api_client(self, provider: str):
         if provider == "openai":
@@ -158,9 +163,31 @@ class PromptRunner:
     async def _execute_with_semaphore(
         self, prompt: Dict[str, Any], session: aiohttp.ClientSession
     ) -> Dict[str, Any]:
-        """Execute a single prompt with semaphore for concurrency control."""
+        """Execute a single prompt with semaphore and error handling."""
+        prompt_id = str(prompt.get("id") or prompt.get("prompt_id") or "unknown")
+
         async with self.semaphore:
-            return await self.execute_prompt_async(prompt, session)
+            success, result, failed_req = await self.error_handler.execute_with_retry(
+                self.execute_prompt_async,
+                prompt_id,
+                prompt,
+                session
+            )
+
+            if success:
+                return result
+            else:
+                # Return the error response captured in the last attempt if available
+                # or construct one from failed_req
+                return {
+                    "prompt_id": prompt_id,
+                    "prompt": prompt.get("prompt") or prompt.get("text", ""),
+                    "response": "",
+                    "model": self.model,
+                    "timestamp": datetime.now().isoformat(),
+                    "status": "error",
+                    "error": failed_req.error_message if failed_req else "Unknown error"
+                }
 
     async def run_prompts(
         self, prompts: List[Dict[str, Any]], checkpoint_callback: Optional[Callable] = None
@@ -197,35 +224,43 @@ class PromptRunner:
             return results
 
     def save_responses(
-        self, results: List[Dict[str, Any]], filepath: str, format: str = "csv"
+        self, results: List[Dict[str, Any]], filepath: str, file_format: str = "csv"
     ) -> None:
-        """Save responses to file."""
-        if format == "csv":
+        """
+        Save responses to file.
+
+        Args:
+            results: List of result dictionaries
+            filepath: Path to save the file
+            file_format: File format ('csv' or 'json')
+        """
+        if file_format == "csv":
             # Collect all unique keys
             all_keys = set()
             for r in results:
-                all_keys.update(r.keys())
+                if isinstance(r, dict):
+                    all_keys.update(r.keys())
 
             with open(filepath, "w", newline="", encoding="utf-8") as f:
-                writer = csv.DictWriter(f, fieldnames=sorted(list(all_keys)))
+                writer = csv.DictWriter(f, fieldnames=sorted(list(all_keys)), extrasaction="ignore")
                 writer.writeheader()
                 writer.writerows(results)
-        elif format == "json":
+        elif file_format == "json":
             with open(filepath, "w", encoding="utf-8") as f:
                 json.dump(results, f, indent=2)
         else:
-            raise ValueError(f"Unsupported format: {format}")
+            raise ValueError(f"Unsupported format: {file_format}")
 
         logger.info(f"Saved {len(results)} responses to {filepath}")
 
     def save_results(self, results: List[Dict[str, Any]], filepath: str) -> None:
         """Save results to CSV file (legacy method)."""
         warnings.warn(
-            "save_results() is deprecated. Use save_responses(..., format='csv') instead.",
+            "save_results() is deprecated. Use save_responses(..., file_format='csv') instead.",
             DeprecationWarning,
             stacklevel=2,
         )
-        self.save_responses(results, filepath, format="csv")
+        self.save_responses(results, filepath, file_format="csv")
 
     def print_summary(self) -> None:
         """Print execution summary."""
