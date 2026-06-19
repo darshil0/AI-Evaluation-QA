@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ai-evaluation-qa"
-version = "2.4.0"
+version = "2.4.2"
 description = "A production-grade framework for evaluating AI model responses"
 readme = "README.md"
 authors = [{ name = "Darshil Shah" }]
@@ -78,7 +78,7 @@ ml = ["scikit-learn>=1.1.0"]
 [project.urls]
 "Bug Reports" = "https://github.com/darshil0/AI-Evaluation-QA/issues"
 "Source" = "https://github.com/darshil0/AI-Evaluation-QA"
-"Documentation" = "https://github.com/darshil0/AI-Evaluation-QA/blob/main/docs/"
+"Documentation" = "https://github.com/darshil0/AI-Evaluation-QA/blob/main/README.md"
 
 [project.scripts]
 ai-eval = "main:cli"

@@ -10,7 +10,7 @@ long_description = readme_path.read_text(encoding="utf-8") if readme_path.exists
 
 setup(
     name="ai-evaluation-qa",
-    version="2.4.0",
+    version="2.4.2",
     author="Darshil",
     author_email="",
     description="Production-grade framework for evaluating AI model responses",
@@ -98,6 +98,6 @@ setup(
     project_urls={
         "Bug Reports": "https://github.com/darshil0/AI-Evaluation-QA/issues",
         "Source": "https://github.com/darshil0/AI-Evaluation-QA",
-        "Documentation": "https://github.com/darshil0/AI-Evaluation-QA/blob/main/docs/",
+        "Documentation": "https://github.com/darshil0/AI-Evaluation-QA/blob/main/README.md",
     },
 )

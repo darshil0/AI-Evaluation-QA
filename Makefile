@@ -197,15 +197,7 @@ init:  ## Initialize project (first time setup)
 	@pre-commit install || true
 	@echo "Initialization complete!"
 
-docs:  ## Generate documentation
-	@echo "Generating documentation..."
-	@if [ -f docs/Makefile ]; then \
-		$(MAKE) -C docs html; \
-		echo "Docs generated! Open docs/_build/html/index.html"; \
-	else \
-		echo "Error: Documentation setup missing. docs/Makefile not found."; \
-		exit 1; \
-	fi
+
 
 update-deps:  ## Update all dependencies to latest versions
 	@echo "Updating dependencies..."
