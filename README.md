@@ -10,23 +10,19 @@
 
 ## Overview
 
-The **AI Evaluation QA Framework** is a production-grade Python library designed for evaluating, scoring, and comparing AI model responses at scale. It provides a robust pipeline to run structured prompt suites against major LLM providers (OpenAI, Anthropic, Azure OpenAI), score them using customizable rubrics and heuristics, and generate professional HTML dashboards, executive summaries, and detailed analytics.
-
----
+The **AI Evaluation QA Framework** is a production-grade Python library for evaluating, scoring, and comparing AI model responses at scale. It provides a robust pipeline to run structured prompt suites against major LLM providers (OpenAI, Anthropic, Azure OpenAI), score them using customizable rubrics, and generate professional dashboards with analytics and cost telemetry.
 
 ## Key Features
 
 - 🚀 **Multi-Provider Support**: Seamlessly evaluate against OpenAI, Anthropic, and Azure OpenAI.
-- ⚖️ **Rubric-Based Scoring**: Score responses across dimensions like Accuracy, Reasoning, Tone, and Completeness (1–5 scale).
-- 🔍 **Automated Defect Detection**: Built-in detection for hallucinations, logical flaws, redundancy, poor tone, and incomplete responses.
-- 📊 **Rich Analytics & Dashboards**: Interactive HTML dashboards, executive summaries, trend analysis, and detailed CSV exports.
+- ⚖️ **Rubric-Based Scoring**: Score responses across Accuracy, Reasoning, Tone, and Completeness (1–5 scale).
+- 🔍 **Automated Defect Detection**: Built-in detection for hallucinations, logical flaws, redundancy, tone issues, and incomplete responses.
+- 📊 **Rich Analytics & Dashboards**: Interactive HTML dashboards, executive summaries, trend analysis, and CSV exports.
 - 💰 **Cost Telemetry**: Precision token counting and estimated cost tracking per model and run.
 - 🛡️ **Security & Validation**: Input/output sanitization, filename safety controls, and comprehensive pre-execution checks.
 - 🔄 **Fault-Tolerant & Resumable**: Mid-batch checkpointing ensures no progress is lost on failure.
 - ⚡ **Asynchronous & Fast**: Built with `asyncio` for high-concurrency API requests.
 - 🐳 **Docker & CI/CD Ready**: Includes Dockerfile, GitHub Actions workflows, and automated testing pipelines.
-
----
 
 ## Requirements
 
@@ -37,17 +33,10 @@ The **AI Evaluation QA Framework** is a production-grade Python library designed
   - Azure OpenAI credentials (`AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT`)
 - **Docker** (optional): For containerized execution
 
----
-
 ## Documentation
 
-- [Project Skills & Expertise](#project-skills--expertise) — Core competencies and architecture.
-- [Business Logic & Workflow](#business-logic--workflow-architecture) — Evaluation pipeline and data flow.
-- [Prompt Engineering Architecture](CONTRIBUTING.md#reverse-engineered-prompt-engineering) — Prompt design patterns and best practices.
 - [Contributing Guide](CONTRIBUTING.md) — Development setup, testing, and pull request guidelines.
-- [Issue Audit & Fixes](CHANGELOG.md#historical-fixes-summary-v240--v238-patch) — Comprehensive QA audit and resolution log.
-
----
+- [Changelog & Issue History](CHANGELOG.md) — Version history and historical fixes.
 
 ## Installation
 
@@ -79,8 +68,6 @@ docker build -t ai-eval:latest .
 docker run --env-file .env ai-eval:latest ai-eval validate
 ```
 
----
-
 ## Quick Start
 
 ### 1. Configure Environment
@@ -105,7 +92,7 @@ OUTPUT_DIR='./reports'
 ai-eval validate
 ```
 
-This checks environment, API connectivity, and configuration validity.
+Checks environment, API connectivity, and configuration validity.
 
 ### 3. Run Evaluation
 
@@ -116,17 +103,15 @@ ai-eval evaluate --prompts data/prompts/reasoning_tests.json \
 
 ### 4. Generate Reports
 
-Reports are generated automatically during evaluation, but you can regenerate them from existing results:
+Reports are generated automatically during evaluation. Regenerate from existing results:
 
 ```bash
 ai-eval report --results results/scored_results.csv --output-dir ./reports
 ```
 
----
-
 ## Example Prompt File
 
-Create a JSON file with your test cases (e.g., `data/prompts/reasoning_tests.json`):
+Create a JSON file with test cases (e.g., `data/prompts/reasoning_tests.json`):
 
 ```json
 [
@@ -154,18 +139,14 @@ Create a JSON file with your test cases (e.g., `data/prompts/reasoning_tests.jso
 ]
 ```
 
----
-
 ## CLI Reference
-
-### Commands
 
 | Command | Purpose | Example |
 |---------|---------|---------|
 | `evaluate` | Full pipeline: run prompts, score, and generate reports | `ai-eval evaluate --prompts tests.json --model gpt-4` |
 | `score` | Score raw results from a previous run | `ai-eval score --results raw_results.csv --output scored.csv` |
 | `report` | Generate HTML dashboards and summaries from scored results | `ai-eval report --results scored.csv --output-dir ./reports` |
-| `check-regression` | Compare current results against a historical baseline | `ai-eval check-regression current.csv --baseline baseline.csv` |
+| `check-regression` | Compare current results against a baseline | `ai-eval check-regression current.csv --baseline baseline.csv` |
 | `validate` | Validate environment setup, API keys, and configuration | `ai-eval validate` |
 | `lint-prompts` | Validate prompt JSON file structure and content | `ai-eval lint-prompts prompts.json` |
 
@@ -178,13 +159,12 @@ Create a JSON file with your test cases (e.g., `data/prompts/reasoning_tests.jso
 --dry-run                                # Simulate run without API calls
 ```
 
----
-
 ## Configuration
 
 Configuration is managed via `config/settings.yaml`. Key sections:
 
 ### Models
+
 ```yaml
 models:
   openai:
@@ -202,6 +182,7 @@ models:
 ```
 
 ### Scoring Rubric
+
 ```yaml
 scoring:
   dimensions:
@@ -220,6 +201,7 @@ scoring:
 ```
 
 ### Execution Settings
+
 ```yaml
 execution:
   timeout_seconds: 60
@@ -229,8 +211,6 @@ execution:
 ```
 
 See `CONTRIBUTING.md` for detailed configuration examples and schema.
-
----
 
 ## Output Files
 
@@ -246,28 +226,6 @@ results/
 ├── detailed_dashboard.html      # Interactive results with filtering
 └── regression_report.html       # Comparison to baseline (if applicable)
 ```
-
----
-
-## Testing
-
-```bash
-# Run all tests with coverage
-pytest tests/ --cov=evaluation --cov=config --cov-report=term-missing
-
-# Run specific test file
-pytest tests/test_scoring.py -v
-
-# Run with markers (unit, integration, slow)
-pytest tests/ -m "not slow"
-
-# Using Makefile
-make test          # Run all tests
-make test-cov      # Run with coverage report
-make lint          # Run linting and type checks
-```
-
----
 
 ## Project Structure
 
@@ -293,19 +251,60 @@ ai-evaluation-qa/
 ├── scripts/
 │   ├── regression_checker.py # Check for performance regressions
 │   ├── setup_verifier.py     # Verify installation and setup
-│   ├── prompt_loader.py      # Logic for loading/validating prompts
-│   ├── data_validator.py     # Data cleaning and validation utilities
+│   ├── prompt_loader.py      # Load and validate prompts
+│   ├── data_validator.py     # Data cleaning and validation
 │   └── setup.sh             # Environment setup script
-├── tests/                  # 100% coverage test suite
+├── tests/                   # 100% coverage test suite
 ├── data/
-│   └── prompts/           # Sample prompt files
-├── Dockerfile             # Container configuration
-├── Makefile              # Common task automation
-├── requirements.txt      # Dependencies
-└── README.md            # This file
+│   └── prompts/            # Sample prompt files
+├── Dockerfile              # Container configuration
+├── Makefile               # Automation commands
+├── requirements.txt       # Dependencies
+└── README.md             # This file
 ```
 
----
+## How It Works
+
+The evaluation pipeline follows these stages:
+
+1. **Validation**: Configuration and prompt schema validation.
+2. **Execution**: Prompts are dispatched to LLM providers asynchronously with rate limiting and error handling.
+3. **Checkpointing**: Results are saved in real-time to recover from failures.
+4. **Scoring**: Raw responses are scored using a combination of heuristic rules and optional LLM-based judgment:
+   - **Accuracy**: Checks for uncertainty markers and factual specificity.
+   - **Reasoning**: Analyzes logical connectors and structured formatting.
+   - **Tone**: Monitors for politeness and appropriateness.
+   - **Completeness**: Evaluates coverage and response depth.
+5. **Defect Detection**: Identifies hallucinations, logical flaws, redundancy, and other issues.
+6. **Cost Tracking**: Calculates token usage and estimated costs using model-specific pricing.
+7. **Reporting**: Generates interactive HTML dashboards and executive summaries.
+
+### Fault Tolerance
+
+The framework provides resilience through:
+
+- **Exponential Backoff**: API rate limits (429 errors) trigger automatic retries with increasing delays.
+- **Checkpointing**: Progress is saved every N requests (configurable), allowing resumption after failures.
+- **Error Isolation**: Failed requests are logged but don't block batch processing.
+- **Security**: All outputs are sanitized to prevent XSS, and filenames are validated to prevent directory traversal.
+
+## Testing
+
+```bash
+# Run all tests with coverage
+pytest tests/ --cov=evaluation --cov=config --cov-report=term-missing
+
+# Run specific test file
+pytest tests/test_scoring.py -v
+
+# Run with markers (unit, integration, slow)
+pytest tests/ -m "not slow"
+
+# Using Makefile
+make test          # Run all tests
+make test-cov      # Run with coverage report
+make lint          # Run linting and type checks
+```
 
 ## Troubleshooting
 
@@ -333,8 +332,6 @@ ai-evaluation-qa/
 **Error**: `API keys not accessible in container`
 **Solution**: Pass `.env` file using `docker run --env-file .env` or use `docker-compose.yml`.
 
----
-
 ## Cost Estimation
 
 The framework tracks token usage for cost optimization:
@@ -353,8 +350,6 @@ Model: claude-opus-4-7
 
 Costs are estimated based on current pricing as of January 2026. Verify with your provider for accuracy.
 
----
-
 ## Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
@@ -365,124 +360,12 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 - Pull request process and review criteria
 - Commit message conventions
 
----
-
 ## License
 
 MIT License. See [LICENSE](LICENSE) for full text.
 
 ---
 
-## Version History
-
-**2.4.2** (Current)
-- Fixed CI/CD pipeline: corrected broken Trivy action version, fixed `safety check` to scan project dependencies, and created the missing `.pre-commit-config.yaml` for developer setup.
-- Removed all stale references to the deleted `docs/` folder from `setup.py`, `pyproject.toml`, and the `Makefile`.
-
-**2.4.1**
-- Fixed missing `encoding="utf-8"` in `open()` calls across `validator.py`, `cost_tracker.py`, and the test suite for improved cross-platform stability on Windows.
-
-**2.4.0**
-- Foundational Documentation merged into primary files (`README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`)
-- CI/CD Pipeline with automated testing and security scanning
-- Enhanced Error Handling and Retry Logic with exponential backoff
-- Client-based architecture for LLM providers
-- Fixed critical deadlocks and parameter shadowing bugs
-- 100% test coverage enforced
-
-**2.3.0**
-- Multi-provider support (OpenAI, Anthropic)
-- Rubric-based scoring
-- CSV export and reporting
-
-**2.0.0**
-- Initial production release
-
----
-
 **Status**: Production / Stable
 **Python**: 3.9+
 **Maintainer**: Darshil ([@darshil0](https://github.com/darshil0))
-
----
-
-## Project Skills & Expertise
-
-This repository demonstrates a high level of proficiency in modern software engineering, AI integration, and quality assurance practices. The following skills are core to the architecture and implementation of the **AI Evaluation QA Framework**.
-
-### 🏗️ Software Architecture & Design
-*   **Modular Design**: Clean separation of concerns between configuration, execution, scoring, and reporting modules.
-*   **Asynchronous Programming**: Extensive use of `asyncio` for high-concurrency API interactions, ensuring optimal throughput.
-*   **Factory & Strategy Patterns**: Implementation of flexible client architectures to support multiple LLM providers (OpenAI, Anthropic, Azure).
-*   **Fault Tolerance**: Robust checkpointing mechanisms and sophisticated retry logic with exponential backoff.
-
-### 🤖 AI & LLM Integration
-*   **Multi-Provider Orchestration**: Deep integration with OpenAI, Anthropic, and Azure OpenAI APIs.
-*   **Prompt Engineering**: Structured prompt management and validation, including support for complex reasoning and evaluation rubrics.
-*   **Tokenomics**: Precise token counting and cost estimation across different model architectures using `tiktoken`.
-*   **Model Evaluation**: Advanced heuristics and rubric-based scoring to quantify LLM performance.
-
-### 📊 Data Engineering & Analytics
-*   **Pipeline Orchestration**: Building end-to-end data pipelines from raw prompt execution to structured reporting.
-*   **Data Validation**: Strict schema enforcement and semantic validation for input/output data.
-*   **Automated Reporting**: Generation of professional HTML/CSS dashboards and interactive visualizations using `Plotly` and `Matplotlib`.
-*   **Statistical Analysis**: Implementation of regression detection and performance benchmarking.
-
-### 🛡️ Quality Assurance & Security
-*   **Test-Driven Development (TDD)**: 100% code coverage policy with a comprehensive suite of unit and integration tests.
-*   **CI/CD Mastery**: Automated workflows for testing, linting, security scanning, and regression monitoring.
-*   **Security Best Practices**: Implementation of input sanitization, XSS protection, and automated secret detection.
-*   **Static Analysis**: Rigorous use of `mypy`, `flake8`, `black`, and `isort` to maintain code quality.
-
-### 🛠️ DevOps & Infrastructure
-*   **Containerization**: Professional multi-stage `Dockerfile` for reproducible environments.
-*   **Automation**: Advanced `Makefile` for streamlining development, testing, and deployment workflows.
-*   **Environment Management**: Sophisticated configuration loading and environment variable management.
-
----
-
-*This framework serves as a testament to building production-ready AI infrastructure that is scalable, secure, and maintainable.*
-
----
-
-## Business Logic & Workflow Architecture
-
-The **AI Evaluation QA Framework** is built on a modular architecture that separates data ingestion, model execution, scoring heuristics, and reporting. This document details the internal logic and data flow of the system.
-
-### 1. Core Workflow Pipeline
-The evaluation follows a linear but highly optimized pipeline:
-
-1.  **Validation**: Before execution, the `ConfigurationValidator` and `PromptValidator` ensure that the environment is correctly set up, API keys are present, and prompt JSON files adhere to the required schema.
-2.  **Prompt Orchestration**: The `EvaluationPipeline` loads prompts and dispatches them to the `PromptRunner`.
-3.  **Concurrent Execution**: The `PromptRunner` utilizes `asyncio` to send multiple requests in parallel to LLM providers. It respects rate limits via an internal `RateLimiter` and handles errors using an asynchronous `EvaluationErrorHandler`.
-4.  **Checkpointing**: As requests complete, results are saved to `data/checkpoints/` in real-time. This ensures that a network failure or crash doesn't lose progress.
-5.  **Scoring & Analytics**: Raw responses are passed to the `ScoringEngine`, which applies a mixture of:
-    *   **Heuristic Rules**: Pattern matching for logic, tone, and completeness.
-    *   **Judge Models**: (Optional) Using LLMs to score other LLMs.
-    *   **Defect Detection**: Identifying hallucinations or redundancies.
-6.  **Cost Tracking**: The `CostTracker` calculates token usage and estimated costs using model-specific pricing and `tiktoken` encoding.
-7.  **Reporting**: The `ReportGenerator` transforms the scored data into interactive HTML dashboards and executive summaries.
-
-### 2. Scoring Heuristics
-The framework scores responses on a 1–5 scale across four primary dimensions:
-
-| Dimension | Logic / Heuristic |
-| :--- | :--- |
-| **Accuracy** | Checks for uncertainty markers, response length, and specific factual markers. |
-| **Reasoning** | Analyzes logical connectors (e.g., "therefore", "consequently") and structured formatting (lists). |
-| **Tone** | Monitors for positive/polite language vs. negative or dismissive markers. |
-| **Completeness** | Evaluates word count thresholds and the presence of requested structural elements. |
-
-### 3. Fault Tolerance & Error Handling
-*   **Exponential Backoff**: When an API rate limit is hit (429 error), the system waits with increasing delays before retrying.
-*   **Failed Request Tracking**: Requests that fail after all retries are logged but don't stop the rest of the batch.
-*   **Safe Serialization**: The checkpointing logic skips rows that fail to serialize, ensuring the overall file remains valid.
-
-### 4. Security & Sanitization
-*   **Filename Safety**: All generated report filenames are sanitized to prevent directory traversal attacks.
-*   **HTML Escaping**: User-provided content (prompts/responses) is escaped before being rendered in HTML reports to mitigate XSS risks.
-*   **Secret Management**: The framework prevents the accidental logging of API keys or sensitive session data.
-
----
-
-*This architecture is designed for production environments where reliability, speed, and clear audit trails are paramount.*
