@@ -1,3 +1,0 @@
-model,prompt,prompt_id,prompt_tokens,response,response_tokens,status,timestamp
-gpt-4,Hello world!,p1,5,Test,5,success,2026-06-18T23:03:32.569062
-gpt-4,Write a short poem.,p2,5,Test,5,success,2026-06-18T23:03:32.569096

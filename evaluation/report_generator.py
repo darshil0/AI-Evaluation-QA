@@ -4,6 +4,7 @@ import json
 from typing import Dict, Optional, List, Any
 import csv
 import html
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +56,7 @@ class ReportGenerator:
                 if col in df.columns:
                     try:
                         return pd.to_numeric(df[col], errors="coerce").mean()
-                    except:
+                    except Exception:
                         continue
             return 0.0
 
@@ -232,8 +233,6 @@ class ReportGenerator:
 
     async def generate_reports_async(self, data: Any) -> Dict[str, str]:
         """Generate all reports asynchronously."""
-        import asyncio
-
         return await asyncio.to_thread(self.generate_reports, data)
 
     def generate_reports(self, data: Any) -> Dict[str, str]:
@@ -361,13 +360,13 @@ class ReportGenerator:
 
         # Write to file
         md_path = self.output_dir / "executive_summary.md"
-        with open(md_path, "w") as f:
+        with open(md_path, "w", encoding="utf-8") as f:
             f.write(markdown)
 
         # Also write JSON version
         summary["dimension_averages"] = dimension_avgs
         json_path = self.output_dir / "executive_summary.json"
-        with open(json_path, "w") as f:
+        with open(json_path, "w", encoding="utf-8") as f:
             json.dump(summary, f, indent=2, default=float)
 
         logger.info(f"Executive summary saved to: {md_path}")

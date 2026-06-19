@@ -1,21 +1,22 @@
 import json
 import os
+from typing import Any, Dict, Optional
 from jsonschema import validate, ValidationError
 
 
 class PromptLoader:
-    def __init__(self, schema_path=None):
+    def __init__(self, schema_path: Optional[str] = None):
         if schema_path and os.path.exists(schema_path):
-            with open(schema_path, "r") as f:
+            with open(schema_path, "r", encoding="utf-8") as f:
                 self.schema = json.load(f)
         else:
             self.schema = None
 
-    def load_and_validate(self, filepath):
+    def load_and_validate(self, filepath: str) -> Dict[str, Any]:
         if not os.path.exists(filepath):
             raise FileNotFoundError(f"Prompt file not found: {filepath}")
 
-        with open(filepath, "r") as f:
+        with open(filepath, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         if self.schema:

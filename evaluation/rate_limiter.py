@@ -30,24 +30,25 @@ class RateLimiter:
 
     async def acquire(self):
         """Acquire rate limit token with backpressure."""
-        async with self.lock:
-            now = datetime.now()
+        while True:
+            async with self.lock:
+                now = datetime.now()
 
-            # Remove calls older than 1 minute
-            cutoff = now - timedelta(minutes=1)
-            self.call_times = [t for t in self.call_times if t > cutoff]
+                # Remove calls older than 1 minute
+                cutoff = now - timedelta(minutes=1)
+                self.call_times = [t for t in self.call_times if t > cutoff]
 
-            # Wait if we've hit the limit
-            if len(self.call_times) >= self.calls_per_minute:
+                # Wait if we've hit the limit
+                if len(self.call_times) < self.calls_per_minute:
+                    self.call_times.append(now)
+                    return
+
                 oldest_call = self.call_times[0]
                 sleep_time = 61 - (now - oldest_call).total_seconds()
 
-                if sleep_time > 0:
-                    logger.warning(f"Rate limit reached. Waiting {sleep_time:.2f}s")
-                    await asyncio.sleep(sleep_time)
-                    return await self.acquire()
-
-            self.call_times.append(now)
+            if sleep_time > 0:
+                logger.warning(f"Rate limit reached. Waiting {sleep_time:.2f}s")
+                await asyncio.sleep(sleep_time)
 
     async def __aenter__(self):
         await self.acquire()

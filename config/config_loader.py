@@ -5,10 +5,6 @@ from typing import Any, Dict, Optional
 
 import yaml
 
-# Configure logging with a default handler if none exists
-if not logging.getLogger(__name__).handlers:
-    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
-
 logger = logging.getLogger(__name__)
 
 

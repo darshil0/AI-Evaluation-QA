@@ -190,7 +190,9 @@ class PromptRunner:
                 }
 
     async def run_prompts(
-        self, prompts: List[Dict[str, Any]], checkpoint_callback: Optional[Callable] = None
+        self,
+        prompts: List[Dict[str, Any]],
+        checkpoint_callback: Optional[Callable[[List[Dict[str, Any]]], Any]] = None,
     ) -> List[Dict[str, Any]]:
         """
         Execute prompts asynchronously with concurrency control and optional checkpointing.
