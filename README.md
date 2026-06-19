@@ -41,11 +41,11 @@ The **AI Evaluation QA Framework** is a production-grade Python library designed
 
 ## Documentation
 
-- [Project Skills & Expertise](Skills.md) — Core competencies and architecture.
-- [Business Logic & Workflow](BUSINESS_LOGIC.md) — Evaluation pipeline and data flow.
-- [Prompt Engineering Architecture](PROMPT_ENGINEERING.md) — Prompt design patterns and best practices.
+- [Project Skills & Expertise](Skills.MD) — Core competencies and architecture.
+- [Business Logic & Workflow](BUSINESS_LOGIC.MD) — Evaluation pipeline and data flow.
+- [Prompt Engineering Architecture](PROMPT_ENGINEERING.MD) — Prompt design patterns and best practices.
 - [Contributing Guide](CONTRIBUTING.md) — Development setup, testing, and pull request guidelines.
-- [Issue Audit & Fixes](FIXES_SUMMARY.md) — Comprehensive QA audit and resolution log.
+- [Issue Audit & Fixes](FIXES_SUMMARY.MD) — Comprehensive QA audit and resolution log.
 
 ---
 
@@ -376,7 +376,7 @@ MIT License. See [LICENSE](LICENSE) for full text.
 ## Version History
 
 **2.4.0** (Current)
-- Foundational Documentation (`Skills.md`, `BUSINESS_LOGIC.md`, `PROMPT_ENGINEERING.md`)
+- Foundational Documentation (`Skills.MD`, `BUSINESS_LOGIC.MD`, `PROMPT_ENGINEERING.MD`)
 - CI/CD Pipeline with automated testing and security scanning
 - Enhanced Error Handling and Retry Logic with exponential backoff
 - Client-based architecture for LLM providers
