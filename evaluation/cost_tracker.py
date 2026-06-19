@@ -1,7 +1,7 @@
-from typing import Dict, Tuple, Optional, List, Any
 import logging
 from datetime import datetime
 from functools import lru_cache
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +72,7 @@ class CostTracker:
             return len(text) // 4
 
         try:
-            import tiktoken
+            pass
 
             return len(encoding.encode(text))
         except Exception as e:

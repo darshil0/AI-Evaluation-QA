@@ -1,5 +1,6 @@
-import pytest
 import pandas as pd
+import pytest
+
 from scripts.data_validator import DataValidator
 
 

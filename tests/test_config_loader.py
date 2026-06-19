@@ -1,7 +1,7 @@
 import pytest
 import yaml
-from pathlib import Path
-from config.config_loader import ConfigLoader, ConfigError
+
+from config.config_loader import ConfigError, ConfigLoader
 
 
 @pytest.fixture

@@ -1,4 +1,5 @@
 import json
+
 import pytest
 from jsonschema import ValidationError
 
@@ -57,7 +58,7 @@ class TestPromptValidation:
         prompt_file = tmp_path / "duplicate_prompts.json"
         prompt_file.write_text(json.dumps(duplicate_prompt), encoding="utf-8")
 
-        with pytest.raises(ValidationError, match="Duplicate prompt IDs"):
+        with pytest.raises(ValidationError, match="Found duplicate prompt IDs in file"):
             validate_prompt_file(str(prompt_file))
 
     def test_invalid_difficulty(self, tmp_path):

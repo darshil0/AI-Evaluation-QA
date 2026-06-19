@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.3] - 2026-06-20
+
+### Fixed
+- **Prompt Validation Enhancement**: Updated `PromptValidator.load_and_validate` to provide more descriptive, actionable error messages and ensure consistent `ValueError` exceptions during validation failures.
+- **Code Quality**: Applied project-wide formatting using Black and Isort to ensure consistent code style and improve maintainability.
+- **Data Integrity**: Fixed a bug in `EvaluationPipeline.process_results_async` that caused duplicate columns and ambiguous Series truth values during result processing.
+
+### Added
+- **Comprehensive Test Suite**: Significantly expanded the test suite, increasing code coverage from 65% to over 80%.
+    - **API Clients**: Added robust unit and integration tests for `AnthropicClient` and `OpenAIClient`.
+    - **Data Processing**: Implemented tests for `DataProcessor` to verify reliable chunked CSV handling for large datasets.
+    - **Quality Control**: Added comprehensive tests for `DefectDetector` logic and heuristic-based issue identification.
+    - **Resilience**: Added verification for `RetryLogic` exponential backoff and error recovery mechanisms.
+    - **Framework Core**: Enhanced coverage for `EvaluationPipeline`, `ConfigLoader`, and centralized `ModelStrings` constants.
+
+### Note
+- This is a non-breaking, maintenance and quality-focused release.
+
 ## [2.4.2] - 2026-06-19
 
 ### Fixed
@@ -287,9 +305,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Historical Fixes Summary (v2.4.0 & v2.3.8-patch)
 
-**Date**: 2026-06-04  
-**Framework Version**: 2.4.0  
-**Auditor**: Darshil Standard Analysis  
+**Date**: 2026-06-04
+**Framework Version**: 2.4.0
+**Auditor**: Darshil Standard Analysis
 
 ---
 
@@ -304,53 +322,53 @@ The v2.4.0 audit focused on deep logic bugs, type safety, file encoding robustne
 ## v2.4.0 Issue Audit
 
 ### Issue #1: Deadlock in RateLimiter
-**Severity**: 🔴 CRITICAL  
-**Component**: `evaluation/rate_limiter.py`  
+**Severity**: 🔴 CRITICAL
+**Component**: `evaluation/rate_limiter.py`
 **Fix**: Refactored recursive `acquire()` calls inside an `async with self.lock` block that caused execution deadlocks under load.
 
 ### Issue #2: Parameter Shadowing Built-in
-**Severity**: 🟠 MEDIUM  
-**Component**: `evaluation/prompt_runner.py`  
+**Severity**: 🟠 MEDIUM
+**Component**: `evaluation/prompt_runner.py`
 **Fix**: Renamed `format` parameter to `file_format` in `save_responses()` to prevent shadowing Python's built-in function. Updated `tests/test_evaluation_pipeline.py` and `tests/test_prompt_runner_coverage.py` to match.
 
 ### Issue #3: Unrealistic Dependency Versions
-**Severity**: 🟠 MEDIUM  
-**Component**: `pyproject.toml`, `setup.py`, `requirements.txt`  
+**Severity**: 🟠 MEDIUM
+**Component**: `pyproject.toml`, `setup.py`, `requirements.txt`
 **Fix**: Reverted futuristic dependency versions (e.g., `numpy>=2.4.6`, `pandas>=3.0.3`) back to modern stable releases (`numpy>=1.26.0`, `pandas>=2.2.0`) to allow realistic installation.
 
 ### Issue #4: Missing File Encodings
-**Severity**: 🟠 MEDIUM  
-**Component**: `evaluation/report_generator.py`, `scripts/prompt_loader.py`  
+**Severity**: 🟠 MEDIUM
+**Component**: `evaluation/report_generator.py`, `scripts/prompt_loader.py`
 **Fix**: Explicitly added `encoding="utf-8"` to all `open()` calls to prevent platform-specific `UnicodeDecodeError` exceptions on Windows.
 
 ### Issue #5: Incomplete Execution Guard
-**Severity**: 🟡 LOW  
-**Component**: `config/prompt_validator.py`  
+**Severity**: 🟡 LOW
+**Component**: `config/prompt_validator.py`
 **Fix**: Added a proper `if __name__ == "__main__":` guard and the missing `asyncio.run()` call to actually execute the `main()` function instead of defining it and exiting.
 
 ### Issue #6: Bare Except Clause
-**Severity**: 🟡 LOW  
-**Component**: `evaluation/report_generator.py`  
+**Severity**: 🟡 LOW
+**Component**: `evaluation/report_generator.py`
 **Fix**: Converted a dangerous bare `except:` block in `calculate_statistics()` to `except Exception:` to prevent catching `KeyboardInterrupt` and `SystemExit`.
 
 ### Issue #7: Missing Package Init Files
-**Severity**: 🟡 LOW  
-**Component**: `config/`, `evaluation/clients/`, `scripts/`  
+**Severity**: 🟡 LOW
+**Component**: `config/`, `evaluation/clients/`, `scripts/`
 **Fix**: Created missing `__init__.py` files to ensure proper Python package discovery across all environments.
 
 ### Issue #8: Invalid Type Hint Syntax
-**Severity**: 🟡 LOW  
-**Component**: `evaluation/prompt_runner.py`, `scripts/prompt_loader.py`  
+**Severity**: 🟡 LOW
+**Component**: `evaluation/prompt_runner.py`, `scripts/prompt_loader.py`
 **Fix**: Fixed incorrect `Optional[callable]` syntax to `Optional[Callable]` and added missing type hints to `PromptLoader`.
 
 ### Issue #9: Fragile Logging Configuration
-**Severity**: 🟡 LOW  
-**Component**: `config/config_loader.py`  
+**Severity**: 🟡 LOW
+**Component**: `config/config_loader.py`
 **Fix**: Removed a fragile module-level `logging.basicConfig()` call that checked child logger handlers but improperly configured the root logger.
 
 ### Issue #10: Unnecessary Asyncio Import
-**Severity**: 🟡 LOW  
-**Component**: `evaluation/report_generator.py`  
+**Severity**: 🟡 LOW
+**Component**: `evaluation/report_generator.py`
 **Fix**: Removed a spurious `import asyncio` statement from inside the strictly synchronous `generate_reports()` method.
 
 ---
@@ -361,7 +379,7 @@ The v2.4.0 audit focused on deep logic bugs, type safety, file encoding robustne
 
 The codebase contains **version conflicts**, **package discovery mismatches**, **broken documentation links**, and **inconsistent dependency specifications** that would cause installation failures, import errors, and deployment issues in production.
 
-**Impact**: 
+**Impact**:
 - Installation may fail or succeed with incompatible versions
 - Runtime ImportError on module load
 - Documentation links broken for contributors
@@ -373,7 +391,7 @@ The codebase contains **version conflicts**, **package discovery mismatches**, *
 
 ### Issue #1: Version Mismatch in OpenAI Dependency
 
-**Severity**: 🔴 CRITICAL  
+**Severity**: 🔴 CRITICAL
 **Component**: `setup.py`, `pyproject.toml`, `requirements.txt`
 
 **Given**: Three configuration files define OpenAI version
@@ -402,7 +420,7 @@ requirements.txt: openai>=1.60.0  ✓ (stable)
 
 ### Issue #2: Matplotlib Version Conflict
 
-**Severity**: 🟠 MEDIUM  
+**Severity**: 🟠 MEDIUM
 **Component**: `setup.py`, `requirements.txt`
 
 **Given**: Inconsistent matplotlib versions specified
@@ -421,7 +439,7 @@ requirements.txt: matplotlib>=3.10.0  ✓
 
 ### Issue #3: Plotly Version Incompatibility
 
-**Severity**: 🟠 MEDIUM  
+**Severity**: 🟠 MEDIUM
 **Component**: `setup.py`, `requirements.txt`
 
 **Given**: Major version difference (6.7.0 vs 5.24.0)
@@ -440,7 +458,7 @@ requirements.txt: plotly>=5.24.0  ✓ (stable)
 
 ### Issue #4: Click Library Version Mismatch
 
-**Severity**: 🟡 LOW  
+**Severity**: 🟡 LOW
 **Component**: `setup.py`, `requirements.txt`, `pyproject.toml`
 
 **Given**: CLI built on Click with inconsistent versions
@@ -460,7 +478,7 @@ requirements.txt: click>=8.1.0   ✓
 
 ### Issue #5: Package Discovery Mismatch
 
-**Severity**: 🔴 CRITICAL  
+**Severity**: 🔴 CRITICAL
 **Component**: `setup.py` vs `pyproject.toml`
 
 **Given**: Package configuration files define different discovery strategies
@@ -493,7 +511,7 @@ packages = find_packages(
 
 ### Issue #6: Broken Documentation Links
 
-**Severity**: 🟠 MEDIUM  
+**Severity**: 🟠 MEDIUM
 **Component**: `README.md`
 
 **Given**: README references CONTRIBUTING.md and LICENSE
@@ -517,7 +535,7 @@ packages = find_packages(
 
 ### Issue #7: Improper Dependency Version Pinning
 
-**Severity**: 🟠 MEDIUM  
+**Severity**: 🟠 MEDIUM
 **Component**: `setup.py` path parsing
 
 **Given**: Long description reads with custom `__import__` pattern
@@ -543,7 +561,7 @@ long_description = readme_path.read_text(encoding="utf-8") if readme_path.exists
 
 ### Issue #8: Missing Import Error Handling in main.py
 
-**Severity**: 🔴 CRITICAL  
+**Severity**: 🔴 CRITICAL
 **Component**: `main.py`
 
 **Given**: Top-level imports from `config.config_loader`
@@ -570,7 +588,7 @@ except ImportError as e:
 
 ### Issue #9: Inconsistent Scipy Version
 
-**Severity**: 🟡 LOW  
+**Severity**: 🟡 LOW
 **Component**: `setup.py`, `requirements.txt`
 
 **Given**: Different scipy versions
@@ -589,7 +607,7 @@ requirements.txt: scipy>=1.14.0  ✓
 
 ### Issue #10: Python-dotenv Version Discrepancy
 
-**Severity**: 🟡 LOW  
+**Severity**: 🟡 LOW
 **Component**: `setup.py`, `pyproject.toml`, `requirements.txt`
 
 **Given**: Three different pinned versions
@@ -609,7 +627,7 @@ requirements.txt: python-dotenv>=1.0.0  ✓
 
 ### Issue #11: Missing Pytest Coverage Configuration
 
-**Severity**: 🟡 LOW  
+**Severity**: 🟡 LOW
 **Component**: `pyproject.toml`, `setup.py`
 
 **Given**: No coverage configuration in pyproject.toml
@@ -657,18 +675,18 @@ exclude_lines = [
 ## Edge Cases & Risk Mitigation
 
 ### Edge Case #1: Existing Virtual Environments
-**Problem**: Users with pre-existing venvs have cached old versions  
+**Problem**: Users with pre-existing venvs have cached old versions
 **Mitigation**: Add installation note to CONTRIBUTING.md:
 ```bash
 pip install --upgrade --force-reinstall -e .[dev]
 ```
 
 ### Edge Case #2: Docker Multi-Stage Builds
-**Problem**: Dockerfile may cache old requirements  
+**Problem**: Dockerfile may cache old requirements
 **Mitigation**: Ensure Dockerfile uses `--no-cache` or bust cache layer
 
 ### Edge Case #3: CI/CD Pinning
-**Problem**: GitHub Actions may pin specific version ranges  
+**Problem**: GitHub Actions may pin specific version ranges
 **Mitigation**: Update `.github/workflows/` to match unified versions
 
 ---
@@ -774,7 +792,6 @@ grep "version" setup.py pyproject.toml  # Should all show 2.3.8
 
 ---
 
-**Status**: ✅ ALL ISSUES RESOLVED (v2.3.8-patch and v2.4.0)  
-**Date Completed**: 2026-06-04  
+**Status**: ✅ ALL ISSUES RESOLVED (v2.3.8-patch and v2.4.0)
+**Date Completed**: 2026-06-04
 **Next Steps**: Deploy fixed files, run full test suite, update CI/CD
-

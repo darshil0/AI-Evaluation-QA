@@ -2,11 +2,11 @@
 Exponential backoff retry logic for API calls.
 """
 
-import functools
 import asyncio
-import time
-from typing import Callable, Type, Tuple, Optional
+import functools
 import logging
+import time
+from typing import Callable, Tuple, Type
 
 logger = logging.getLogger(__name__)
 

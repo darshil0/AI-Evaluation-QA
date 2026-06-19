@@ -50,24 +50,24 @@ install-dev:  ## Install development dependencies
 
 test:  ## Run all tests with coverage
 	@echo "Running tests..."
-	$(PYTEST) $(TEST_DIR) --cov=evaluation --cov=config --cov-report=html --cov-report=term-missing --cov-fail-under=80 -v
+	PYTHONPATH=. $(PYTEST) $(TEST_DIR) --cov=evaluation --cov=config --cov=scripts --cov-report=html --cov-report=term-missing --cov-fail-under=80 -v
 
 test-quick:  ## Run tests without coverage (faster)
 	@echo "Running quick tests..."
-	$(PYTEST) $(TEST_DIR) -v --tb=short
+	PYTHONPATH=. $(PYTEST) $(TEST_DIR) -v --tb=short
 
 test-unit:  ## Run only unit tests
 	@echo "Running unit tests..."
-	$(PYTEST) $(TEST_DIR) -m unit -v
+	PYTHONPATH=. $(PYTEST) $(TEST_DIR) -m unit -v
 
 test-integration:  ## Run only integration tests
 	@echo "Running integration tests..."
-	$(PYTEST) $(TEST_DIR) -m integration -v
+	PYTHONPATH=. $(PYTEST) $(TEST_DIR) -m integration -v
 
 test-parallel:  ## Run tests in parallel
 	@echo "Running tests in parallel..."
 	@$(PYTHON) -c "import pytest_xdist" 2>/dev/null || (echo "pytest-xdist missing. Installing..."; $(PIP) install pytest-xdist)
-	$(PYTEST) $(TEST_DIR) -n auto -v
+	PYTHONPATH=. $(PYTEST) $(TEST_DIR) -n auto -v
 
 test-run:  ## Quick sanity test for Docker
 	@echo "Running sanity checks..."
@@ -78,7 +78,7 @@ test-run:  ## Quick sanity test for Docker
 
 coverage:  ## Generate and open coverage report
 	@echo "Generating coverage report..."
-	$(PYTEST) $(TEST_DIR) --cov=evaluation --cov=config --cov-report=html
+	PYTHONPATH=. $(PYTEST) $(TEST_DIR) --cov=evaluation --cov=config --cov=scripts --cov-report=html
 	@echo "Coverage report generated in htmlcov/"
 
 lint:  ## Run all linters

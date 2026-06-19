@@ -1,15 +1,14 @@
-import csv
 import os
 import tempfile
 
 import pytest
 
 from evaluation.scoring_engine import (
-    ScoringEngine,
     Rubric,
     RubricCriterion,
     ScoreComponent,
     ScoreReport,
+    ScoringEngine,
     score_responses,
 )
 
@@ -30,7 +29,11 @@ class TestScoringEngineEdgeCases:
                 "scoring": {
                     "criteria": {
                         "accuracy": {"type": "rule", "weight": 0.5, "params": {}},
-                        "judge_score": {"type": "judge", "weight": 0.5, "params": {"json_key": "score"}},
+                        "judge_score": {
+                            "type": "judge",
+                            "weight": 0.5,
+                            "params": {"json_key": "score"},
+                        },
                     }
                 }
             }
@@ -154,7 +157,9 @@ class TestScoringEngineEdgeCases:
 
     def test_score_rule_mentions_entity(self):
         engine = self.make_engine()
-        raw, notes = engine._score_rule("Hello from Dallas", {"rule": "mentions_entity", "entity": "Dallas"})
+        raw, notes = engine._score_rule(
+            "Hello from Dallas", {"rule": "mentions_entity", "entity": "Dallas"}
+        )
         assert raw == 1.0
         assert "present" in notes
 
@@ -304,11 +309,7 @@ class TestScoringEngineEdgeCases:
     def test_standalone_score_responses_with_config(self):
         responses = [{"prompt": "Test", "response": "Answer"}]
         config = {
-            "scoring": {
-                "criteria": {
-                    "accuracy": {"type": "rule", "weight": 1.0, "params": {}}
-                }
-            }
+            "scoring": {"criteria": {"accuracy": {"type": "rule", "weight": 1.0, "params": {}}}}
         }
         scored = score_responses(responses, config=config)
         assert len(scored) == 1

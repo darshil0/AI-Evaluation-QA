@@ -30,7 +30,11 @@ class TestScoringEngineCoverage:
                 "scoring": {
                     "criteria": {
                         "accuracy": {"type": "rule", "weight": 0.5, "params": {}},
-                        "judge_score": {"type": "judge", "weight": 0.5, "params": {"json_key": "score"}},
+                        "judge_score": {
+                            "type": "judge",
+                            "weight": 0.5,
+                            "params": {"json_key": "score"},
+                        },
                     }
                 }
             }
@@ -77,14 +81,17 @@ class TestScoringEngineCoverage:
     def test_rule_contains_terms(self):
         engine = self.make_engine()
         raw, notes = engine._score_rule(
-            "Python testing and automation", {"rule": "contains_terms", "terms": ["Python", "automation"], "min_match": 2}
+            "Python testing and automation",
+            {"rule": "contains_terms", "terms": ["Python", "automation"], "min_match": 2},
         )
         assert raw == 1.0
         assert "matched" in notes
 
     def test_rule_mentions_entity(self):
         engine = self.make_engine()
-        raw, notes = engine._score_rule("Hello from Dallas", {"rule": "mentions_entity", "entity": "Dallas"})
+        raw, notes = engine._score_rule(
+            "Hello from Dallas", {"rule": "mentions_entity", "entity": "Dallas"}
+        )
         assert raw == 1.0
         assert "present" in notes
 
@@ -102,7 +109,7 @@ class TestScoringEngineCoverage:
 
     def test_judge_json_key_parsing(self):
         engine = self.make_engine()
-        text = "```json\n{\"score\": 4}\n```"
+        text = '```json\n{"score": 4}\n```'
         raw, notes = engine._score_judge(text, {"json_key": "score"})
         assert raw is not None
         assert "json key" in notes

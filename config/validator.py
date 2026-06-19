@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from jsonschema import validate, ValidationError
+from jsonschema import ValidationError, validate
 
 logger = logging.getLogger(__name__)
 
@@ -182,13 +182,15 @@ def validate_prompt_file(filepath: str) -> Dict:
     try:
         validate(instance=data, schema=PROMPT_SCHEMA)
     except ValidationError as e:
-        raise ValidationError(f"Schema validation failed: {e.message}")
+        raise ValidationError(f"Prompt schema validation failed: {e.message}")
 
     # Additional validation: check for duplicate IDs
     prompt_ids = [p["id"] for p in data["prompts"]]
     if len(prompt_ids) != len(set(prompt_ids)):
         duplicates = [pid for pid in prompt_ids if prompt_ids.count(pid) > 1]
-        raise ValidationError(f"Duplicate prompt IDs found: {set(duplicates)}")
+        raise ValidationError(
+            f"Found duplicate prompt IDs in file: {list(set(duplicates))}. Prompt IDs must be unique."
+        )
 
     return data
 

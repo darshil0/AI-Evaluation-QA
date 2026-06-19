@@ -1,6 +1,6 @@
-import pytest
 import pandas as pd
-from pathlib import Path
+import pytest
+
 from evaluation.report_generator import ReportGenerator
 
 

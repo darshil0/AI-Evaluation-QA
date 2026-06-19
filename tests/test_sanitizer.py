@@ -3,6 +3,7 @@ Unit tests for data sanitizer.
 """
 
 import pytest
+
 from evaluation.sanitizer import DataSanitizer
 
 
@@ -75,3 +76,13 @@ class TestDataSanitizer:
         assert DataSanitizer.validate_api_key("short") is False
         assert DataSanitizer.validate_api_key("") is False
         assert DataSanitizer.validate_api_key(None) is False
+        assert DataSanitizer.validate_api_key(123) is False
+
+    def test_validate_api_key_generic(self):
+        """Test generic API key validation."""
+        assert DataSanitizer.validate_api_key("a" * 35) is True
+
+    def test_sanitize_json_non_dict_list(self):
+        """Test sanitizing simple values."""
+        assert DataSanitizer.sanitize_json(123) == 123
+        assert DataSanitizer.sanitize_json(True) is True

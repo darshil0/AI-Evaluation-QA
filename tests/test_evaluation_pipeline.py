@@ -5,21 +5,22 @@ This module contains comprehensive tests for the evaluation framework,
 including prompt execution, scoring, and report generation.
 """
 
-import pytest
-import json
 import csv
+import json
 import os
 import sys
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
 import tempfile
+from pathlib import Path
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from evaluation.prompt_runner import PromptRunner, execute_prompts
-from evaluation.scoring_engine import ScoringEngine, score_responses
-from evaluation.report_generator import ReportGenerator, generate_reports
+from evaluation.prompt_runner import PromptRunner
+from evaluation.report_generator import ReportGenerator
+from evaluation.scoring_engine import ScoringEngine
 
 # ============================================================================
 # FIXTURES

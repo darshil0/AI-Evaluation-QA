@@ -1,6 +1,5 @@
 """Prompt file validation and schema checking."""
 
-import json
 import logging
 import os
 from datetime import datetime
@@ -117,7 +116,10 @@ class PromptValidator:
     def load_and_validate(file_path: str) -> Dict[str, Any]:
         """Load JSON file and validate it completely."""
         try:
-            data = validate_prompt_file(file_path)
+            try:
+                data = validate_prompt_file(file_path)
+            except Exception as e:
+                raise ValueError(str(e))
 
             _, warnings = PromptValidator.validate_semantic(data)
             if warnings:

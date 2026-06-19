@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ai-evaluation-qa"
-version = "2.4.2"
+version = "2.4.3"
 description = "A production-grade framework for evaluating AI model responses"
 readme = "README.md"
 authors = [{ name = "Darshil Shah" }]
@@ -86,6 +86,7 @@ ai-eval = "main:cli"
 [tool.setuptools]
 # Fixed: Use package discovery for evaluation, config, scripts
 packages = ["evaluation", "config", "scripts"]
+py-modules = ["main"]
 
 [tool.setuptools.package-data]
 evaluation = ["*.yaml", "*.yml", "*.json"]

@@ -1,6 +1,6 @@
-import pytest
 import pandas as pd
-from pathlib import Path
+import pytest
+
 from scripts.regression_checker import RegressionDetector
 
 
