@@ -6,9 +6,9 @@ scoring, and reporting on AI evaluations. It uses the Click library to expose
 commands for full pipeline execution or independent sub-stages.
 
 Usage:
-    ai-eval evaluate --prompts <file>
+    ai-eval evaluate --prompts <file> [--model <model_name>]
     ai-eval score --results <file> --output <file>
-    ai-eval report --results <file> --dir <dir>
+    ai-eval report --results <file> --output-dir <dir>
 """
 
 import logging
