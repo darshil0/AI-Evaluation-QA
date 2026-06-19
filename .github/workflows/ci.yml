@@ -58,6 +58,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install bandit safety
+          pip install -e ".[dev]"
 
       - name: Run Bandit
         run: bandit -r evaluation config scripts -ll
@@ -66,7 +67,7 @@ jobs:
         run: safety check --full-report
 
       - name: Trivy Vulnerability Scanner
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
           ignore-unfixed: true
