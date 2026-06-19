@@ -8,18 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.4.3] - 2026-06-20
 
 ### Fixed
-- **Prompt Validation**: Fixed `PromptValidator.load_and_validate` to correctly raise `ValueError` on validation failures, matching test expectations.
-- **Code Consistency**: Performed codebase-wide formatting using `make format` to ensure compliance with Black and Isort standards.
+- **Prompt Validation Enhancement**: Updated `PromptValidator.load_and_validate` to provide more descriptive, actionable error messages and ensure consistent `ValueError` exceptions during validation failures.
+- **Code Quality**: Applied project-wide formatting using Black and Isort to ensure consistent code style and improve maintainability.
+- **Data Integrity**: Fixed a bug in `EvaluationPipeline.process_results_async` that caused duplicate columns and ambiguous Series truth values during result processing.
 
 ### Added
-- **Expanded Test Coverage**: Significantly increased test coverage from ~65% to >80%.
-    - Added unit tests for `AnthropicClient` and `OpenAIClient`.
-    - Added tests for `DataProcessor` chunked CSV handling.
-    - Added tests for `DefectDetector` logic and heuristics.
-    - Added tests for `RetryLogic` exponential backoff.
-    - Added tests for `ModelStrings` constants.
-    - Added tests for `PromptLoader` and enhanced validation testing.
-    - Improved coverage for `EvaluationPipeline` and `ConfigLoader`.
+- **Comprehensive Test Suite**: Significantly expanded the test suite, increasing code coverage from 65% to over 80%.
+    - **API Clients**: Added robust unit and integration tests for `AnthropicClient` and `OpenAIClient`.
+    - **Data Processing**: Implemented tests for `DataProcessor` to verify reliable chunked CSV handling for large datasets.
+    - **Quality Control**: Added comprehensive tests for `DefectDetector` logic and heuristic-based issue identification.
+    - **Resilience**: Added verification for `RetryLogic` exponential backoff and error recovery mechanisms.
+    - **Framework Core**: Enhanced coverage for `EvaluationPipeline`, `ConfigLoader`, and centralized `ModelStrings` constants.
+
+### Note
+- This is a non-breaking, maintenance and quality-focused release.
 
 ## [2.4.2] - 2026-06-19
 
