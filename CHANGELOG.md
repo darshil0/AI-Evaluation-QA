@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.3] - 2026-06-20
+
+### Fixed
+- **Prompt Validation**: Fixed `PromptValidator.load_and_validate` to correctly raise `ValueError` on validation failures, matching test expectations.
+- **Code Consistency**: Performed codebase-wide formatting using `make format` to ensure compliance with Black and Isort standards.
+
+### Added
+- **Expanded Test Coverage**: Significantly increased test coverage from ~65% to >80%.
+    - Added unit tests for `AnthropicClient` and `OpenAIClient`.
+    - Added tests for `DataProcessor` chunked CSV handling.
+    - Added tests for `DefectDetector` logic and heuristics.
+    - Added tests for `RetryLogic` exponential backoff.
+    - Added tests for `ModelStrings` constants.
+    - Added tests for `PromptLoader` and enhanced validation testing.
+    - Improved coverage for `EvaluationPipeline` and `ConfigLoader`.
+
 ## [2.4.2] - 2026-06-19
 
 ### Fixed
