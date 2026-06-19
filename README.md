@@ -1,9 +1,9 @@
 # AI Evaluation QA Framework
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.4.2-green.svg" alt="Version Badge">
+  <img src="https://img.shields.io/badge/version-2.4.3-green.svg" alt="Version Badge">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License Badge">
-  <img src="https://img.shields.io/badge/coverage-80%25-brightgreen.svg" alt="Test Coverage Badge">
+  <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg" alt="Test Coverage Badge">
   <img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="Python Version Badge">
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/contributing-welcome-orange.svg" alt="Contributing Badge"></a>
 </p>
