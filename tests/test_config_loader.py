@@ -23,7 +23,7 @@ def sample_config():
 def test_load_valid_config(tmp_path, sample_config, monkeypatch):
     """Test loading valid configuration"""
     config_file = tmp_path / "settings.yaml"
-    with open(config_file, "w") as f:
+    with open(config_file, "w", encoding="utf-8") as f:
         yaml.dump(sample_config, f)
 
     # Mock environment variable
@@ -42,7 +42,7 @@ def test_missing_config_file():
 def test_missing_required_fields(tmp_path, monkeypatch):
     """Test error on missing required fields"""
     config_file = tmp_path / "settings.yaml"
-    with open(config_file, "w") as f:
+    with open(config_file, "w", encoding="utf-8") as f:
         yaml.dump({"models": {}}, f)
 
     monkeypatch.setenv("OPENAI_API_KEY", "test_key")
@@ -55,7 +55,7 @@ def test_invalid_provider(tmp_path, sample_config, monkeypatch):
     """Test error on invalid provider"""
     sample_config["models"]["primary"]["provider"] = "invalid_provider"
     config_file = tmp_path / "settings.yaml"
-    with open(config_file, "w") as f:
+    with open(config_file, "w", encoding="utf-8") as f:
         yaml.dump(sample_config, f)
 
     with pytest.raises(ConfigError, match="Invalid provider"):
@@ -66,7 +66,7 @@ def test_invalid_weights(tmp_path, sample_config, monkeypatch):
     """Test error when dimension weights don't sum to 1.0"""
     sample_config["scoring"]["criteria"]["accuracy"]["weight"] = 0.5
     config_file = tmp_path / "settings.yaml"
-    with open(config_file, "w") as f:
+    with open(config_file, "w", encoding="utf-8") as f:
         yaml.dump(sample_config, f)
 
     monkeypatch.setenv("OPENAI_API_KEY", "test_key")
@@ -79,7 +79,7 @@ def test_invalid_max_retries(tmp_path, sample_config, monkeypatch):
     """Test error on invalid max_retries value"""
     sample_config["api"]["max_retries"] = 20
     config_file = tmp_path / "settings.yaml"
-    with open(config_file, "w") as f:
+    with open(config_file, "w", encoding="utf-8") as f:
         yaml.dump(sample_config, f)
 
     monkeypatch.setenv("OPENAI_API_KEY", "test_key")
@@ -91,7 +91,7 @@ def test_invalid_max_retries(tmp_path, sample_config, monkeypatch):
 def test_missing_api_key(tmp_path, sample_config, monkeypatch):
     """Test error on missing API key"""
     config_file = tmp_path / "settings.yaml"
-    with open(config_file, "w") as f:
+    with open(config_file, "w", encoding="utf-8") as f:
         yaml.dump(sample_config, f)
 
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)

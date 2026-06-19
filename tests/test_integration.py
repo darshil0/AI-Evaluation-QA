@@ -37,7 +37,7 @@ def test_end_to_end_pipeline(tmp_path, monkeypatch):
             "thresholds": {"excellent": 4.5, "good": 3.5, "acceptable": 2.5, "poor": 1.5},
         },
     }
-    with open(config_file, "w") as f:
+    with open(config_file, "w", encoding="utf-8") as f:
         yaml.dump(config, f)
 
     monkeypatch.setenv("OPENAI_API_KEY", "test_key")
@@ -95,7 +95,7 @@ def test_prompt_validation_pipeline(tmp_path):
         ],
     }
 
-    with open(prompt_file, "w") as f:
+    with open(prompt_file, "w", encoding="utf-8") as f:
         json.dump(prompts_data, f)
 
     # Load and validate

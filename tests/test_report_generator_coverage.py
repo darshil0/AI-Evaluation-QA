@@ -175,7 +175,7 @@ class TestReportGeneratorEdgeCases:
             generator.generate_html_report(data, output_file)
 
             assert os.path.exists(output_file)
-            with open(output_file, "r") as f:
+            with open(output_file, "r", encoding="utf-8") as f:
                 content = f.read()
                 assert "<html>" in content
                 assert "Evaluation Summary" in content
@@ -204,7 +204,7 @@ class TestReportGeneratorEdgeCases:
             output_file = os.path.join(tmpdir, "report.html")
             generator.generate_html_report(data, output_file)
 
-            with open(output_file, "r") as f:
+            with open(output_file, "r", encoding="utf-8") as f:
                 content = f.read()
                 assert "Total Evaluations" in content
                 assert "Mean Accuracy" in content

@@ -104,7 +104,7 @@ class TestPromptRunnerEdgeCases:
         try:
             runner.save_responses(results, temp_file, file_format="json")
 
-            with open(temp_file, "r") as f:
+            with open(temp_file, "r", encoding="utf-8") as f:
                 loaded = json.load(f)
 
             assert len(loaded) == 2

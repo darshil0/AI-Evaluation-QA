@@ -172,7 +172,7 @@ class TestPromptRunner:
         runner.save_responses(sample_responses, str(output_file), file_format="csv")
 
         assert output_file.exists()
-        with open(output_file, "r") as f:
+        with open(output_file, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             rows = list(reader)
             assert len(rows) == len(sample_responses)
@@ -185,7 +185,7 @@ class TestPromptRunner:
         runner.save_responses(sample_responses, str(output_file), file_format="json")
 
         assert output_file.exists()
-        with open(output_file, "r") as f:
+        with open(output_file, "r", encoding="utf-8") as f:
             data = json.load(f)
             assert len(data) == len(sample_responses)
 
@@ -339,7 +339,7 @@ class TestScoringEngine:
         engine.save_scores(sample_scored_responses, str(output_file))
 
         assert output_file.exists()
-        with open(output_file, "r") as f:
+        with open(output_file, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             rows = list(reader)
             assert len(rows) == len(sample_scored_responses)
@@ -363,7 +363,7 @@ class TestReportGenerator:
         """Test loading scored data from CSV."""
         # Create CSV file
         csv_file = temp_dir / "scored.csv"
-        with open(csv_file, "w", newline="") as f:
+        with open(csv_file, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=sample_scored_responses[0].keys())
             writer.writeheader()
             writer.writerows(sample_scored_responses)

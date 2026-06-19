@@ -46,7 +46,7 @@ def test_executive_summary_content(tmp_path, sample_scored_dataframe):
     generator = ReportGenerator(str(tmp_path))
     summary_path = generator._generate_executive_summary(sample_scored_dataframe)
 
-    with open(summary_path) as f:
+    with open(summary_path, encoding="utf-8") as f:
         content = f.read()
 
     assert "Total Evaluations:** 5" in content
@@ -76,6 +76,6 @@ def test_generate_html_report(tmp_path, sample_scored_dataframe):
     generator.generate_html_report(scored_responses, str(output_file))
 
     assert output_file.exists()
-    with open(output_file) as f:
+    with open(output_file, encoding="utf-8") as f:
         content = f.read()
     assert "Evaluation Summary" in content
