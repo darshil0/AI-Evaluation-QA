@@ -1,14 +1,14 @@
-import pytest
-import pandas as pd
-from pathlib import Path
 import json
+from pathlib import Path
+
+import pandas as pd
 
 
 def test_end_to_end_pipeline(tmp_path, monkeypatch):
     """Test complete evaluation pipeline"""
     from config.config_loader import ConfigLoader
-    from evaluation.scoring_engine import ScoringEngine
     from evaluation.report_generator import ReportGenerator
+    from evaluation.scoring_engine import ScoringEngine
 
     # Setup mock data
     results_df = pd.DataFrame(

@@ -1,7 +1,8 @@
 import json
 import os
 from typing import Any, Dict, Optional
-from jsonschema import validate, ValidationError
+
+from jsonschema import ValidationError, validate
 
 
 class PromptLoader:

@@ -1,6 +1,7 @@
-import pandas as pd
-from typing import Iterator, Callable, Dict, Optional
 import logging
+from typing import Callable, Dict, Iterator, Optional
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 

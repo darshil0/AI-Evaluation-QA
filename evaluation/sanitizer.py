@@ -2,9 +2,9 @@
 Data sanitization utilities for security.
 """
 
+import logging
 import re
 from typing import Any, Dict, List, Union
-import logging
 
 logger = logging.getLogger(__name__)
 

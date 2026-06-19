@@ -6,10 +6,11 @@ import os
 import time
 import warnings
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Callable, Union
+from typing import Any, Callable, Dict, List, Optional
 
 import aiohttp
 import openai
+
 from evaluation.error_handler import EvaluationErrorHandler
 
 logger = logging.getLogger(__name__)
@@ -33,7 +34,7 @@ class PromptRunner:
         self.semaphore = asyncio.Semaphore(self.config.get("max_concurrent_requests", 5))
         self.error_handler = EvaluationErrorHandler(
             max_retries=retry_attempts,
-            backoff_factor=float(self.config.get("execution", {}).get("backoff_factor", 2.0))
+            backoff_factor=float(self.config.get("execution", {}).get("backoff_factor", 2.0)),
         )
 
     def _get_api_client(self, provider: str):
@@ -168,10 +169,7 @@ class PromptRunner:
 
         async with self.semaphore:
             success, result, failed_req = await self.error_handler.execute_with_retry(
-                self.execute_prompt_async,
-                prompt_id,
-                prompt,
-                session
+                self.execute_prompt_async, prompt_id, prompt, session
             )
 
             if success:
@@ -186,7 +184,7 @@ class PromptRunner:
                     "model": self.model,
                     "timestamp": datetime.now().isoformat(),
                     "status": "error",
-                    "error": failed_req.error_message if failed_req else "Unknown error"
+                    "error": failed_req.error_message if failed_req else "Unknown error",
                 }
 
     async def run_prompts(

@@ -10,7 +10,7 @@ long_description = readme_path.read_text(encoding="utf-8") if readme_path.exists
 
 setup(
     name="ai-evaluation-qa",
-    version="2.4.2",
+    version="2.4.3",
     author="Darshil",
     author_email="",
     description="Production-grade framework for evaluating AI model responses",

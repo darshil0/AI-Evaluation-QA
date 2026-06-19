@@ -7,7 +7,8 @@ import math
 import os
 import re
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
+
 from evaluation.defect_detector import DefectDetector
 
 logger = logging.getLogger(__name__)
@@ -128,7 +129,9 @@ class ScoringEngine:
                 raise ValueError(f"Weight must be non-negative: {c.key}")
 
         if abs(total_weight - 1.0) > 1e-6:
-            logger.warning("Rubric weights sum to %s, not 1.0; scores will be normalized.", total_weight)
+            logger.warning(
+                "Rubric weights sum to %s, not 1.0; scores will be normalized.", total_weight
+            )
 
     def _normalize_value(
         self, val: Optional[float], min_val: Optional[float] = None, max_val: Optional[float] = None
@@ -453,7 +456,9 @@ class ScoringEngine:
             report = self.score_response(response_data)
             # Ensure response text is available for defect detection
             if "response" not in report.metadata:
-                report.metadata["response"] = response_data.get("model_response") or response_data.get("response", "")
+                report.metadata["response"] = response_data.get(
+                    "model_response"
+                ) or response_data.get("response", "")
 
             scored = self.report_to_dict(report, include_defects=True)
             scored_responses.append(scored)
@@ -511,7 +516,9 @@ class ScoringEngine:
         print("SCORING SUMMARY")
         print("=" * 30)
 
-        avg_score = sum(float(s.get("overall_score", 0) or 0) for s in self.scores) / len(self.scores)
+        avg_score = sum(float(s.get("overall_score", 0) or 0) for s in self.scores) / len(
+            self.scores
+        )
         print(f"Total Responses: {len(self.scores)}")
         print(f"Overall Average Score: {avg_score:.2f}/5.00")
 
