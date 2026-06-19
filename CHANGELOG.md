@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Data Processing**: Added `evaluation/data_processor.py` for chunked processing of large CSV files.
 - **Model Management**: Centralized model string constants in `evaluation/model_constants.py`.
 - **Retry Logic**: Added dedicated `evaluation/retry_logic.py` with exponential backoff decorators.
+- **CLI Enhancements**: Added `--model` override to `evaluate` command and improved lazy-loading of heavy dependencies for faster startup.
 
 ### Fixed
 - **Deadlock Bug**: Fixed recursive `acquire()` call inside `async with self.lock` in `evaluation/rate_limiter.py` that would cause deadlocks.
@@ -29,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Missing Init Files**: Added missing `__init__.py` files to `config/`, `evaluation/clients/`, and `scripts/` directories to ensure proper Python package discovery.
 - **Dependency Constraints**: Updated unrealistic, futuristic dependency versions for `numpy`, `pandas`, `jsonschema`, `scipy`, and `matplotlib` across `pyproject.toml`, `setup.py`, and `requirements.txt` to align with stable reality.
 - **Test Compatibility**: Updated `tests/test_evaluation_pipeline.py` and `tests/test_prompt_runner_coverage.py` to use `file_format=` instead of `format=` to align with the parameter renaming in `PromptRunner`, restoring 100% test coverage.
+- **CLI Consistency**: Fixed incorrect usage examples in `main.py` docstrings to match actual command line options (`--output-dir` instead of `--dir`).
 
 ## [2.3.8-patch] - 2026-06-02
 
