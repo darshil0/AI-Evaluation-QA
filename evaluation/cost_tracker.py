@@ -250,7 +250,7 @@ class CostTracker:
         filepath = Path(filepath)
         filepath.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(filepath, "w") as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             json.dump({"summary": self.get_summary(), "usage_log": self.usage_log}, f, indent=2)
 
         logger.info(f"Usage log exported to {filepath}")
