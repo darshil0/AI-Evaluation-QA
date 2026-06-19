@@ -48,7 +48,7 @@ setup(
         "tiktoken>=0.7.0",  # Fixed: Was 0.13.0, unified
         "numpy>=1.26.0",
         "pandas>=2.2.0",
-        "scipy>=1.13.0",  # Fixed: Was 1.17.1, unified to 1.14.0
+        "scipy>=1.13.0",
     ],
     extras_require={
         "dev": [

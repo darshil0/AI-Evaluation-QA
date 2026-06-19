@@ -172,3 +172,7 @@ def main():
     cost_tracker = CostTracker(budget_limit=float(budget_limit) if budget_limit else None)
 
     logger.info("✓ Pipeline initialized and ready")
+
+
+if __name__ == "__main__":
+    main()
