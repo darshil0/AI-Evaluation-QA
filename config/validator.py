@@ -119,7 +119,7 @@ class ConfigurationValidator:
             raise FileNotFoundError(f"Configuration file not found: {config_path}")
 
         try:
-            with open(config_path, "r") as f:
+            with open(config_path, "r", encoding="utf-8") as f:
                 f.read()
             logger.info(f"✓ Configuration file valid: {config_path}")
             return True
