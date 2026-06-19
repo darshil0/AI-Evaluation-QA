@@ -8,7 +8,7 @@ commands for full pipeline execution or independent sub-stages.
 Usage:
     ai-eval evaluate --prompts <file>
     ai-eval score --results <file> --output <file>
-    ai-eval report --results <file> --dir <dir>
+    ai-eval report --results <file> --output-dir <dir>
 """
 
 import logging
