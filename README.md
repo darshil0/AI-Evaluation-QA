@@ -41,10 +41,11 @@ The **AI Evaluation QA Framework** is a production-grade Python library designed
 
 ## Documentation
 
-- [Project Skills & Expertise](Skills.md) — Core competencies and architecture.
-- [Business Logic & Workflow](BUSINESS_LOGIC.md) — Evaluation pipeline and data flow.
-- [Prompt Engineering Architecture](PROMPT_ENGINEERING.md) — Prompt design patterns and best practices.
+- [Project Skills & Expertise](Skills.MD) — Core competencies and architecture.
+- [Business Logic & Workflow](BUSINESS_LOGIC.MD) — Evaluation pipeline and data flow.
+- [Prompt Engineering Architecture](PROMPT_ENGINEERING.MD) — Prompt design patterns and best practices.
 - [Contributing Guide](CONTRIBUTING.md) — Development setup, testing, and pull request guidelines.
+- [Issue Audit & Fixes](FIXES_SUMMARY.MD) — Comprehensive QA audit and resolution log.
 
 ---
 
@@ -110,13 +111,12 @@ This checks environment, API connectivity, and configuration validity.
 
 ```bash
 ai-eval evaluate --prompts data/prompts/reasoning_tests.json \
-                 --models gpt-4-turbo claude-opus azure-gpt-4 \
-                 --output-dir ./results
+                 --model gpt-4-turbo
 ```
 
 ### 4. Generate Reports
 
-Reports are generated automatically, but you can regenerate them:
+Reports are generated automatically during evaluation, but you can regenerate them from existing results:
 
 ```bash
 ai-eval report --results results/scored_results.csv --output-dir ./reports
@@ -162,10 +162,10 @@ Create a JSON file with your test cases (e.g., `data/prompts/reasoning_tests.jso
 
 | Command | Purpose | Example |
 |---------|---------|---------|
-| `evaluate` | Full pipeline: run prompts, score, and generate reports | `ai-eval evaluate --prompts tests.json --models gpt-4` |
-| `score` | Score raw results from a previous run | `ai-eval score --results raw_results.csv --rubric config/rubric.json` |
+| `evaluate` | Full pipeline: run prompts, score, and generate reports | `ai-eval evaluate --prompts tests.json --model gpt-4` |
+| `score` | Score raw results from a previous run | `ai-eval score --results raw_results.csv --output scored.csv` |
 | `report` | Generate HTML dashboards and summaries from scored results | `ai-eval report --results scored.csv --output-dir ./reports` |
-| `check-regression` | Compare current results against a historical baseline | `ai-eval check-regression current.csv --baseline baseline.csv --threshold 0.05` |
+| `check-regression` | Compare current results against a historical baseline | `ai-eval check-regression current.csv --baseline baseline.csv` |
 | `validate` | Validate environment setup, API keys, and configuration | `ai-eval validate` |
 | `lint-prompts` | Validate prompt JSON file structure and content | `ai-eval lint-prompts prompts.json` |
 
@@ -274,21 +274,28 @@ make lint          # Run linting and type checks
 ```
 ai-evaluation-qa/
 ├── evaluation/              # Core library
+│   ├── clients/             # Multi-provider API clients
 │   ├── evaluation_pipeline.py # Main evaluation workflow
 │   ├── prompt_runner.py     # Model API executor
 │   ├── scoring_engine.py    # Rubric-based scoring engine
 │   ├── defect_detector.py   # Automated issue detection
 │   ├── report_generator.py  # Report generation
+│   ├── cost_tracker.py      # Token counting and cost calculation
+│   ├── error_handler.py     # API error handling and retries
+│   ├── rate_limiter.py      # Concurrency and rate control
 │   └── sanitizer.py         # Input/output safety
 ├── config/
 │   ├── settings.yaml        # Main configuration
 │   ├── logging_config.py    # Logging configuration
-│   └── validator.py         # Config and prompt schema validation
+│   ├── validator.py         # Configuration validation
+│   ├── config_loader.py     # Configuration loading and migration
+│   └── prompt_validator.py  # Prompt schema validation
 ├── scripts/
 │   ├── regression_checker.py # Check for performance regressions
 │   ├── setup_verifier.py     # Verify installation and setup
 │   ├── prompt_loader.py      # Logic for loading/validating prompts
-│   └── data_validator.py     # Data cleaning and validation utilities
+│   ├── data_validator.py     # Data cleaning and validation utilities
+│   └── setup.sh             # Environment setup script
 ├── tests/                  # 100% coverage test suite
 ├── data/
 │   └── prompts/           # Sample prompt files
@@ -369,11 +376,12 @@ MIT License. See [LICENSE](LICENSE) for full text.
 ## Version History
 
 **2.4.0** (Current)
-- Azure OpenAI support
-- Interactive HTML dashboards
-- Cost telemetry and tracking
-- Docker and CI/CD integration
-- 100% test coverage
+- Foundational Documentation (`Skills.MD`, `BUSINESS_LOGIC.MD`, `PROMPT_ENGINEERING.MD`)
+- CI/CD Pipeline with automated testing and security scanning
+- Enhanced Error Handling and Retry Logic with exponential backoff
+- Client-based architecture for LLM providers
+- Fixed critical deadlocks and parameter shadowing bugs
+- 100% test coverage enforced
 
 **2.3.0**
 - Multi-provider support (OpenAI, Anthropic)
