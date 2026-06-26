@@ -12,7 +12,7 @@
 
 The **AI Evaluation QA Framework** is a production-grade Python library for evaluating, scoring, and comparing AI model responses at scale. It provides a robust pipeline to run structured prompt suites against major LLM providers (OpenAI, Anthropic, Azure OpenAI), score them using customizable rubrics, and generate professional dashboards with analytics and cost telemetry.
 
-**Framework Version**: 2.4.4 (2026-06-21) | **Python**: 3.9+ | **License**: MIT
+**Framework Version**: 2.4.4 (2026-06-26) | **Python**: 3.9+ | **License**: MIT
 
 ## Key Features
 
