@@ -512,15 +512,25 @@ class ScoringEngine:
             print("No scores to summarize")
             return
 
+        import pandas as pd
+
+        df = pd.DataFrame(self.scores)
+
         print("\n" + "=" * 30)
         print("SCORING SUMMARY")
         print("=" * 30)
 
-        avg_score = sum(float(s.get("overall_score", 0) or 0) for s in self.scores) / len(
-            self.scores
-        )
+        score_col = "overall_score" if "overall_score" in df.columns else "aggregated_score"
+        avg_score = df[score_col].mean()
+        threshold = 3.5 if score_col == "overall_score" else 0.7
+        success_rate = (df[score_col] >= threshold).sum() / len(df) * 100 if len(df) > 0 else 0
+
+        if score_col == "aggregated_score":
+            avg_score *= 5.0
+
         print(f"Total Responses: {len(self.scores)}")
         print(f"Overall Average Score: {avg_score:.2f}/5.00")
+        print(f"Success Rate: {success_rate:.1f}%")
 
         defect_counts: Dict[str, int] = {}
         for s in self.scores:

@@ -31,11 +31,19 @@ class PromptRunner:
         self.retry_attempts = retry_attempts
         self.failure_count = 0
         self.total_count = 0
-        self.semaphore = asyncio.Semaphore(self.config.get("max_concurrent_requests", 5))
+        self._max_concurrent_requests = self.config.get("max_concurrent_requests", 5)
+        self._semaphore = None
         self.error_handler = EvaluationErrorHandler(
             max_retries=retry_attempts,
             backoff_factor=float(self.config.get("execution", {}).get("backoff_factor", 2.0)),
         )
+
+    @property
+    def semaphore(self) -> asyncio.Semaphore:
+        """Lazily initialize the semaphore to ensure it is created within an event loop."""
+        if self._semaphore is None:
+            self._semaphore = asyncio.Semaphore(self._max_concurrent_requests)
+        return self._semaphore
 
     def _get_api_client(self, provider: str):
         if provider == "openai":
