@@ -61,7 +61,7 @@ make test
 1. **Branching**: Create a descriptive branch name (e.g., `feat/add-new-metric`).
 2. **Commit Messages**: Use [Conventional Commits](https://www.conventionalcommits.org/).
 3. **Local Verification**: Run `make check` to ensure your code passes all linting and tests before pushing.
-4. **Submission**: Open a PR against the `main` branch. 
+4. **Submission**: Open a PR against the `main` branch.
 
 ---
 
@@ -114,4 +114,3 @@ The **AI Evaluation QA Framework** was architected using a highly structured "Sy
 
 ---
 *By reverse-engineering the intent behind the framework, developers can better understand the "why" behind the code structure.*
-

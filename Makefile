@@ -17,14 +17,14 @@ MODEL ?= gpt-4
 PROMPT_FILE ?= data/prompts/sample_prompts.json
 REPORTS_DIR ?= reports
 CHECKPOINT_DIR ?= data/checkpoints
-DOCKER_IMAGE ?= ai-evaluation-qa:2.3.8
+DOCKER_IMAGE ?= ai-evaluation-qa:2.4.4
 
 SRC_DIRS := evaluation config scripts
 TEST_DIR := tests
 
 # FIX: Use Make's conditional instead of broken shell syntax
 TARGET_FILES := main.py
-ifeq ($(wildcard setup.py),setup.py)
+ifneq (,$(wildcard setup.py))
 TARGET_FILES += setup.py
 endif
 
@@ -45,12 +45,13 @@ install-dev:  ## Install development dependencies
 	$(PIP) install -e .[dev]
 	@echo "Installing pre-commit..."
 	$(PIP) install pre-commit
-	pre-commit install
+	pre-commit install || { echo "❌ Pre-commit installation failed"; exit 1; }
+	pre-commit run --all-files || true
 	@echo "Dev installation complete!"
 
 test:  ## Run all tests with coverage
 	@echo "Running tests..."
-	PYTHONPATH=. $(PYTEST) $(TEST_DIR) --cov=evaluation --cov=config --cov=scripts --cov-report=html --cov-report=term-missing --cov-fail-under=80 -v
+	PYTHONPATH=. $(PYTEST) $(TEST_DIR) --cov=evaluation --cov=config --cov=scripts --cov-report=html --cov-report=term-missing --cov-fail-under=100 -v
 
 test-quick:  ## Run tests without coverage (faster)
 	@echo "Running quick tests..."
@@ -58,10 +59,12 @@ test-quick:  ## Run tests without coverage (faster)
 
 test-unit:  ## Run only unit tests
 	@echo "Running unit tests..."
+	@PYTHONPATH=. $(PYTEST) $(TEST_DIR) -m unit -v --collect-only 2>/dev/null | grep -q "test" || { echo "⚠️  No unit tests found"; exit 0; }
 	PYTHONPATH=. $(PYTEST) $(TEST_DIR) -m unit -v
 
 test-integration:  ## Run only integration tests
 	@echo "Running integration tests..."
+	@PYTHONPATH=. $(PYTEST) $(TEST_DIR) -m integration -v --collect-only 2>/dev/null | grep -q "test" || { echo "⚠️  No integration tests found"; exit 0; }
 	PYTHONPATH=. $(PYTEST) $(TEST_DIR) -m integration -v
 
 test-parallel:  ## Run tests in parallel
@@ -104,8 +107,8 @@ check:  ## Run format, lint, and test
 
 security:  ## Run security checks
 	@echo "Running security checks..."
-	$(BANDIT) -r $(SRC_DIRS) $(TARGET_FILES) -ll
-	$(SAFETY) check --exit-code || true
+	$(BANDIT) -r $(SRC_DIRS) $(TARGET_FILES) -ll || { echo "⚠️  Bandit found issues"; exit 1; }
+	$(SAFETY) check || { echo "⚠️  Safety found known vulnerabilities (review CHANGELOG.md)"; }
 	@echo "Security check complete!"
 
 clean:  ## Clean build artifacts and cache
@@ -176,7 +179,13 @@ verify:  ## Verify installation and configuration
 	@echo "Checking dependencies..."
 	@$(PIP) list | grep -E "pytest|black|isort|mypy|click|openai" || true
 	@echo "Checking API keys..."
-	@$(PYTHON) -c "import os; print('OpenAI:', 'OK' if os.getenv('OPENAI_API_KEY') else 'MISSING'); print('Anthropic:', 'OK' if os.getenv('ANTHROPIC_API_KEY') else 'MISSING')"
+	@if [ -z "$(OPENAI_API_KEY)" ] && [ -z "$(ANTHROPIC_API_KEY)" ]; then \
+		echo "⚠️  No API keys found. Add to .env:"; \
+		echo "    OPENAI_API_KEY=your-key-here"; \
+		echo "    ANTHROPIC_API_KEY=your-key-here"; \
+	else \
+		$(PYTHON) -c "import os; print('OpenAI:', 'OK' if os.getenv('OPENAI_API_KEY') else 'MISSING'); print('Anthropic:', 'OK' if os.getenv('ANTHROPIC_API_KEY') else 'MISSING')"; \
+	fi
 	@echo "Verification complete!"
 
 init:  ## Initialize project (first time setup)
@@ -207,7 +216,7 @@ update-deps:  ## Update all dependencies to latest versions
 
 docker-build:  ## Build Docker image
 	@echo "Building Docker image..."
-	$(DOCKER) build -t $(DOCKER_IMAGE) -t ai-evaluation-qa:latest .
+	$(DOCKER) build --build-arg PYTHON_VERSION=3.11 -t $(DOCKER_IMAGE) -t ai-evaluation-qa:latest .
 
 docker-run:  ## Run evaluation in Docker
 	@echo "Running in Docker..."
