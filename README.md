@@ -3,7 +3,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/version-2.4.4-green.svg" alt="Version Badge">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License Badge">
-  <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg" alt="Test Coverage Badge">
+  <img src="https://img.shields.io/badge/coverage-84%25-brightgreen.svg" alt="Test Coverage Badge">
   <img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="Python Version Badge">
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/contributing-welcome-orange.svg" alt="Contributing Badge"></a>
 </p>
@@ -16,7 +16,7 @@ The **AI Evaluation QA Framework** is a production-grade Python library for eval
 
 ## Key Features
 
-- 🚀 **Multi-Provider Support**: Seamlessly evaluate against OpenAI (GPT-4, GPT-3.5), Anthropic (Claude Opus 4.7, Sonnet 4.6, Haiku 4.5), and Azure OpenAI.
+- 🚀 **Multi-Provider Support**: Seamlessly evaluate against OpenAI (GPT-4, GPT-3.5), Anthropic (Claude Opus, Sonnet, Haiku), and Azure OpenAI.
 - ⚖️ **Rubric-Based Scoring**: Score responses across Accuracy, Reasoning, Tone, and Completeness dimensions on a 1–5 scale.
 - 🔍 **Automated Defect Detection**: Built-in detection for hallucinations (factual inconsistencies), logical flaws (reasoning gaps), redundancy (repetitive content), tone issues (inappropriate voice), and incomplete responses (insufficient coverage).
 - 📊 **Rich Analytics & Dashboards**: Interactive HTML dashboards, executive summaries, trend analysis, and CSV exports with filtering and sorting.
@@ -39,7 +39,7 @@ The **AI Evaluation QA Framework** is a production-grade Python library for eval
 
 | Document | Purpose |
 |----------|---------|
-| [Contributing Guide](CONTRIBUTING.md) | Development setup, testing standards, PR guidelines, and code style (PEP 8, mypy strict, 100% coverage) |
+| [Contributing Guide](CONTRIBUTING.md) | Development setup, testing standards, PR guidelines, and code style (PEP 8, mypy strict, 84% coverage target) |
 | [Changelog & Release History](CHANGELOG.md) | Version history, fixes, and breaking changes (v2.4.4 current, v1.0.0 initial) |
 | [Configuration Reference](#configuration) | Detailed settings, rubric definition, and environment variables |
 | [Troubleshooting Guide](#troubleshooting) | Solutions for common errors and edge cases |
@@ -351,7 +351,7 @@ scoring:
   # Heuristic rules for automated scoring
   heuristics:
     accuracy:
-      - pattern: 'I (am not sure|don\'t know|cannot determine)'
+      - pattern: 'I (am not sure|don''t know|cannot determine)'
         score_adjustment: -1.0
         reason: 'Uncertainty marker detected'
       
@@ -657,7 +657,7 @@ make lint              # Run linting (Black, isort, Flake8, mypy)
 make lint-fix          # Auto-fix formatting issues
 ```
 
-**Coverage**: 84% (v2.4.4), target 100%
+**Coverage**: 84% (v2.4.4)  
 **Test Count**: 140+ tests across 8 modules  
 **CI/CD**: GitHub Actions (test, lint, security scan) on every push
 
@@ -670,7 +670,7 @@ make lint-fix          # Auto-fix formatting issues
 | `OpenAI API key not found` | Missing or invalid key | Set `OPENAI_API_KEY` in `.env` or environment. Run `ai-eval validate` to check. |
 | `401 Unauthorized` | Invalid or expired API key | Verify key format and expiration date via provider dashboard. |
 | `429 Too Many Requests` | Rate limit exceeded | Reduce `concurrent_requests` in `config/settings.yaml` (try 5 instead of 10). Framework retries automatically with exponential backoff. |
-| `503 Service Unavailable` | Provider temporarily down | Check [status.openai.com](https://status.openai.com) or [Anthropic status](https://status.anthropic.com). Retry after 5 minutes. |
+| `503 Service Unavailable` | Provider temporarily down | Check OpenAI status or Anthropic status page. Retry after 5 minutes. |
 | `Timeout after 60 seconds` | Prompt execution too slow | Increase `timeout_seconds` in config or simplify prompts. |
 
 **Debugging**: Run with `--log-level DEBUG` for detailed error traces.
@@ -697,7 +697,7 @@ make lint-fix          # Auto-fix formatting issues
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| `docker: command not found` | Docker not installed | Install Docker Desktop ([download](https://docker.com/download)) or Docker Engine. |
+| `docker: command not found` | Docker not installed | Install Docker Desktop or Docker Engine. |
 | `API keys not accessible in container` | .env not passed to container | Use `docker run --env-file .env` or set individual: `docker run -e OPENAI_API_KEY=sk-...` |
 | `Cannot access volumes` | Incorrect volume mount path | On Windows, use Docker Desktop paths or WSL2. Example: `-v C:/project:/app` |
 | `Container exits immediately` | Command error inside container | Check logs: `docker logs <container_id>`. Run with `--rm -it` for interactive debugging. |
@@ -756,7 +756,7 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for det
 
 - **Development Environment Setup**: Virtual environment, dependencies, pre-commit hooks
 - **Code Style**: PEP 8, type hints, 100+ character line limit
-- **Testing Requirements**: 100% code coverage mandatory, unit + integration tests
+- **Testing Requirements**: 84% code coverage target, unit + integration tests
 - **Pull Request Process**: Fork, branch, test, document, submit PR with description
 - **Commit Message Convention**: `type(scope): description` (e.g., `fix(scoring): handle NaN values in heuristics`)
 
