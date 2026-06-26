@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.4] - 2026-06-21
+
+### Fixed
+- **Executive Summary Scoring** (`evaluation/evaluation_pipeline.py`, `evaluation/report_generator.py`): Fixed scaling of `aggregated_score` in executive summaries. Previously, 0-1 scale scores were displayed as /5.00 without multiplication. Also updated `success_rate` threshold to 0.7 for consistency with the 0-1 scale.
+- **Python 3.10+ Compatibility** (`evaluation/prompt_runner.py`): Lazily initialize `asyncio.Semaphore` to avoid `DeprecationWarning` when created outside an active event loop in newer Python versions.
+- **Code Quality** (`config/prompt_validator.py`, `evaluation/cost_tracker.py`): Moved `aiohttp` import inside functions to reduce module-level dependencies. Removed redundant `pass` statement in token counting logic.
+- **Test Configuration** (`pyproject.toml`): Added missing `asyncio` marker to `pytest` configuration to fix test collection issues.
+
 ## [2.4.3] - 2026-06-20
 
 ### Fixed
@@ -270,6 +278,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version Comparison Links
 
+[2.4.4]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.3...v2.4.4
 [2.4.3]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.2...v2.4.3
 [2.4.2]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.1...v2.4.2
 [2.4.1]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.0...v2.4.1

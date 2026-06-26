@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ai-evaluation-qa"
-version = "2.4.3"
+version = "2.4.4"
 description = "A production-grade framework for evaluating AI model responses"
 readme = "README.md"
 authors = [{ name = "Darshil Shah" }]
@@ -109,6 +109,7 @@ addopts = "-ra --strict-markers"
 markers = [
     "unit: unit tests",
     "integration: integration tests",
+    "asyncio: tests using asyncio",
 ]
 minversion = "8.0"
 

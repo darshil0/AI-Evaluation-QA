@@ -184,13 +184,34 @@ def validate_prompt_file(filepath: str) -> Dict:
     except ValidationError as e:
         raise ValidationError(f"Prompt schema validation failed: {e.message}")
 
-    # Additional validation: check for duplicate IDs
-    prompt_ids = [p["id"] for p in data["prompts"]]
-    if len(prompt_ids) != len(set(prompt_ids)):
-        duplicates = [pid for pid in prompt_ids if prompt_ids.count(pid) > 1]
-        raise ValidationError(
-            f"Found duplicate prompt IDs in file: {list(set(duplicates))}. Prompt IDs must be unique."
-        )
+    # Additional validation: check for duplicate IDs and semantic correctness
+    prompt_ids = set()
+    warnings = []
+
+    for _, prompt in enumerate(data.get("prompts", [])):
+        prompt_id = prompt.get("id")
+
+        if prompt_id in prompt_ids:
+            raise ValidationError(
+                f"Duplicate prompt ID found: {prompt_id}. Prompt IDs must be unique."
+            )
+        prompt_ids.add(prompt_id)
+
+        # Semantic warnings (not errors)
+        text_length = len(prompt.get("text", ""))
+        if text_length < 20:
+            warnings.append(f"Prompt {prompt_id} text is very short ({text_length} chars)")
+
+        criteria = prompt.get("expected_criteria", {})
+        if criteria:
+            min_tokens = criteria.get("min_tokens")
+            max_tokens = criteria.get("max_tokens")
+            if min_tokens and max_tokens and min_tokens > max_tokens:
+                warnings.append(f"Prompt {prompt_id}: min_tokens > max_tokens")
+
+    if warnings:
+        for warning in warnings:
+            logger.warning(f"⚠ {warning}")
 
     return data
 

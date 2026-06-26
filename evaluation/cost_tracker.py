@@ -72,8 +72,6 @@ class CostTracker:
             return len(text) // 4
 
         try:
-            pass
-
             return len(encoding.encode(text))
         except Exception as e:
             logger.error(f"Error counting tokens: {e}")

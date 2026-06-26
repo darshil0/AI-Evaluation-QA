@@ -55,7 +55,11 @@ class ReportGenerator:
             for col in col_names:
                 if col in df.columns:
                     try:
-                        return pd.to_numeric(df[col], errors="coerce").mean()
+                        mean_val = pd.to_numeric(df[col], errors="coerce").mean()
+                        # If it's a 0-1 scale metric (like aggregated_score or score_*), scale it to 5.0
+                        if col == "aggregated_score" or col.startswith("score_"):
+                            mean_val *= 5.0
+                        return mean_val
                     except Exception:
                         continue
             return 0.0
@@ -305,12 +309,25 @@ class ReportGenerator:
 
         try:
             score_col = "aggregated_score" if "aggregated_score" in df.columns else "overall_score"
+            avg_score = df[score_col].mean()
+            median_score = df[score_col].median()
+            std_dev = df[score_col].std()
+
+            # Threshold is 3.5 for 0-5 scale, or 0.7 for 0-1 scale
+            threshold = 3.5 if score_col == "overall_score" else 0.7
+            success_rate = (df[score_col] >= threshold).sum() / len(df) * 100 if len(df) > 0 else 0
+
+            if score_col == "aggregated_score":
+                avg_score *= 5.0
+                median_score *= 5.0
+                std_dev *= 5.0
+
             summary = {
                 "total_evaluations": len(df),
-                "average_score": df[score_col].mean(),
-                "median_score": df[score_col].median(),
-                "std_dev": df[score_col].std(),
-                "success_rate": (df[score_col] >= 3.5).sum() / len(df) * 100 if len(df) > 0 else 0,
+                "average_score": avg_score,
+                "median_score": median_score,
+                "std_dev": std_dev,
+                "success_rate": success_rate,
             }
         except Exception as e:
             logger.warning(f"Could not generate executive summary: {e}")
@@ -339,9 +356,11 @@ class ReportGenerator:
 
         markdown += "\n## Dimension Performance\n"
         for dim, avg in sorted(dimension_avgs.items(), key=lambda x: x[1], reverse=True):
-            markdown += f"- **{dim.title()}:** {avg:.2f}/5.00\n"
+            # dimension_avgs (from score_*) are already on 0-1 scale based on report_to_dict
+            display_avg = avg * 5.0
+            markdown += f"- **{dim.title()}:** {display_avg:.2f}/5.00\n"
 
-        markdown += f"\n## Key Insights\n"
+        markdown += "\n## Key Insights\n"
 
         # Add insights
         if summary["average_score"] >= 4.5:
@@ -420,7 +439,7 @@ if __name__ == "__main__":
     generator = ReportGenerator(output_dir)
     reports = generator.generate_reports(df)
 
-    print(f"\n✅ Reports generated successfully!")
+    print("\n✅ Reports generated successfully!")
     print(f"📊 Dashboard: {reports.get('dashboard')}")
     print(f"📈 Executive Summary: {reports.get('executive_summary')}")
     print(f"\nAll reports saved to: {output_dir}")

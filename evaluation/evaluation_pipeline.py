@@ -272,7 +272,13 @@ class EvaluationPipeline:
         score_col = "overall_score" if "overall_score" in df.columns else "aggregated_score"
         if score_col in df.columns:
             avg_score = df[score_col].mean()
+            threshold = 3.5 if score_col == "overall_score" else 0.7
+            success_rate = (df[score_col] >= threshold).sum() / len(df) * 100 if len(df) > 0 else 0
+
+            if score_col == "aggregated_score":
+                avg_score *= 5.0
             print(f"Average Score:      {avg_score:.2f}/5.00")
+            print(f"Success Rate:       {success_rate:.1f}%")
 
         total_cost = df["cost"].sum() if "cost" in df.columns else 0
         print(f"Total Tokens:       {self.cost_tracker.get_total_tokens():,}")

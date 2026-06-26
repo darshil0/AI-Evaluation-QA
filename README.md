@@ -1,7 +1,7 @@
 # AI Evaluation QA Framework
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.4.3-green.svg" alt="Version Badge">
+  <img src="https://img.shields.io/badge/version-2.4.4-green.svg" alt="Version Badge">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License Badge">
   <img src="https://img.shields.io/badge/coverage-84%25-brightgreen.svg" alt="Test Coverage Badge">
   <img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="Python Version Badge">
@@ -12,7 +12,7 @@
 
 The **AI Evaluation QA Framework** is a production-grade Python library for evaluating, scoring, and comparing AI model responses at scale. It provides a robust pipeline to run structured prompt suites against major LLM providers (OpenAI, Anthropic, Azure OpenAI), score them using customizable rubrics, and generate professional dashboards with analytics and cost telemetry.
 
-**Framework Version**: 2.4.3 (2026-06-20) | **Python**: 3.9+ | **License**: MIT
+**Framework Version**: 2.4.4 (2026-06-21) | **Python**: 3.9+ | **License**: MIT
 
 ## Key Features
 
@@ -40,7 +40,7 @@ The **AI Evaluation QA Framework** is a production-grade Python library for eval
 | Document | Purpose |
 |----------|---------|
 | [Contributing Guide](CONTRIBUTING.md) | Development setup, testing standards, PR guidelines, and code style (PEP 8, mypy strict, 100% coverage) |
-| [Changelog & Release History](CHANGELOG.md) | Version history, fixes, and breaking changes (v2.4.3 current, v1.0.0 initial) |
+| [Changelog & Release History](CHANGELOG.md) | Version history, fixes, and breaking changes (v2.4.4 current, v1.0.0 initial) |
 | [Configuration Reference](#configuration) | Detailed settings, rubric definition, and environment variables |
 | [Troubleshooting Guide](#troubleshooting) | Solutions for common errors and edge cases |
 
@@ -135,10 +135,10 @@ ls -la .env
 ai-eval validate
 
 # Expected output:
-# [2026-06-20 10:23:45] INFO     Validating environment...
-# [2026-06-20 10:23:47] INFO     ✓ OpenAI API key is valid
-# [2026-06-20 10:23:48] INFO     ✓ Configuration file valid
-# [2026-06-20 10:23:48] INFO     ✓ Ready to evaluate
+# [2026-06-21 10:23:45] INFO     Validating environment...
+# [2026-06-21 10:23:47] INFO     ✓ OpenAI API key is valid
+# [2026-06-21 10:23:48] INFO     ✓ Configuration file valid
+# [2026-06-21 10:23:48] INFO     ✓ Ready to evaluate
 ```
 
 **Expected Duration**: 5-10 seconds
@@ -201,13 +201,13 @@ ai-eval evaluate --prompts data/prompts/reasoning_tests.json \
 
 **Expected Output**:
 ```
-[2026-06-20 10:25:15] INFO     Starting evaluation pipeline...
-[2026-06-20 10:25:20] INFO     ✓ Loaded 3 prompts
-[2026-06-20 10:25:35] INFO     ✓ Executed 3 prompts (3/3 succeeded, 0 failed)
-[2026-06-20 10:25:45] INFO     ✓ Scored responses: accuracy=3.8/5, reasoning=4.1/5
-[2026-06-20 10:25:50] INFO     ✓ Generated reports in ./results
-[2026-06-20 10:25:50] INFO     Total tokens: 1,234 prompt + 567 completion
-[2026-06-20 10:25:50] INFO     Estimated cost: $0.04 (OpenAI gpt-4-turbo)
+[2026-06-21 10:25:15] INFO     Starting evaluation pipeline...
+[2026-06-21 10:25:20] INFO     ✓ Loaded 3 prompts
+[2026-06-21 10:25:35] INFO     ✓ Executed 3 prompts (3/3 succeeded, 0 failed)
+[2026-06-21 10:25:45] INFO     ✓ Scored responses: accuracy=3.8/5, reasoning=4.1/5
+[2026-06-21 10:25:50] INFO     ✓ Generated reports in ./results
+[2026-06-21 10:25:50] INFO     Total tokens: 1,234 prompt + 567 completion
+[2026-06-21 10:25:50] INFO     Estimated cost: $0.04 (OpenAI gpt-4-turbo)
 ```
 
 ### Step 5: View Reports
@@ -247,7 +247,7 @@ Options:
   --output-dir PATH                        # Output directory for results (default: ./results)
   --dry-run                                # Simulate run without making API calls
   --help                                   # Show help message
-  --version                                # Show version (2.4.3)
+  --version                                # Show version (2.4.4)
 ```
 
 ### Example Command Sequences
@@ -277,7 +277,7 @@ Configuration is managed via `config/settings.yaml`. Edit this file to customize
 ```yaml
 # ============================================================================
 # AI Evaluation QA Framework Configuration
-# Version: 2.4.3
+# Version: 2.4.4
 # ============================================================================
 
 # Logging Configuration
@@ -657,7 +657,7 @@ make lint              # Run linting (Black, isort, Flake8, mypy)
 make lint-fix          # Auto-fix formatting issues
 ```
 
-**Coverage**: 84% (v2.4.3), target 100%  
+**Coverage**: 84% (v2.4.4), target 100%
 **Test Count**: 140+ tests across 8 modules  
 **CI/CD**: GitHub Actions (test, lint, security scan) on every push
 
@@ -798,7 +798,7 @@ MIT License — See [LICENSE](LICENSE) file for full text.
 
 ---
 
-**Status**: Production / Stable (v2.4.3)  
+**Status**: Production / Stable (v2.4.4)
 **Python**: 3.9+ | **License**: MIT | **Maintainer**: [@darshil0](https://github.com/darshil0)
 
-**Last Updated**: 2026-06-20 | **Next Release**: TBD
+**Last Updated**: 2026-06-21 | **Next Release**: TBD
