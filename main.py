@@ -18,8 +18,6 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Optional
 
-import click
-
 # Configure logging with rotation before any imports that might log
 log_file = os.getenv("EVAL_LOG_FILE", "evaluation.log")
 max_bytes = int(os.getenv("EVAL_LOG_MAX_BYTES", 10_000_000))  # 10 MB
@@ -35,6 +33,9 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+# flake8: noqa: E402
+import click
 
 # Fixed: Lazy imports for heavy dependencies with try-catch for ImportError
 try:
@@ -92,8 +93,12 @@ def evaluate(config: str, prompts: str, model: Optional[str]) -> None:
         pipeline.run(prompts)
         logger.info("Evaluation completed successfully")
     except FileNotFoundError as e:
-        logger.exception("File not found")
-        click.echo(f"Error: File not found - {e}", err=True)
+        logger.exception("Prompts file not found")
+        click.echo(f"Error: Prompts file not found - {e}", err=True)
+        click.echo("\nTroubleshooting:", err=True)
+        click.echo("  1. Check file path: ls -la <PROMPT_FILE>", err=True)
+        click.echo("  2. Validate format: ai-eval lint-prompts <file>", err=True)
+        click.echo("  3. Example: ai-eval evaluate --prompts data/prompts/sample.json", err=True)
         sys.exit(1)
     except Exception as e:
         logger.exception("Evaluation failed")

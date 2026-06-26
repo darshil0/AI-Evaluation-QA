@@ -23,7 +23,7 @@ setup(
         exclude=["tests*", "docs*", "examples*", ".github*", ".venv*", "__pycache__*"]
     ),
     classifiers=[
-        "Development Status :: 5 - Production/Stable",
+        "Development Status :: 5 Production/Stable",
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Testing",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
@@ -37,37 +37,37 @@ setup(
     python_requires=">=3.9",
     # Fixed: Synchronized versions with pyproject.toml and requirements.txt
     install_requires=[
-        "openai>=1.60.0",  # Fixed: Was 2.40.0 in setup.py, unified to 1.60.0
-        "aiohttp>=3.10.0",  # Fixed: Was 3.14.0, unified to 3.10.0
-        "jsonschema>=4.21.0",
-        "pyyaml>=6.0.3",
-        "matplotlib>=3.8.0",  # Fixed: Was 3.10.9, unified
-        "plotly>=5.24.0",  # Fixed: Was 6.7.0, unified to 5.24.0
-        "click>=8.1.0",  # Fixed: Was 8.4.1, unified to 8.1.0
-        "python-dotenv>=1.0.0",  # Fixed: Was 1.2.2, unified to 1.0.0
-        "tiktoken>=0.7.0",  # Fixed: Was 0.13.0, unified
-        "numpy>=1.26.0",
-        "pandas>=2.2.0",
-        "scipy>=1.13.0",
+        "openai>=1.60.0,<2.0.0",
+        "aiohttp>=3.10.0,<4.0.0",
+        "jsonschema>=4.21.0,<5.0.0",
+        "pyyaml>=6.0.3,<7.0.0",
+        "matplotlib>=3.8.0,<4.0.0",
+        "plotly>=5.24.0,<6.0.0",
+        "click>=8.1.0,<9.0.0",
+        "python-dotenv>=1.0.0,<2.0.0",
+        "tiktoken>=0.7.0,<1.0.0",
+        "numpy>=1.26.0,<2.0.0",
+        "pandas>=2.2.0,<3.0.0",
+        "scipy>=1.13.0,<2.0.0",
     ],
     extras_require={
         "dev": [
-            "pytest>=8.3.0",
-            "pytest-cov>=5.0.0",
-            "pytest-asyncio>=0.24.0",
-            "pytest-xdist>=3.6.0",
-            "pytest-html>=4.1.0",
-            "black>=24.10.0",
-            "isort>=5.13.0",
-            "flake8>=7.0.0",
-            "flake8-bugbear>=24.0.0",
-            "mypy>=1.9.0",
-            "pylint>=3.1.0",
-            "bandit>=1.7.0",
-            "safety>=2.3.5",
-            "pre-commit>=3.6.0",
-            "coverage>=7.6.0",
-            "coverage-badge>=1.1.2",
+            "pytest>=8.3.0,<9.0.0",
+            "pytest-cov>=5.0.0,<6.0.0",
+            "pytest-asyncio>=0.24.0,<1.0.0",
+            "pytest-xdist>=3.6.0,<4.0.0",
+            "pytest-html>=4.1.0,<5.0.0",
+            "black>=24.10.0,<25.0.0",
+            "isort>=5.13.0,<6.0.0",
+            "flake8>=7.0.0,<8.0.0",
+            "flake8-bugbear>=24.0.0,<25.0.0",
+            "mypy>=1.9.0,<2.0.0",
+            "pylint>=3.1.0,<4.0.0",
+            "bandit>=1.7.0,<2.0.0",
+            "safety>=3.0.0,<4.0.0",
+            "pre-commit>=3.6.0,<4.0.0",
+            "coverage>=7.6.0,<8.0.0",
+            "coverage-badge>=1.1.2,<2.0.0",
         ],
         "pdf": ["reportlab>=3.6.0", "weasyprint>=54.0"],
         "ml": ["scikit-learn>=1.1.0"],
