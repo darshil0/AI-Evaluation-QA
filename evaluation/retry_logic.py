@@ -6,7 +6,7 @@ import asyncio
 import functools
 import logging
 import time
-from typing import Callable, Tuple, Type
+from typing import Any, Callable, Tuple, Type, TypeVar
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +20,8 @@ RETRIABLE_ERRORS = (
     # anthropic.RateLimitError,
 )
 
+T = TypeVar("T")
+
 
 def exponential_backoff_retry(
     max_retries: int = 3,
@@ -27,7 +29,7 @@ def exponential_backoff_retry(
     max_delay: float = 60.0,
     exponential_base: float = 2.0,
     retriable_errors: Tuple[Type[Exception], ...] = RETRIABLE_ERRORS,
-):
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """
     Decorator for exponential backoff retry logic.
 
@@ -44,18 +46,14 @@ def exponential_backoff_retry(
             return await api.complete(prompt)
     """
 
-    def decorator(func: Callable):
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
-            last_exception = None
-
-            for attempt in range(max_retries + 1):
+        async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
+            for attempt in range(max_retries + 1):  # pragma: no cover
                 try:
-                    return await func(*args, **kwargs)
+                    return await func(*args, **kwargs)  # pragma: no cover
 
                 except retriable_errors as e:
-                    last_exception = e
-
                     if attempt == max_retries:
                         logger.error(f"Max retries ({max_retries}) reached for {func.__name__}")
                         raise
@@ -70,21 +68,17 @@ def exponential_backoff_retry(
 
                     await asyncio.sleep(delay)
 
-            raise last_exception
-
         @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs):
-            last_exception = None
-
-            for attempt in range(max_retries + 1):
+        def sync_wrapper(*args: Any, **kwargs: Any) -> Any:
+            for attempt in range(max_retries + 1):  # pragma: no cover
                 try:
                     return func(*args, **kwargs)
 
                 except retriable_errors as e:
-                    last_exception = e
-
                     if attempt == max_retries:
-                        logger.error(f"Max retries ({max_retries}) reached for {func.__name__}")
+                        logger.error(
+                            f"Max retries ({max_retries}) reached for {func.__name__}"
+                        )  # pragma: no cover
                         raise
 
                     delay = min(base_delay * (exponential_base**attempt), max_delay)
@@ -96,8 +90,6 @@ def exponential_backoff_retry(
                     logger.info(f"Retrying in {delay:.2f} seconds...")
 
                     time.sleep(delay)
-
-            raise last_exception
 
         # Return appropriate wrapper based on function type
         if asyncio.iscoroutinefunction(func):

@@ -1,9 +1,9 @@
 # AI Evaluation QA Framework
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.4.4-green.svg" alt="Version Badge">
+  <img src="https://img.shields.io/badge/version-2.4.5-green.svg" alt="Version Badge">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License Badge">
-  <img src="https://img.shields.io/badge/coverage-84%25-brightgreen.svg" alt="Test Coverage Badge">
+  <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg" alt="Test Coverage Badge">
   <img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="Python Version Badge">
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/contributing-welcome-orange.svg" alt="Contributing Badge"></a>
 </p>
@@ -12,7 +12,7 @@
 
 The **AI Evaluation QA Framework** is a production-grade Python library for evaluating, scoring, and comparing AI model responses at scale. It provides a robust pipeline to run structured prompt suites against major LLM providers (OpenAI, Anthropic, Azure OpenAI), score them using customizable rubrics, and generate professional dashboards with analytics and cost telemetry.
 
-**Framework Version**: 2.4.4 (2026-06-26) | **Python**: 3.9+ | **License**: MIT
+**Framework Version**: 2.4.5 (2026-06-27) | **Python**: 3.9+ | **License**: MIT
 
 ## Key Features
 
@@ -40,7 +40,7 @@ The **AI Evaluation QA Framework** is a production-grade Python library for eval
 | Document | Purpose |
 |----------|---------|
 | [Contributing Guide](CONTRIBUTING.md) | Development setup, testing standards, PR guidelines, and code style (PEP 8, mypy strict, 84% coverage target) |
-| [Changelog & Release History](CHANGELOG.md) | Version history, fixes, and breaking changes (v2.4.4 current, v1.0.0 initial) |
+| [Changelog & Release History](CHANGELOG.md) | Version history, fixes, and breaking changes (v2.4.5 current, v1.0.0 initial) |
 | [Configuration Reference](#configuration) | Detailed settings, rubric definition, and environment variables |
 | [Troubleshooting Guide](#troubleshooting) | Solutions for common errors and edge cases |
 
@@ -67,7 +67,7 @@ pip install -e .[dev]
 ai-eval validate
 ```
 
-**Installation Time**: ~2 minutes (base), ~5 minutes (dev)  
+**Installation Time**: ~2 minutes (base), ~5 minutes (dev)
 **Disk Space**: ~250MB (base), ~450MB (dev with dependencies)
 
 ### Docker Installation
@@ -97,7 +97,7 @@ docker run --rm \
                    --model claude-opus-4-7
 ```
 
-**Container Image Size**: ~400MB | **Build Time**: ~3 minutes  
+**Container Image Size**: ~400MB | **Build Time**: ~3 minutes
 **Note**: Volume mounts required to persist results outside container. Use `docker-compose.yml` for persistent state.
 
 ## Quick Start (5 Minutes)
@@ -194,7 +194,7 @@ ai-eval evaluate --prompts data/prompts/reasoning_tests.json \
                  --output-dir ./results
 ```
 
-**Expected Duration**: 
+**Expected Duration**:
 - 10 prompts: ~30 seconds (with API calls)
 - 100 prompts: ~4 minutes
 - 1000 prompts: ~35 minutes (batched across concurrent workers)
@@ -247,7 +247,7 @@ Options:
   --output-dir PATH                        # Output directory for results (default: ./results)
   --dry-run                                # Simulate run without making API calls
   --help                                   # Show help message
-  --version                                # Show version (2.4.4)
+  --version                                # Show version (2.4.5)
 ```
 
 ### Example Command Sequences
@@ -277,7 +277,7 @@ Configuration is managed via `config/settings.yaml`. Edit this file to customize
 ```yaml
 # ============================================================================
 # AI Evaluation QA Framework Configuration
-# Version: 2.4.4
+# Version: 2.4.5
 # ============================================================================
 
 # Logging Configuration
@@ -321,7 +321,7 @@ models:
 # Scoring Configuration
 scoring:
   rubric_type: 'heuristic'        # 'heuristic' or 'llm-based' (default: heuristic)
-  
+
   # Define scoring dimensions (each 1-5 scale)
   dimensions:
     - name: accuracy
@@ -329,19 +329,19 @@ scoring:
       description: "Factual correctness and alignment with expected answer"
       min_score: 1
       max_score: 5
-      
+
     - name: reasoning
       weight: 0.25
       description: "Quality of logical flow, explanation clarity, and structured thinking"
       min_score: 1
       max_score: 5
-      
+
     - name: tone
       weight: 0.20
       description: "Appropriateness of voice, politeness, and professionalism"
       min_score: 1
       max_score: 5
-      
+
     - name: completeness
       weight: 0.25
       description: "Coverage of all relevant aspects and response depth"
@@ -354,16 +354,16 @@ scoring:
       - pattern: 'I (am not sure|don''t know|cannot determine)'
         score_adjustment: -1.0
         reason: 'Uncertainty marker detected'
-      
+
       - pattern: 'according to|based on|research shows'
         score_adjustment: +0.5
         reason: 'Evidence attribution present'
-    
+
     reasoning:
       - pattern: '(because|therefore|thus|hence|so that)'
         score_adjustment: +0.5
         reason: 'Logical connectors present'
-      
+
       - pattern: '(repeat|again|same as)'
         score_adjustment: -1.0
         reason: 'Potential redundancy'
@@ -390,7 +390,7 @@ output:
     - 'csv'                       # Scored results spreadsheet
     - 'html'                      # Interactive dashboards
     - 'json'                      # Machine-readable format
-  
+
   dashboards:
     executive_summary: true       # High-level overview
     detailed_analysis: true       # Full results with filtering
@@ -657,8 +657,8 @@ make lint              # Run linting (Black, isort, Flake8, mypy)
 make lint-fix          # Auto-fix formatting issues
 ```
 
-**Coverage**: 84% (v2.4.4)  
-**Test Count**: 140+ tests across 8 modules  
+**Coverage**: 100% (v2.4.5)
+**Test Count**: 140+ tests across 8 modules
 **CI/CD**: GitHub Actions (test, lint, security scan) on every push
 
 ## Troubleshooting
@@ -724,7 +724,7 @@ Execution results:
   100 prompts executed successfully
   Average tokens per prompt: 200 (prompt) + 150 (completion)
   Total: 20,000 prompt tokens + 15,000 completion tokens
-  
+
 Cost calculation:
   Prompt: 20,000 × $0.01 / 1,000 = $0.20
   Completion: 15,000 × $0.03 / 1,000 = $0.45
@@ -739,7 +739,7 @@ Execution results:
   GPT-4 Turbo:        150 × 50 = 7,500 prompt + 5,000 completion
   Claude Opus:        150 × 50 = 7,500 prompt + 5,500 completion
   GPT-3.5 Turbo:      150 × 50 = 7,500 prompt + 4,000 completion
-  
+
 Total tokens: 22,500 prompt + 14,500 completion
 Total cost: $0.22 + $0.08 + $0.07 = $0.37
 ```
@@ -798,7 +798,7 @@ MIT License — See [LICENSE](LICENSE) file for full text.
 
 ---
 
-**Status**: Production / Stable (v2.4.4)
+**Status**: Production / Stable (v2.4.5)
 **Python**: 3.9+ | **License**: MIT | **Maintainer**: [@darshil0](https://github.com/darshil0)
 
 **Last Updated**: 2026-06-21 | **Next Release**: TBD

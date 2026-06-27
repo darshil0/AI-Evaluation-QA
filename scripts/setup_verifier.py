@@ -4,11 +4,12 @@
 import os
 import sys
 from pathlib import Path
+from typing import Any, Callable
 
 
 def verify_setup() -> bool:
     """Run all verification checks."""
-    checks = {
+    checks: dict[str, Callable[[], Any]] = {
         "Config file exists": lambda: Path("config/settings.yaml").exists(),
         "Required directories": lambda: all(
             Path(d).exists() for d in ["data/prompts", "reports", "evaluation"]

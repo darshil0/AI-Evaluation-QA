@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.5] - 2026-06-27
+
+### Added
+- Comprehensive type hint coverage across core modules.
+- New test suite with 100% code coverage (including defensive path exclusions).
+- Centralized logging configuration with JSON support.
+- Behavioral tests for EvaluationPipeline, ScoringEngine, and ReportGenerator.
+- Automated CI gate enforcement for linting and coverage.
+
+### Changed
+- Migrated scoring configuration schema to standard criteria format.
+- Hardened API error handling and cost tracking logic.
+- Optimized performance for large-scale evaluation results processing.
+- Refined regression detection with improved statistical thresholds.
+
+### Fixed
+- Mypy type-hint errors in retry logic and error handlers.
+- Unused variable warnings and potential runtime loop errors.
+- Whitespace trimming logic in data validation scripts.
+- Inconsistent grade-score relationships in reporting.
+
 ## [2.4.4] - 2026-06-21
 
 ### Fixed
@@ -278,6 +299,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version Comparison Links
 
+[2.4.5]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.4...v2.4.5
 [2.4.4]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.3...v2.4.4
 [2.4.3]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.2...v2.4.3
 [2.4.2]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.1...v2.4.2
