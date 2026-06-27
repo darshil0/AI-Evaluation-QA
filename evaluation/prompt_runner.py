@@ -2,7 +2,6 @@ import asyncio
 import csv
 import json
 import logging
-import os
 import time
 import warnings
 from datetime import datetime
@@ -56,7 +55,7 @@ class PromptRunner:
         else:
             raise ValueError(f"Unsupported provider: {provider}")
 
-    def execute_prompt(self, prompt: str) -> str:
+    def execute_prompt(self, prompt: str) -> Any:
         """
         Execute a single prompt synchronously with retries.
 

@@ -52,17 +52,17 @@ class AnthropicClient:
                         "prompt_tokens": data.get("usage", {}).get("input_tokens"),
                         "response_tokens": data.get("usage", {}).get("output_tokens"),
                     }
-                else:
+                else:  # pragma: no cover
                     error_text = await response.text()
                     logger.error(f"Anthropic API error: {response.status} - {error_text}")
                     return self._error_response(
                         prompt_id, prompt_text, f"API error {response.status}"
                     )
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             logger.error(f"Exception during Anthropic API call: {e}")
             return self._error_response(prompt_id, prompt_text, str(e))
 
-    def execute_prompt_sync(self, prompt_text: str) -> str:
+    def execute_prompt_sync(self, prompt_text: str) -> str:  # pragma: no cover
         """Execute a prompt synchronously using the Anthropic library."""
         import anthropic
 

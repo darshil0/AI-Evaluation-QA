@@ -499,7 +499,7 @@ class TestEdgeCases:
         # The constructor doesn't check for API key anymore, execute_prompt does.
         runner = PromptRunner()
         with patch.dict(os.environ, {}, clear=True):
-            with pytest.raises(Exception):
+            with pytest.raises(Exception, match="api_key client option must be set"):
                 runner.execute_prompt("Test prompt")
 
     def test_unicode_handling(self):

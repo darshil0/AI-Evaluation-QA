@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ai-evaluation-qa"
-version = "2.4.5"
+version = "2.5.0"
 description = "Production-grade framework for evaluating AI model responses"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.14"
 license = {text = "MIT"}
 authors = [
     {name = "Darshil"}
@@ -19,10 +19,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
     "openai>=1.60.0,<2.0.0",
@@ -101,7 +98,7 @@ profile = "black"
 line_length = 100
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.14"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true

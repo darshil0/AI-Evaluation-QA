@@ -128,7 +128,7 @@ ls -la .env
 
 ```bash
 # This command validates:
-# ✓ Python version (3.9+)
+# ✓ Python version (3.14+)
 # ✓ API key availability and connectivity
 # ✓ Configuration file format
 # ✓ Directory permissions for results output
@@ -798,7 +798,7 @@ MIT License — See [LICENSE](LICENSE) file for full text.
 
 ---
 
-**Status**: Production / Stable (v2.4.6)
-**Python**: 3.9+ | **License**: MIT | **Maintainer**: [@darshil0](https://github.com/darshil0)
+**Status**: Production / Stable (v2.5.0)
+**Python**: 3.14+ | **License**: MIT | **Maintainer**: [@darshil0](https://github.com/darshil0)
 
 **Last Updated**: 2026-06-27 | **Next Release**: TBD

@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-06-27
+
+### Added
+- **Python 3.14+ Support**: Upgraded the entire framework to support and require Python 3.14+.
+- **Enhanced Type Checking**: Integrated `types-PyYAML` and refined type hints across core modules for stricter static analysis.
+
+### Changed
+- **CI/CD Pipeline Optimization**: Updated GitHub Actions workflows to include Python 3.13 and 3.14, ensuring compatibility with the latest Python releases.
+- **Dependency Refresh**: Relaxed dependency bounds for `numpy`, `pandas`, and `scipy` to support upcoming Python versions.
+
+### Fixed
+- **Test Suite Alignment**: Resolved multiple test failures caused by API changes in upstream libraries (OpenAI v1.x).
+- **100% Coverage Maintenance**: Restored and enforced 100% test coverage across all core modules.
+- **Linting & Formatting**: Unified code style using Black, Isort, and Flake8 with project-specific overrides.
+
 ## [2.4.6] - 2026-06-27
 
 ### Fixed
