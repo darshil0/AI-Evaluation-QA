@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11"]   # use a supported runner-distributed version [web:9]
+        python-version: ["3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          pytest --cov=evaluation --cov=config --cov=scripts --junitxml=./test-results.xml --cov-report=xml --cov-fail-under=80 tests/
+          pytest tests/ --cov=evaluation --cov=config --cov=scripts --cov-report=xml --cov-fail-under=80
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
@@ -48,10 +48,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.13"
           cache: pip
 
       - name: Install security tools
@@ -64,7 +64,7 @@ jobs:
         run: bandit -r evaluation config scripts -ll
 
       - name: Run Safety Check
-        run: safety check --full-report || true
+        run: safety check --full-report
 
       - name: Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@v0.33.1
