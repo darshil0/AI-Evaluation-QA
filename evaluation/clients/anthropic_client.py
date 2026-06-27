@@ -62,6 +62,19 @@ class AnthropicClient:
             logger.error(f"Exception during Anthropic API call: {e}")
             return self._error_response(prompt_id, prompt_text, str(e))
 
+    def execute_prompt_sync(self, prompt_text: str) -> str:
+        """Execute a prompt synchronously using the Anthropic library."""
+        import anthropic
+
+        client = anthropic.Anthropic(api_key=self.api_key)
+        message = client.messages.create(
+            model=self.model,
+            max_tokens=self.config.get("models", {}).get("primary", {}).get("max_tokens", 2000),
+            messages=[{"role": "user", "content": prompt_text}],
+            timeout=self.config.get("api", {}).get("timeout", 60),
+        )
+        return message.content[0].text if message.content else ""
+
     def _error_response(self, prompt_id: str, prompt_text: str, error_msg: str) -> Dict[str, Any]:
         return {
             "prompt_id": prompt_id,

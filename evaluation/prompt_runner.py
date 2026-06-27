@@ -9,7 +9,6 @@ from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional
 
 import aiohttp
-import openai
 
 from evaluation.error_handler import EvaluationErrorHandler
 
@@ -26,15 +25,15 @@ class PromptRunner:
     ):
         """Initialize PromptRunner with configuration."""
         self.config = config or {}
-        self.model = model
-        self.timeout = timeout
-        self.retry_attempts = retry_attempts
+        self.model = self.config.get("models", {}).get("primary", {}).get("model_name", model)
+        self.timeout = self.config.get("api", {}).get("timeout", timeout)
+        self.retry_attempts = self.config.get("api", {}).get("max_retries", retry_attempts)
         self.failure_count = 0
         self.total_count = 0
-        self._max_concurrent_requests = self.config.get("max_concurrent_requests", 5)
+        self._max_concurrent_requests = self.config.get("api", {}).get("max_concurrent_requests", 5)
         self._semaphore: Optional[asyncio.Semaphore] = None
         self.error_handler = EvaluationErrorHandler(
-            max_retries=retry_attempts,
+            max_retries=self.retry_attempts,
             backoff_factor=float(self.config.get("execution", {}).get("backoff_factor", 2.0)),
         )
 
@@ -79,20 +78,12 @@ class PromptRunner:
         self.total_count += 1
         last_exception = Exception("No attempts made")
 
+        provider = self.config.get("models", {}).get("primary", {}).get("provider", "openai")
+        client = self._get_api_client(provider)
+
         for attempt in range(self.retry_attempts):
             try:
-                api_key = os.getenv("OPENAI_API_KEY") or self.config.get("api_key")
-                if not api_key:
-                    raise ValueError("OPENAI_API_KEY environment variable not set")
-
-                client = openai.OpenAI(api_key=api_key)
-                response = client.chat.completions.create(
-                    model=self.model,
-                    messages=[{"role": "user", "content": prompt}],
-                    timeout=self.timeout,
-                )
-                content = response.choices[0].message.content
-                return content if content is not None else ""
+                return client.execute_prompt_sync(prompt)
             except Exception as e:
                 last_exception = e
                 logger.warning(f"Attempt {attempt + 1} failed: {e}")

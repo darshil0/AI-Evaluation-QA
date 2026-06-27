@@ -50,6 +50,19 @@ class OpenAIClient:
             logger.error(f"Exception during OpenAI API call: {e}")
             return self._error_response(prompt_id, prompt_text, str(e))
 
+    def execute_prompt_sync(self, prompt_text: str) -> str:
+        """Execute a prompt synchronously using the OpenAI library."""
+        import openai
+
+        client = openai.OpenAI(api_key=self.api_key)
+        response = client.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt_text}],
+            timeout=self.config.get("api", {}).get("timeout", 60),
+        )
+        content = response.choices[0].message.content
+        return content if content is not None else ""
+
     def _error_response(self, prompt_id: str, prompt_text: str, error_msg: str) -> Dict[str, Any]:
         return {
             "prompt_id": prompt_id,

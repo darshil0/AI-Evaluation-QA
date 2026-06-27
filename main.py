@@ -18,10 +18,20 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Optional
 
+from dotenv import load_dotenv
+
+# Load environment variables before anything else
+load_dotenv()
+
 # Configure logging with rotation before any imports that might log
 log_file = os.getenv("EVAL_LOG_FILE", "evaluation.log")
 max_bytes = int(os.getenv("EVAL_LOG_MAX_BYTES", 10_000_000))  # 10 MB
 backup_count = int(os.getenv("EVAL_LOG_BACKUP_COUNT", 5))
+
+# Ensure log directory exists if log_file is in a directory
+log_path = Path(log_file)
+if log_path.parent != Path("."):
+    log_path.parent.mkdir(parents=True, exist_ok=True)
 
 logging.basicConfig(
     level=logging.INFO,

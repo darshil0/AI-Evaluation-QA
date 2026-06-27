@@ -36,8 +36,8 @@ class EvaluationPipeline:
         output_dir = self.config.get("output", {}).get("directory", "reports")
         self.report_generator = ReportGenerator(output_dir)
 
-        budget_limit = self.config.get("evaluation", {}).get("budget_limit")
-        model_name = self.config.get("model", "gpt-4")
+        budget_limit = self.config.get("budget", {}).get("limit_usd")
+        model_name = self.config.get("models", {}).get("primary", {}).get("model_name", "gpt-4")
         self.cost_tracker = CostTracker(model_name=model_name, budget_limit=budget_limit)
 
     def run_evaluation(self, prompt_file: str) -> Any:

@@ -25,23 +25,25 @@ def temp_dir(tmp_path):
 @pytest.fixture
 def sample_prompts():
     """Provide sample prompt data for testing."""
-    return [
-        {
-            "id": "test_001",
-            "category": "reasoning",
-            "text": "What is 2 + 2?",
-            "expected_characteristics": ["Correct answer", "Clear explanation"],
-        },
-        {
-            "id": "test_002",
-            "category": "empathy",
-            "text": "I am feeling sad. Can you help?",
-            "expected_characteristics": [
-                "Empathetic response",
-                "Helpful suggestions",
-            ],
-        },
-    ]
+    return {
+        "prompts": [
+            {
+                "id": "test_001",
+                "category": "reasoning",
+                "text": "What is 2 + 2?",
+                "expected_characteristics": ["Correct answer", "Clear explanation"],
+            },
+            {
+                "id": "test_002",
+                "category": "empathy",
+                "text": "I am feeling sad. Can you help?",
+                "expected_characteristics": [
+                    "Empathetic response",
+                    "Helpful suggestions",
+                ],
+            },
+        ]
+    }
 
 
 @pytest.fixture
