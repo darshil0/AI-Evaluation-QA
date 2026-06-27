@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.6] - 2026-06-27
+
+### Fixed
+- **Config Key Path Mismatches** (`evaluation/evaluation_pipeline.py`, `evaluation/prompt_runner.py`):
+  - `budget_limit` now reads from `budget.limit_usd` (was `evaluation.budget_limit`).
+  - `model_name` now reads from `models.primary.model_name` (was top-level `model`).
+  - `timeout` default now reads from `api.timeout` (was hardcoded `30`).
+  - `_max_concurrent_requests` now reads from `api.max_concurrent_requests` (was top-level `max_concurrent_requests`).
+- **Sync Execution Provider Dispatch** (`evaluation/prompt_runner.py`): `execute_prompt` now dispatches by configured provider instead of always using OpenAI directly. Added `execute_prompt_sync` methods to `OpenAIClient` and `AnthropicClient`.
+- **dotenv Loading Order** (`main.py`): `load_dotenv()` is now called before reading `EVAL_LOG_FILE` etc., ensuring `.env` variables are available for logging configuration.
+- **Missing Config Version** (`config/settings.yaml`): Added `version: "2.3"` to eliminate the legacy-format warning from `ConfigLoader`.
+- **Test Conflicts** (`tests/test_evaluation_pipeline.py`): Removed duplicate `pytest_configure` (conflicted with `conftest.py`). Renamed `sample_prompts` fixture to `pipeline_prompts` to avoid shadowing conftest's fixture.
+
+
 ## [2.4.5] - 2026-06-27
 
 ### Added
