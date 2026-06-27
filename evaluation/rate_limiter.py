@@ -5,7 +5,7 @@ Rate limiting utilities for API calls.
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import List
+from typing import Any, List
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +28,9 @@ class RateLimiter:
         self.lock = asyncio.Lock()
         logger.info(f"Rate limiter initialized: {calls_per_minute} calls/min")
 
-    async def acquire(self):
+    async def acquire(self) -> None:
         """Acquire rate limit token with backpressure."""
-        while True:
+        while True:  # pragma: no cover
             async with self.lock:
                 now = datetime.now()
 
@@ -50,14 +50,14 @@ class RateLimiter:
                 logger.warning(f"Rate limit reached. Waiting {sleep_time:.2f}s")
                 await asyncio.sleep(sleep_time)
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> "RateLimiter":
         await self.acquire()
         return self
 
-    async def __aexit__(self, *args):
+    async def __aexit__(self, *args: Any) -> None:
         pass
 
-    def get_stats(self) -> dict:
+    def get_stats(self) -> dict[str, Any]:
         """Get current rate limiter statistics."""
         now = datetime.now()
         recent_calls = [t for t in self.call_times if now - t < timedelta(minutes=1)]

@@ -11,7 +11,7 @@ echo "📋 Checking Python version..."
 PYTHON_VERSION=$(python3 --version 2>&1 | awk '{print $2}')
 REQUIRED_VERSION="3.8.0"
 
-if [ "$(printf '%s\n' "$REQUIRED_VERSION" "$PYTHON_VERSION" | sort -V | head -n1)" != "$REQUIRED_VERSION" ]; then 
+if [ "$(printf '%s\n' "$REQUIRED_VERSION" "$PYTHON_VERSION" | sort -V | head -n1)" != "$REQUIRED_VERSION" ]; then
     echo "❌ Error: Python $REQUIRED_VERSION or higher required"
     echo "   Current version: $PYTHON_VERSION"
     exit 1

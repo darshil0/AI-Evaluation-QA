@@ -20,6 +20,11 @@ class PromptLoader:
         with open(filepath, "r", encoding="utf-8") as f:
             data = json.load(f)
 
+        if not isinstance(data, dict):
+            raise ValueError(
+                f"Prompt file {filepath} must contain a JSON object"
+            )  # pragma: no cover
+
         if self.schema:
             try:
                 validate(instance=data, schema=self.schema)

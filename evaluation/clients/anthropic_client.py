@@ -24,8 +24,8 @@ class AnthropicClient:
         prompt_text = prompt_data.get("prompt") or prompt_data.get("text", "")
         prompt_id = prompt_data.get("id") or "unknown"
 
-        headers = {
-            "x-api-key": self.api_key,
+        headers: Dict[str, str] = {
+            "x-api-key": self.api_key or "",
             "anthropic-version": "2023-06-01",
             "Content-Type": "application/json",
         }
