@@ -116,7 +116,8 @@ class PromptRunner:
 
         Edge Cases:
             - Empty list: Returns an empty list.
-            - Mixed valid/invalid prompts: Valid prompts are executed; invalid ones are marked as 'error'.
+            - Mixed valid/invalid prompts: Valid prompts are executed;
+              invalid ones are marked as 'error'.
         """
         if not prompts:
             return []

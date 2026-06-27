@@ -56,7 +56,8 @@ class ReportGenerator:
                 if col in df.columns:
                     try:
                         mean_val = pd.to_numeric(df[col], errors="coerce").mean()
-                        # If it's a 0-1 scale metric (like aggregated_score or score_*), scale it to 5.0
+                        # If it's a 0-1 scale metric (like aggregated_score or score_*),
+                        # scale it to 5.0
                         if col == "aggregated_score" or col.startswith("score_"):
                             mean_val *= 5.0
                         return mean_val
@@ -152,7 +153,10 @@ class ReportGenerator:
             score = f"{float(res.get('overall_score', 0)):.2f}"
             defects = html.escape(str(res.get("defects", "")))
 
-            table_rows += f"<tr><td>{p_id}</td><td>{p_text}</td><td>{model}</td><td>{score}</td><td>{defects}</td></tr>"
+            table_rows += (
+                f"<tr><td>{p_id}</td><td>{p_text}</td><td>{model}</td>"
+                f"<td>{score}</td><td>{defects}</td></tr>"
+            )
 
         html_content = f"""
         <!DOCTYPE html>

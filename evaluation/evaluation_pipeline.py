@@ -67,7 +67,8 @@ class EvaluationPipeline:
             loop = asyncio.get_event_loop()
             if loop.is_running():
                 raise RuntimeError(
-                    "run() cannot be called from an active event loop. Use 'await _run_async(...)' instead."
+                    "run() cannot be called from an active event loop. "
+                    "Use 'await _run_async(...)' instead."
                 )
             return loop.run_until_complete(self._run_async(prompt_file))
         except Exception as e:
@@ -141,7 +142,8 @@ class EvaluationPipeline:
             loop = asyncio.get_event_loop()
             if loop.is_running():
                 raise RuntimeError(
-                    "process_results() cannot be called from an active event loop. Use 'await process_results_async(...)' instead."
+                    "process_results() cannot be called from an active event loop. "
+                    "Use 'await process_results_async(...)' instead."
                 )
             return loop.run_until_complete(self.process_results_async(results))
 
