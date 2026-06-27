@@ -197,7 +197,8 @@ class ConfigLoader:
             weight = item["weight"]
             if not isinstance(weight, (int, float)) or isinstance(weight, bool):
                 raise ConfigError(
-                    f"Weight for scoring.criteria.{name} must be numeric, got {type(weight).__name__}"
+                    f"Weight for scoring.criteria.{name} must be numeric, "
+                    f"got {type(weight).__name__}"
                 )
 
             total_weight += float(weight)
