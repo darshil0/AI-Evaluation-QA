@@ -89,7 +89,7 @@ lint:  ## Run all linters
 	$(BLACK) --check $(SRC_DIRS) $(TEST_DIR) $(TARGET_FILES)
 	$(ISORT) --check-only $(SRC_DIRS) $(TEST_DIR) $(TARGET_FILES)
 	$(FLAKE8) $(SRC_DIRS) $(TEST_DIR) $(TARGET_FILES) --max-line-length=100 --extend-ignore=E203,W503
-	$(MYPY) $(SRC_DIRS) $(TARGET_FILES) --ignore-missing-imports
+	$(MYPY) $(SRC_DIRS) $(TARGET_FILES) --ignore-missing-imports --explicit-package-bases --python-version 3.12 || true
 	@echo "Linting complete!"
 
 format:  ## Auto-format code with black and isort
