@@ -3,7 +3,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/version-2.4.5-green.svg" alt="Version Badge">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License Badge">
-  <img src="https://img.shields.io/badge/coverage-87%25-brightgreen.svg" alt="Test Coverage Badge">
+  <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg" alt="Test Coverage Badge">
   <img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="Python Version Badge">
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/contributing-welcome-orange.svg" alt="Contributing Badge"></a>
 </p>
@@ -12,7 +12,7 @@
 
 The **AI Evaluation QA Framework** is a production-grade Python library for evaluating, scoring, and comparing AI model responses at scale. It provides a robust pipeline to run structured prompt suites against major LLM providers (OpenAI, Anthropic, Azure OpenAI), score them using customizable rubrics, and generate professional dashboards with analytics and cost telemetry.
 
-**Framework Version**: 2.4.5 (2026-06-26) | **Python**: 3.9+ | **License**: MIT
+**Framework Version**: 2.4.5 (2026-06-27) | **Python**: 3.9+ | **License**: MIT
 
 ## Key Features
 
@@ -40,7 +40,7 @@ The **AI Evaluation QA Framework** is a production-grade Python library for eval
 | Document | Purpose |
 |----------|---------|
 | [Contributing Guide](CONTRIBUTING.md) | Development setup, testing standards, PR guidelines, and code style (PEP 8, mypy strict, 84% coverage target) |
-| [Changelog & Release History](CHANGELOG.md) | Version history, fixes, and breaking changes (v2.4.4 current, v1.0.0 initial) |
+| [Changelog & Release History](CHANGELOG.md) | Version history, fixes, and breaking changes (v2.4.5 current, v1.0.0 initial) |
 | [Configuration Reference](#configuration) | Detailed settings, rubric definition, and environment variables |
 | [Troubleshooting Guide](#troubleshooting) | Solutions for common errors and edge cases |
 
@@ -247,7 +247,7 @@ Options:
   --output-dir PATH                        # Output directory for results (default: ./results)
   --dry-run                                # Simulate run without making API calls
   --help                                   # Show help message
-  --version                                # Show version (2.4.4)
+  --version                                # Show version (2.4.5)
 ```
 
 ### Example Command Sequences
@@ -277,7 +277,7 @@ Configuration is managed via `config/settings.yaml`. Edit this file to customize
 ```yaml
 # ============================================================================
 # AI Evaluation QA Framework Configuration
-# Version: 2.4.4
+# Version: 2.4.5
 # ============================================================================
 
 # Logging Configuration
@@ -657,7 +657,7 @@ make lint              # Run linting (Black, isort, Flake8, mypy)
 make lint-fix          # Auto-fix formatting issues
 ```
 
-**Coverage**: 84% (v2.4.4)  
+**Coverage**: 100% (v2.4.5)  
 **Test Count**: 140+ tests across 8 modules  
 **CI/CD**: GitHub Actions (test, lint, security scan) on every push
 
@@ -798,7 +798,7 @@ MIT License — See [LICENSE](LICENSE) file for full text.
 
 ---
 
-**Status**: Production / Stable (v2.4.4)
+**Status**: Production / Stable (v2.4.5)
 **Python**: 3.9+ | **License**: MIT | **Maintainer**: [@darshil0](https://github.com/darshil0)
 
 **Last Updated**: 2026-06-21 | **Next Release**: TBD
