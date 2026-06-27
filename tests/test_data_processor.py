@@ -65,5 +65,5 @@ def test_estimate_memory_usage():
 
 
 def test_process_large_csv_error():
-    with pytest.raises(Exception):
+    with pytest.raises(FileNotFoundError):
         DataProcessor.process_large_csv("non_existent.csv", lambda x: x)

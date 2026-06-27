@@ -175,7 +175,8 @@ def sample_results_csv():
 def sample_scored_csv():
     """Provide sample scored CSV content."""
     return (
-        "prompt_id,category,model_response,accuracy_score,reasoning_score,tone_score,completeness_score,overall_score,defects\n"
+        "prompt_id,category,model_response,accuracy_score,reasoning_score,tone_score,\
+completeness_score,overall_score,defects\n"
         "test_001,reasoning,The answer is 4,5,4,3,3,4.15,None\n"
         "test_002,empathy,I understand,3,3,5,2,3.25,D04\n"
     )

@@ -45,7 +45,7 @@ def test_no_baseline(tmp_path, current_df_no_regression):
     detector = RegressionDetector(str(tmp_path / "baseline.csv"))
     results = detector.check_regression(current_df_no_regression)
 
-    assert results["has_regression"] == False
+    assert results["has_regression"] is False
     assert "No baseline available" in results["reason"]
 
 
@@ -57,7 +57,7 @@ def test_no_regression_detected(tmp_path, baseline_df, current_df_no_regression)
     detector = RegressionDetector(str(baseline_path))
     results = detector.check_regression(current_df_no_regression)
 
-    assert results["has_regression"] == False
+    assert results["has_regression"] is False
 
 
 def test_regression_detected(tmp_path, baseline_df, current_df_with_regression):
@@ -68,7 +68,7 @@ def test_regression_detected(tmp_path, baseline_df, current_df_with_regression):
     detector = RegressionDetector(str(baseline_path))
     results = detector.check_regression(current_df_with_regression)
 
-    assert results["has_regression"] == True
+    assert results["has_regression"] is True
     assert len(results["regressions"]) > 0
 
 
@@ -83,7 +83,7 @@ def test_insufficient_samples(tmp_path):
     detector = RegressionDetector(str(baseline_path))
     results = detector.check_regression(small_df)
 
-    assert results["has_regression"] == False
+    assert results["has_regression"] is False
     assert "Insufficient samples" in results["reason"]
 
 

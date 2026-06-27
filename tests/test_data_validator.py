@@ -33,7 +33,7 @@ def test_validate_valid_dataframe(valid_raw_df):
     """Test validation of valid dataframe"""
     is_valid, issues = DataValidator.validate_dataframe(valid_raw_df, "raw_results")
 
-    assert is_valid == True
+    assert is_valid is True
     assert len(issues) == 0
 
 
@@ -42,7 +42,7 @@ def test_validate_empty_dataframe():
     empty_df = pd.DataFrame()
     is_valid, issues = DataValidator.validate_dataframe(empty_df)
 
-    assert is_valid == False
+    assert is_valid is False
     assert "Dataframe is empty" in issues[0]
 
 
@@ -52,7 +52,7 @@ def test_validate_missing_columns():
 
     is_valid, issues = DataValidator.validate_dataframe(df, "raw_results")
 
-    assert is_valid == False
+    assert is_valid is False
     assert any("Missing required columns" in issue for issue in issues)
 
 
@@ -69,7 +69,7 @@ def test_validate_duplicate_ids():
 
     is_valid, issues = DataValidator.validate_dataframe(df, "raw_results")
 
-    assert is_valid == False
+    assert is_valid is False
     assert any("Duplicate prompt IDs" in issue for issue in issues)
 
 
@@ -87,7 +87,7 @@ def test_validate_scores_out_of_range():
 
     is_valid, issues = DataValidator.validate_dataframe(df, "scored_results")
 
-    assert is_valid == False
+    assert is_valid is False
     assert any("outside valid range" in issue for issue in issues)
 
 
@@ -104,7 +104,7 @@ def test_validate_invalid_grades():
 
     is_valid, issues = DataValidator.validate_dataframe(df, "scored_results")
 
-    assert is_valid == False
+    assert is_valid is False
     assert any("Invalid grade values" in issue for issue in issues)
 
 
@@ -120,7 +120,7 @@ def test_validate_invalid_timestamp(monkeypatch):
     # Missing other columns will create issues, but we only check for timestamp issue
     is_valid, issues = DataValidator.validate_dataframe(df, "raw_results")
 
-    assert is_valid == False
+    assert is_valid is False
     assert any("Invalid timestamp format" in issue for issue in issues)
 
 
@@ -192,7 +192,7 @@ def test_clean_dataframe_trim_exception(caplog, monkeypatch):
 
     monkeypatch.setattr(pd.Series, "apply", mock_apply)
 
-    cleaned = DataValidator.clean_dataframe(df)
+    DataValidator.clean_dataframe(df)
     assert "Could not trim column" in caplog.text
 
 

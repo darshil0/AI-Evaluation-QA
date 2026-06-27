@@ -27,7 +27,7 @@ class TestReportGeneratorEdgeCases:
         """Test initialization creates output directory."""
         with tempfile.TemporaryDirectory() as tmpdir:
             output_dir = os.path.join(tmpdir, "new_dir", "reports")
-            generator = ReportGenerator(output_dir)
+            ReportGenerator(output_dir)
             assert os.path.exists(output_dir)
 
     def test_load_data_from_csv(self):

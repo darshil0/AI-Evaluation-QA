@@ -8,12 +8,6 @@ from config.config_loader import ConfigError, ConfigLoader, ConfigVersionError
 
 
 def test_config_loader_incompatible_version():
-    config = {
-        "version": "1.0",
-        "models": {"primary": {"provider": "openai", "model_name": "gpt-4"}},
-        "api": {"max_retries": 3},
-        "scoring": {"criteria": {"accuracy": {"weight": 1.0}}},
-    }
     # Version 1.0 should be migrated to 2.3, not raise error if it can be migrated
     # But if it's explicitly below MIN_COMPATIBLE_VERSION after possible migration?
     # Actually _check_version_compatibility is called BEFORE _migrate_config

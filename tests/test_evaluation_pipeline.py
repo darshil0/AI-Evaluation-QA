@@ -8,15 +8,11 @@ including prompt execution, scoring, and report generation.
 import csv
 import json
 import os
-import sys
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
-
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from evaluation.prompt_runner import PromptRunner
 from evaluation.report_generator import ReportGenerator
@@ -57,7 +53,11 @@ def sample_responses():
         {
             "prompt_id": "test_001",
             "prompt": "Explain why the sky is blue.",
-            "response": "The sky appears blue due to Rayleigh scattering. When sunlight enters the atmosphere, shorter wavelengths (blue) scatter more than longer wavelengths (red).",
+            "response": (
+                "The sky appears blue due to Rayleigh scattering. "
+                "When sunlight enters the atmosphere, shorter wavelengths (blue) "
+                "scatter more than longer wavelengths (red)."
+            ),
             "model": "gpt-4",
             "timestamp": "2025-11-11T10:00:00",
         },
@@ -199,7 +199,7 @@ class TestPromptRunner:
 
         runner = PromptRunner(model="gpt-4", retry_attempts=1, config={"api_key": "test-key"})
 
-        with pytest.raises(Exception):
+        with pytest.raises(Exception, match="API Error"):
             runner.execute_prompt("Test prompt")
 
     @patch("openai.OpenAI")
@@ -259,7 +259,10 @@ class TestScoringEngine:
         engine = ScoringEngine()
 
         # Good reasoning
-        response = "Water boils at 100°C because at this temperature, the vapor pressure equals atmospheric pressure. Therefore it boils. 1) heat 2) boil."
+        response = (
+            "Water boils at 100°C because at this temperature, the vapor pressure "
+            "equals atmospheric pressure. Therefore it boils. 1) heat 2) boil."
+        )
         score = engine.score_reasoning(response, "Why does water boil at 100°C?")
         assert 4 <= score <= 5
 
@@ -287,7 +290,10 @@ class TestScoringEngine:
         engine = ScoringEngine()
 
         # Complete response
-        response = "To reset your password: 1) Go to settings, 2) Click forgot password, 3) Check your email, 4) Create a new password."
+        response = (
+            "To reset your password: 1) Go to settings, 2) Click forgot password, "
+            "3) Check your email, 4) Create a new password."
+        )
         score = engine.score_completeness(response, "How do I reset my password?")
         assert 4 <= score <= 5
 
@@ -468,11 +474,16 @@ class TestIntegration:
         assert scored_file.exists()
         assert (temp_dir / "evaluation_summary.html").exists()
 
-    def test_error_propagation(self):
+    @patch("openai.OpenAI")
+    def test_error_propagation(self, mock_openai_class):
         """Test that errors propagate correctly through the pipeline."""
+        mock_client = MagicMock()
+        mock_openai_class.return_value = mock_client
+        mock_client.chat.completions.create.side_effect = ValueError("invalid-model")
+
         runner = PromptRunner(model="invalid-model", config={"api_key": "test-key"})
 
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError, match="invalid-model"):
             runner.execute_prompt("Test prompt")
 
 
