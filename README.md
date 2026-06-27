@@ -12,7 +12,7 @@
 
 The **AI Evaluation QA Framework** is a production-grade Python library for evaluating, scoring, and comparing AI model responses at scale. It provides a robust pipeline to run structured prompt suites against major LLM providers (OpenAI, Anthropic, Azure OpenAI), score them using customizable rubrics, and generate professional dashboards with analytics and cost telemetry.
 
-**Framework Version**: 2.4.6 (2026-06-27) | **Python**: 3.14 | **License**: MIT
+**Framework Version**: 2.5.0 (2026-06-27) | **Python**: 3.14 | **License**: MIT
 
 ## Key Features
 
@@ -28,7 +28,7 @@ The **AI Evaluation QA Framework** is a production-grade Python library for eval
 
 ## Requirements
 
-- **Python**: 3.9 or higher
+- **Python**: 3.14
 - **API Keys**: At least one of the following:
   - OpenAI API key (`OPENAI_API_KEY`) — [Get key](https://platform.openai.com/account/api-keys)
   - Anthropic API key (`ANTHROPIC_API_KEY`) — [Get key](https://console.anthropic.com/)
@@ -277,7 +277,7 @@ Configuration is managed via `config/settings.yaml`. Edit this file to customize
 ```yaml
 # ============================================================================
 # AI Evaluation QA Framework Configuration
-# Version: 2.4.5
+# Version: 2.5.0
 # ============================================================================
 
 # Logging Configuration
