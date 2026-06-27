@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.5] - 2026-06-27
+
+### Fixed
+- **CI/CD Pipeline Enhancement** (`ci/ci.yml`): Updated GitHub Actions workflows to resolve Node.js 16 deprecation warnings. Migrated to compatible action versions across lint, test, and security scan workflows for improved compatibility with GitHub's latest runner environments.
+- **Package Distribution** (`Makefile`, `setup.py`, `pyproject.toml`): Synchronized build and distribution configurations to ensure consistency across setuptools, pip, and wheel generation. Added explicit exclusion rules for test and documentation artifacts to maintain clean package distributions.
+- **Test Fixture Management** (`tests/fixtures/`): Added comprehensive test fixture files for validation and integration testing, improving test suite reproducibility and reducing external dependencies during CI execution.
+
+### Changed
+- **Build Process Optimization** (`Makefile`): Refactored Makefile targets for improved cross-platform compatibility (macOS/Linux/Windows). Enhanced error reporting and added validation steps to the `build`, `install`, and `install-dev` targets.
+- **Documentation Synchronization** (`README.md`): Updated references and quick-start guide to reflect current versioning and project structure after v2.4.4 issue resolution.
+
+### Note
+- This is a stabilization release following v2.4.4's comprehensive issue resolution. All 266 tests continue to pass with 100% code coverage across core modules.
+- This release maintains backward compatibility; no breaking changes to public APIs.
+
 ## [2.4.4] - 2026-06-21
 
 ### Fixed
@@ -278,6 +293,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version Comparison Links
 
+[2.4.5]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.4...v2.4.5
 [2.4.4]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.3...v2.4.4
 [2.4.3]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.2...v2.4.3
 [2.4.2]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.1...v2.4.2
