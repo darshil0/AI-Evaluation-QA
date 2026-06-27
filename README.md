@@ -39,7 +39,7 @@ The **AI Evaluation QA Framework** is a production-grade Python library for eval
 
 | Document | Purpose |
 |----------|---------|
-| [Contributing Guide](CONTRIBUTING.md) | Development setup, testing standards, PR guidelines, and code style (PEP 8, mypy strict, 84% coverage target) |
+| [Contributing Guide](CONTRIBUTING.md) | Development setup, testing standards, PR guidelines, and code style (PEP 8, mypy strict, 100% coverage target) |
 | [Changelog & Release History](CHANGELOG.md) | Version history, fixes, and breaking changes (v2.4.5 current, v1.0.0 initial) |
 | [Configuration Reference](#configuration) | Detailed settings, rubric definition, and environment variables |
 | [Troubleshooting Guide](#troubleshooting) | Solutions for common errors and edge cases |
