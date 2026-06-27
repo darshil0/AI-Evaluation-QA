@@ -9,6 +9,9 @@ on:
       - "scripts/**"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   regression:
     runs-on: ubuntu-latest
@@ -51,10 +54,15 @@ jobs:
         run: |
           shopt -s nullglob
           files=(reports/run_results_*_scored.csv)
+
           if [ -f reports/baseline.csv ] && [ ${#files[@]} -gt 0 ]; then
-            LATEST="$(ls -t reports/run_results_*_scored.csv | head -1)"
-            ai-eval check-regression "$LATEST" --baseline reports/baseline.csv
+            latest=""
+            for f in "${files[@]}"; do
+              if [ -z "$latest" ] || [ "$f" -nt "$latest" ]; then
+                latest="$f"
+              fi
+            done
+            ai-eval check-regression "$latest" --baseline reports/baseline.csv
           else
             echo "Baseline or scored results missing; skipping regression check."
-            exit 0
           fi
