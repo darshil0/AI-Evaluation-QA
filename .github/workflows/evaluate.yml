@@ -17,33 +17,40 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.13", "3.14"]
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.14"
+          python-version: ${{ matrix.python-version }}
           cache: pip
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+          python -m pip install -e ".[dev]"
 
       - name: Run sanity evaluation
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
+          set -euo pipefail
           mkdir -p data/prompts reports
+
           if [ ! -f data/prompts/sanity_check.json ]; then
             cat > data/prompts/sanity_check.json <<'EOF'
-          {"prompts":[{"id":"sanity-1","prompt":"Say hello","expected":"Hello"}]}
-          EOF
+{"prompts":[{"id":"sanity-1","prompt":"Say hello","expected":"Hello"}]}
+EOF
           fi
 
-          if [ -n "$OPENAI_API_KEY" ] || [ -n "$ANTHROPIC_API_KEY" ]; then
+          if [ -n "${OPENAI_API_KEY:-}" ] || [ -n "${ANTHROPIC_API_KEY:-}" ]; then
             ai-eval evaluate --prompts data/prompts/sanity_check.json
           else
             echo "API keys not found, performing import validation only."
@@ -52,13 +59,14 @@ jobs:
 
       - name: Check for regressions
         run: |
+          set -euo pipefail
           shopt -s nullglob
           files=(reports/run_results_*_scored.csv)
 
           if [ -f reports/baseline.csv ] && [ ${#files[@]} -gt 0 ]; then
-            latest=""
+            latest="${files[0]}"
             for f in "${files[@]}"; do
-              if [ -z "$latest" ] || [ "$f" -nt "$latest" ]; then
+              if [ "$f" -nt "$latest" ]; then
                 latest="$f"
               fi
             done
