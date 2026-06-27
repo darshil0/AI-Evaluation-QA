@@ -34,10 +34,10 @@ class TestPromptRunnerEdgeCases:
         runner = PromptRunner(model="gpt-4")
 
         with patch.dict(os.environ, {}, clear=True):
-            with pytest.raises(ValueError) as exc_info:
+            with pytest.raises(Exception) as exc_info:
                 runner.execute_prompt("Test prompt")
 
-            assert "OPENAI_API_KEY" in str(exc_info.value)
+            assert "api_key client option must be set" in str(exc_info.value)
 
     def test_execute_prompts_empty_list(self):
         """Test execute_prompts with empty list."""

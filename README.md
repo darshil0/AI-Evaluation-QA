@@ -1,10 +1,10 @@
 # AI Evaluation QA Framework
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.4.6-green.svg" alt="Version Badge">
+  <img src="https://img.shields.io/badge/version-2.5.0-green.svg" alt="Version Badge">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License Badge">
   <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg" alt="Test Coverage Badge">
-  <img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="Python Version Badge">
+  <img src="https://img.shields.io/badge/python-3.14+-blue.svg" alt="Python Version Badge">
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/contributing-welcome-orange.svg" alt="Contributing Badge"></a>
 </p>
 
@@ -12,7 +12,7 @@
 
 The **AI Evaluation QA Framework** is a production-grade Python library for evaluating, scoring, and comparing AI model responses at scale. It provides a robust pipeline to run structured prompt suites against major LLM providers (OpenAI, Anthropic, Azure OpenAI), score them using customizable rubrics, and generate professional dashboards with analytics and cost telemetry.
 
-**Framework Version**: 2.4.6 (2026-06-27) | **Python**: 3.9+ | **License**: MIT
+**Framework Version**: 2.5.0 (2026-06-27) | **Python**: 3.14+ | **License**: MIT
 
 ## Key Features
 
@@ -28,7 +28,7 @@ The **AI Evaluation QA Framework** is a production-grade Python library for eval
 
 ## Requirements
 
-- **Python**: 3.9 or higher
+- **Python**: 3.14 or higher
 - **API Keys**: At least one of the following:
   - OpenAI API key (`OPENAI_API_KEY`) — [Get key](https://platform.openai.com/account/api-keys)
   - Anthropic API key (`ANTHROPIC_API_KEY`) — [Get key](https://console.anthropic.com/)
@@ -128,7 +128,7 @@ ls -la .env
 
 ```bash
 # This command validates:
-# ✓ Python version (3.9+)
+# ✓ Python version (3.14+)
 # ✓ API key availability and connectivity
 # ✓ Configuration file format
 # ✓ Directory permissions for results output
@@ -798,7 +798,7 @@ MIT License — See [LICENSE](LICENSE) file for full text.
 
 ---
 
-**Status**: Production / Stable (v2.4.6)
-**Python**: 3.9+ | **License**: MIT | **Maintainer**: [@darshil0](https://github.com/darshil0)
+**Status**: Production / Stable (v2.5.0)
+**Python**: 3.14+ | **License**: MIT | **Maintainer**: [@darshil0](https://github.com/darshil0)
 
 **Last Updated**: 2026-06-27 | **Next Release**: TBD

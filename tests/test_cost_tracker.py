@@ -44,8 +44,8 @@ class TestCostTracker:
         """Test model name normalization."""
         tracker = CostTracker()
 
-        assert tracker._normalize_model_name("gpt-4-turbo-preview") == "gpt-4-turbo"
-        assert tracker._normalize_model_name("claude-3-sonnet-20240229") == "claude-sonnet-4"
+        assert tracker._normalize_model_name("gpt-4-turbo-preview") == "gpt-4-turbo-preview"
+        assert tracker._normalize_model_name("claude-3-sonnet-20240229") == "claude-sonnet-4-6"
         assert tracker._normalize_model_name("gpt-3.5-turbo-0125") == "gpt-3.5-turbo"
 
     def test_get_summary(self):

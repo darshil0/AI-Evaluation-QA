@@ -10,7 +10,7 @@ long_description = readme_path.read_text(encoding="utf-8") if readme_path.exists
 
 setup(
     name="ai-evaluation-qa",
-    version="2.4.5",
+    version="2.5.0",
     author="Darshil",
     author_email="",
     description="Production-grade framework for evaluating AI model responses",
@@ -29,12 +29,9 @@ setup(
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
-        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.14",
     ],
-    python_requires=">=3.9",
+    python_requires=">=3.14",
     # Fixed: Synchronized versions with pyproject.toml and requirements.txt
     install_requires=[
         "openai>=1.60.0,<2.0.0",

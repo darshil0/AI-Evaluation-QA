@@ -8,7 +8,6 @@ including prompt execution, scoring, and report generation.
 import csv
 import json
 import os
-import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
 
@@ -432,7 +431,9 @@ class TestIntegration:
     """Integration tests for the complete pipeline."""
 
     @patch("openai.OpenAI")
-    def test_full_pipeline(self, mock_openai_class, mock_openai_response, temp_dir, pipeline_prompts):
+    def test_full_pipeline(
+        self, mock_openai_class, mock_openai_response, temp_dir, pipeline_prompts
+    ):
         """Test the complete evaluation pipeline."""
         mock_client = MagicMock()
         mock_openai_class.return_value = mock_client
@@ -498,7 +499,7 @@ class TestEdgeCases:
         # The constructor doesn't check for API key anymore, execute_prompt does.
         runner = PromptRunner()
         with patch.dict(os.environ, {}, clear=True):
-            with pytest.raises(Exception):
+            with pytest.raises(Exception, match="api_key client option must be set"):
                 runner.execute_prompt("Test prompt")
 
     def test_unicode_handling(self):

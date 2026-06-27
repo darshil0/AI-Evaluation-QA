@@ -17,7 +17,7 @@ MODEL ?= gpt-4
 PROMPT_FILE ?= data/prompts/sample_prompts.json
 REPORTS_DIR ?= reports
 CHECKPOINT_DIR ?= data/checkpoints
-DOCKER_IMAGE ?= ai-evaluation-qa:2.4.5
+DOCKER_IMAGE ?= ai-evaluation-qa:2.5.0
 
 SRC_DIRS := evaluation config scripts
 TEST_DIR := tests
@@ -89,7 +89,7 @@ lint:  ## Run all linters
 	$(BLACK) --check $(SRC_DIRS) $(TEST_DIR) $(TARGET_FILES)
 	$(ISORT) --check-only $(SRC_DIRS) $(TEST_DIR) $(TARGET_FILES)
 	$(FLAKE8) $(SRC_DIRS) $(TEST_DIR) $(TARGET_FILES) --max-line-length=100 --extend-ignore=E203,W503
-	$(MYPY) $(SRC_DIRS) $(TARGET_FILES) --ignore-missing-imports --explicit-package-bases --python-version 3.12 || true
+	$(MYPY) $(SRC_DIRS) $(TARGET_FILES) --ignore-missing-imports --explicit-package-bases --python-version 3.14 || true
 	@echo "Linting complete!"
 
 format:  ## Auto-format code with black and isort
@@ -216,7 +216,7 @@ update-deps:  ## Update all dependencies to latest versions
 
 docker-build:  ## Build Docker image
 	@echo "Building Docker image..."
-	$(DOCKER) build --build-arg PYTHON_VERSION=3.11 -t $(DOCKER_IMAGE) -t ai-evaluation-qa:latest .
+	$(DOCKER) build --build-arg PYTHON_VERSION=3.14 -t $(DOCKER_IMAGE) -t ai-evaluation-qa:latest .
 
 docker-run:  ## Run evaluation in Docker
 	@echo "Running in Docker..."

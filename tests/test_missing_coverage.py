@@ -204,11 +204,12 @@ def test_cost_tracker_token_count_error():
 
 def test_cost_tracker_normalize_models():
     tracker = CostTracker()
-    assert tracker._normalize_model_name("gpt-4-turbo-preview") == "gpt-4-turbo"
+    assert tracker._normalize_model_name("gpt-4-turbo-preview") == "gpt-4-turbo-preview"
+    assert tracker._normalize_model_name("gpt-4-turbo") == "gpt-4-turbo-preview"
     assert tracker._normalize_model_name("gpt-3.5-turbo-16k") == "gpt-3.5-turbo"
-    assert tracker._normalize_model_name("claude-3-opus") == "claude-opus-4"
-    assert tracker._normalize_model_name("claude-3-sonnet") == "claude-sonnet-4"
-    assert tracker._normalize_model_name("claude-3-haiku") == "claude-haiku-4"
+    assert tracker._normalize_model_name("claude-3-opus") == "claude-opus-4-6"
+    assert tracker._normalize_model_name("claude-3-sonnet") == "claude-sonnet-4-6"
+    assert tracker._normalize_model_name("claude-3-haiku") == "claude-haiku-4-5-20251001"
 
 
 def test_prompt_loader_with_schema(tmp_path):

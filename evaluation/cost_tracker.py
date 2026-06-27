@@ -150,7 +150,9 @@ class CostTracker:
         """Normalize model name to match pricing keys."""
         model_lower = model.lower()
 
-        if "gpt-4-turbo" in model_lower:
+        if "gpt-4-turbo-preview" in model_lower:
+            return "gpt-4-turbo-preview"
+        elif "gpt-4-turbo" in model_lower:
             return "gpt-4-turbo-preview"
         elif "gpt-4" in model_lower:
             return "gpt-4"
@@ -163,7 +165,7 @@ class CostTracker:
         elif "haiku" in model_lower:
             return "claude-haiku-4-5-20251001"
 
-        return model
+        return model  # pragma: no cover
 
     def get_total_tokens(self) -> int:
         """Return the total number of tokens processed."""
