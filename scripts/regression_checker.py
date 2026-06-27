@@ -221,7 +221,8 @@ if __name__ == "__main__":
 
     if len(sys.argv) < 2:
         print(
-            "Usage: python check_regression.py <current_results_file> [--baseline <baseline_file>] [--save-baseline]"
+            "Usage: python check_regression.py <current_results_file> "
+            "[--baseline <baseline_file>] [--save-baseline]"
         )
         sys.exit(1)
 
