@@ -33,7 +33,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          pytest tests/ --cov=evaluation --cov=config --cov=scripts --cov-report=xml --cov-fail-under=80
+          pytest tests/ --cov=evaluation --cov=config --cov=scripts --cov-report=xml --cov-fail-under=100
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
