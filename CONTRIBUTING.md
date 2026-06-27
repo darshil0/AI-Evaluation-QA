@@ -6,7 +6,7 @@ First off, thank you for considering contributing to the AI Evaluation QA Framew
 
 ## 🛠️ Development Setup
 
-We require Python 3.9+ for development. To set up your environment:
+We require Python 3.14 for development. To set up your environment:
 
 ### 1. Fork and Clone
 Fork the repository on GitHub and clone it locally:
