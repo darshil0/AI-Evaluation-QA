@@ -146,10 +146,10 @@ class RegressionDetector:
         baseline_fail_pct = (baseline_grades.get("D", 0) + baseline_grades.get("F", 0)) * 100
         current_fail_pct = (current_grades.get("D", 0) + current_grades.get("F", 0)) * 100
 
-        # Chi-square test for grade distribution
+        # Chi-square test for grade distribution with Laplace smoothing
         all_grades = ["A", "B", "C", "D", "F"]
-        baseline_counts = [baseline_df[baseline_df["grade"] == g].shape[0] for g in all_grades]
-        current_counts = [current_df[current_df["grade"] == g].shape[0] for g in all_grades]
+        baseline_counts = [baseline_df[baseline_df["grade"] == g].shape[0] + 1 for g in all_grades]
+        current_counts = [current_df[current_df["grade"] == g].shape[0] + 1 for g in all_grades]
 
         try:
             chi2, p_value = stats.chisquare(current_counts, baseline_counts)
