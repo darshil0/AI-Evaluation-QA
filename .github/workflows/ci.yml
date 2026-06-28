@@ -67,7 +67,7 @@ jobs:
         run: safety check --full-report
 
       - name: Trivy Vulnerability Scanner
-        uses: aquasecurity/trivy-action@v0.33.1
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           scan-type: fs
           ignore-unfixed: true
