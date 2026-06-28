@@ -17,7 +17,7 @@ MODEL ?= gpt-4
 PROMPT_FILE ?= data/prompts/sample_prompts.json
 REPORTS_DIR ?= reports
 CHECKPOINT_DIR ?= data/checkpoints
-DOCKER_IMAGE ?= ai-evaluation-qa:2.5.0
+DOCKER_IMAGE ?= ai-evaluation-qa:2.5.1
 
 SRC_DIRS := evaluation config scripts
 TEST_DIR := tests

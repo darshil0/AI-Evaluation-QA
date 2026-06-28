@@ -1,7 +1,7 @@
 # AI Evaluation QA Framework
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.5.0-green.svg" alt="Version Badge">
+  <img src="https://img.shields.io/badge/version-2.5.1-green.svg" alt="Version Badge">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License Badge">
   <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg" alt="Test Coverage Badge">
   <img src="https://img.shields.io/badge/python-3.14-blue.svg" alt="Python Version Badge">
@@ -12,7 +12,7 @@
 
 The **AI Evaluation QA Framework** is a production-grade Python library for evaluating, scoring, and comparing AI model responses at scale. It provides a robust pipeline to run structured prompt suites against major LLM providers (OpenAI, Anthropic, Azure OpenAI), score them using customizable rubrics, and generate professional dashboards with analytics and cost telemetry.
 
-**Framework Version**: 2.5.0 (2026-06-27) | **Python**: 3.14 | **License**: MIT
+**Framework Version**: 2.5.1 (2026-06-28) | **Python**: 3.14 | **License**: MIT
 
 ## Key Features
 
