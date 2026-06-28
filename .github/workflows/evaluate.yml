@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.13", "3.14"]
+        python-version: ["3.14"]
 
     steps:
       - uses: actions/checkout@v4
@@ -46,8 +46,8 @@ jobs:
 
           if [ ! -f data/prompts/sanity_check.json ]; then
             cat > data/prompts/sanity_check.json <<'EOF'
-{"prompts":[{"id":"sanity-1","prompt":"Say hello","expected":"Hello"}]}
-EOF
+          {"prompts":[{"id":"sanity-1","prompt":"Say hello","expected":"Hello"}]}
+          EOF
           fi
 
           if [ -n "${OPENAI_API_KEY:-}" ] || [ -n "${ANTHROPIC_API_KEY:-}" ]; then
