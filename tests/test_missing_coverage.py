@@ -340,6 +340,6 @@ def test_report_generator_low_score_insight(tmp_path):
     generator = ReportGenerator(str(tmp_path))
     data = [{"prompt_id": "1", "overall_score": 1.0}]
     reports = generator.generate_reports(data)
-    with open(reports["executive_summary"], "r") as f:
+    with open(reports["executive_summary"], "r", encoding="utf-8") as f:
         content = f.read()
     assert "Performance below expectations" in content

@@ -135,7 +135,7 @@ class TestPromptRunnerEdgeCases:
             temp_file = f.name
 
         try:
-            runner.save_results(results, temp_file)
+            runner.save_responses(results, temp_file, file_format="csv")
             assert os.path.exists(temp_file)
         finally:
             os.unlink(temp_file)

@@ -115,7 +115,7 @@ async def test_save_results_and_summary(sample_prompts, config, monkeypatch):
     runner = PromptRunner(config)
     results = await runner.run_prompts(sample_prompts)
     output_path = TMP_DIR / "test_results.csv"
-    runner.save_results(results, str(output_path))
+    runner.save_responses(results, str(output_path), file_format="csv")
     assert output_path.exists()
     assert output_path.stat().st_size > 0
     runner.print_summary()
