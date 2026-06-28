@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Async & Coroutines**: Resolved `RuntimeWarning: coroutine never awaited` in `evaluation_pipeline.py` by properly closing unawaited coroutines when an active event loop raises a RuntimeError.
 - **Statistical Safety**: Prevented `divide by zero` RuntimeWarnings in `regression_checker.py` by introducing Laplace smoothing for expected count generation in Chi-square tests.
 - **Deprecations**: Upgraded deprecated `asyncio.iscoroutinefunction` checks in `retry_logic.py` to use `inspect.iscoroutinefunction` for full compatibility with Python 3.14.
+- **CI/CD Pipeline**: Removed obsolete Python 3.13 from GitHub Actions matrices and security jobs to fully align with the `>=3.14` requirement. Fixed a preexisting YAML indentation error in `evaluate.yml`.
 
 ---
 
