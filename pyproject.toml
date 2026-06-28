@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ai-evaluation-qa"
-version = "2.5.0"
+version = "2.5.1"
 description = "Production-grade framework for evaluating AI model responses"
 readme = "README.md"
 requires-python = ">=3.14"
