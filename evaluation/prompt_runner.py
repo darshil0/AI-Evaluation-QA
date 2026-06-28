@@ -255,7 +255,7 @@ class PromptRunner:
 
         logger.info(f"Saved {len(results)} responses to {filepath}")
 
-    def save_results(self, results: List[Dict[str, Any]], filepath: str) -> None:
+    def save_results(self, results: List[Dict[str, Any]], filepath: str) -> None:  # pragma: no cover
         """Save results to CSV file (legacy method)."""
         warnings.warn(
             "save_results() is deprecated. Use save_responses(..., file_format='csv') instead.",

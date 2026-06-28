@@ -4,6 +4,7 @@ Exponential backoff retry logic for API calls.
 
 import asyncio
 import functools
+import inspect
 import logging
 import time
 from typing import Any, Callable, Tuple, Type, TypeVar
@@ -92,7 +93,7 @@ def exponential_backoff_retry(
                     time.sleep(delay)
 
         # Return appropriate wrapper based on function type
-        if asyncio.iscoroutinefunction(func):
+        if inspect.iscoroutinefunction(func):
             return async_wrapper
         else:
             return sync_wrapper

@@ -63,9 +63,11 @@ class EvaluationPipeline:
         Failure Modes:
             - RuntimeError: If called from an active event loop.
         """
+        coro = self._run_async(prompt_file)
         try:
-            return asyncio.run(self._run_async(prompt_file))
+            return asyncio.run(coro)
         except RuntimeError:
+            coro.close()
             loop = asyncio.get_event_loop()  # pragma: no cover
             if loop.is_running():  # pragma: no cover
                 raise RuntimeError(  # pragma: no cover
@@ -140,9 +142,11 @@ class EvaluationPipeline:
             raise  # pragma: no cover
 
     def process_results(self, results: List[Dict[str, Any]]) -> Any:
+        coro = self.process_results_async(results)  # pragma: no cover
         try:  # pragma: no cover
-            return asyncio.run(self.process_results_async(results))  # pragma: no cover
+            return asyncio.run(coro)  # pragma: no cover
         except RuntimeError:  # pragma: no cover
+            coro.close()
             loop = asyncio.get_event_loop()  # pragma: no cover
             if loop.is_running():  # pragma: no cover
                 raise RuntimeError(  # pragma: no cover
