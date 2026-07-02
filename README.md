@@ -17,7 +17,7 @@ The **AI Evaluation QA Framework** is a production-grade Python library for eval
 ## Key Features
 
 - 🚀 **Multi-Provider Support**: Seamlessly evaluate against OpenAI (GPT-4, GPT-3.5), Anthropic (Claude Opus, Sonnet, Haiku), and Azure OpenAI.
-- ⚖️ **Rubric-Based Scoring**: Score responses across Accuracy, Reasoning, Tone, and Completeness dimensions on a 1–5 scale.
+- ⚖️ **Rubric-Based Scoring**: Score responses across Accuracy, Reasoning, Tone, and Completeness criteria on a 1–5 scale.
 - 🔍 **Automated Defect Detection**: Built-in detection for hallucinations (factual inconsistencies), logical flaws (reasoning gaps), redundancy (repetitive content), tone issues (inappropriate voice), and incomplete responses (insufficient coverage).
 - 📊 **Rich Analytics & Dashboards**: Interactive HTML dashboards, executive summaries, trend analysis, and CSV exports with filtering and sorting.
 - 💰 **Cost Telemetry**: Precision token counting via `tiktoken` and estimated cost tracking per model and run (updated pricing: June 2026).
@@ -40,7 +40,7 @@ The **AI Evaluation QA Framework** is a production-grade Python library for eval
 | Document | Purpose |
 |----------|---------|
 | [Contributing Guide](CONTRIBUTING.md) | Development setup, testing standards, PR guidelines, and code style (PEP 8, mypy strict, 100% coverage target) |
-| [Changelog & Release History](CHANGELOG.md) | Version history, fixes, and breaking changes (v2.4.5 current, v1.0.0 initial) |
+| [Changelog & Release History](CHANGELOG.md) | Version history, fixes, and breaking changes (v2.5.1 current) |
 | [Configuration Reference](#configuration) | Detailed settings, rubric definition, and environment variables |
 | [Troubleshooting Guide](#troubleshooting) | Solutions for common errors and edge cases |
 
@@ -94,7 +94,7 @@ docker run --rm \
   -v $(pwd)/results:/app/results \
   ai-eval:latest \
   ai-eval evaluate --prompts /app/data/prompts/reasoning_tests.json \
-                   --model claude-opus-4-7
+                   --model claude-opus-4-6
 ```
 
 **Container Image Size**: ~400MB | **Build Time**: ~3 minutes
@@ -180,17 +180,17 @@ Create a JSON file with test cases (e.g., `data/prompts/reasoning_tests.json`):
 ```bash
 # Dry run first (no API calls, validates pipeline)
 ai-eval evaluate --prompts data/prompts/reasoning_tests.json \
-                 --model gpt-4-turbo \
+                 --model gpt-4-turbo-preview \
                  --dry-run
 
 # Run full evaluation
 ai-eval evaluate --prompts data/prompts/reasoning_tests.json \
-                 --model gpt-4-turbo \
+                 --model gpt-4-turbo-preview \
                  --output-dir ./results
 
 # Run with Anthropic model instead
 ai-eval evaluate --prompts data/prompts/reasoning_tests.json \
-                 --model claude-opus-4-7 \
+                 --model claude-opus-4-6 \
                  --output-dir ./results
 ```
 
@@ -207,7 +207,7 @@ ai-eval evaluate --prompts data/prompts/reasoning_tests.json \
 [2026-06-21 10:25:45] INFO     ✓ Scored responses: accuracy=3.8/5, reasoning=4.1/5
 [2026-06-21 10:25:50] INFO     ✓ Generated reports in ./results
 [2026-06-21 10:25:50] INFO     Total tokens: 1,234 prompt + 567 completion
-[2026-06-21 10:25:50] INFO     Estimated cost: $0.04 (OpenAI gpt-4-turbo)
+[2026-06-21 10:25:50] INFO     Estimated cost: $0.04 (OpenAI gpt-4-turbo-preview)
 ```
 
 ### Step 5: View Reports
@@ -229,7 +229,7 @@ cat results/scored_results.csv
 
 | Command | Purpose | Example | Exit Code |
 |---------|---------|---------|-----------|
-| `evaluate` | Full pipeline: validate, execute, score, report | `ai-eval evaluate --prompts tests.json --model gpt-4-turbo` | 0 (success), 1 (failure) |
+| `evaluate` | Full pipeline: validate, execute, score, report | `ai-eval evaluate --prompts tests.json --model gpt-4-turbo-preview` | 0 (success), 1 (failure) |
 | `score` | Score raw results from previous run without re-executing | `ai-eval score --results raw_results.csv --output scored.csv` | 0, 1 |
 | `report` | Generate HTML dashboards and summaries from scored results | `ai-eval report --results scored.csv --output-dir ./reports` | 0, 1 |
 | `check-regression` | Compare current results against baseline, detect performance regressions | `ai-eval check-regression current.csv --baseline baseline.csv` | 0 (no regression), 1 (regression detected) |
@@ -247,7 +247,7 @@ Options:
   --output-dir PATH                        # Output directory for results (default: ./results)
   --dry-run                                # Simulate run without making API calls
   --help                                   # Show help message
-  --version                                # Show version (2.4.5)
+  --version                                # Show version (2.5.1)
 ```
 
 ### Example Command Sequences
@@ -255,17 +255,17 @@ Options:
 ```bash
 # Scenario 1: Complete workflow with GPT-4
 ai-eval validate && \
-ai-eval evaluate --prompts data/prompts/test.json --model gpt-4-turbo
+ai-eval evaluate --prompts data/prompts/test.json --model gpt-4-turbo-preview
 
 # Scenario 2: Score existing results without re-running API
-ai-eval score --results data/raw_results.csv --output results/scored.csv && \
+ai-eval score --results results/scored_results.csv --output results/scored.csv && \
 ai-eval report --results results/scored.csv --output-dir ./reports
 
 # Scenario 3: Compare against baseline to detect regressions
 ai-eval check-regression results/current.csv --baseline data/baseline.csv
 
 # Scenario 4: Dry run for testing (no API calls)
-ai-eval evaluate --prompts data/prompts/test.json --model gpt-4-turbo --dry-run
+ai-eval evaluate --prompts data/prompts/test.json --model gpt-4-turbo-preview --dry-run
 ```
 
 ## Configuration
@@ -277,7 +277,7 @@ Configuration is managed via `config/settings.yaml`. Edit this file to customize
 ```yaml
 # ============================================================================
 # AI Evaluation QA Framework Configuration
-# Version: 2.5.0
+# Version: 2.5.1
 # ============================================================================
 
 # Logging Configuration
@@ -295,7 +295,7 @@ models:
     timeout_seconds: 60
     max_retries: 3
     models:
-      - gpt-4-turbo              # Latest stable GPT-4 (128K context)
+      - gpt-4-turbo-preview      # Latest stable GPT-4 (128K context)
       - gpt-4                     # Original GPT-4 (8K context)
       - gpt-3.5-turbo             # Fast, affordable baseline
 
@@ -305,9 +305,9 @@ models:
     timeout_seconds: 60
     max_retries: 3
     models:
-      - claude-opus-4-7           # Most capable (200K context)
+      - claude-opus-4-6           # Most capable (200K context)
       - claude-sonnet-4-6         # Balanced (200K context)
-      - claude-haiku-4-5          # Fastest, most affordable (200K context)
+      - claude-haiku-4-5-20251001 # Fastest, most affordable (200K context)
 
   azure_openai:
     enabled: false
@@ -322,27 +322,27 @@ models:
 scoring:
   rubric_type: 'heuristic'        # 'heuristic' or 'llm-based' (default: heuristic)
 
-  # Define scoring dimensions (each 1-5 scale)
-  dimensions:
-    - name: accuracy
+  # Define scoring criteria (each 1-5 scale)
+  criteria:
+    accuracy:
       weight: 0.30
       description: "Factual correctness and alignment with expected answer"
       min_score: 1
       max_score: 5
 
-    - name: reasoning
+    reasoning:
       weight: 0.25
       description: "Quality of logical flow, explanation clarity, and structured thinking"
       min_score: 1
       max_score: 5
 
-    - name: tone
+    tone:
       weight: 0.20
       description: "Appropriateness of voice, politeness, and professionalism"
       min_score: 1
       max_score: 5
 
-    - name: completeness
+    completeness:
       weight: 0.25
       description: "Coverage of all relevant aspects and response depth"
       min_score: 1
@@ -414,7 +414,7 @@ security:
 Example:
 ```bash
 # This overrides all config file settings
-OPENAI_API_KEY='sk-...' CONCURRENT_REQUESTS=5 ai-eval evaluate --prompts test.json
+OPENAI_API_KEY='sk-...' python main.py evaluate --prompts test.json
 ```
 
 ## Output Files
@@ -424,7 +424,7 @@ Each evaluation generates the following outputs in `results/` directory:
 ```
 results/
 ├── raw_results.csv                 # Model responses, tokens, and metadata
-├── scored_results.csv              # Raw results + scoring dimensions (1-5)
+├── scored_results.csv              # Raw results + scoring criteria (1-5)
 ├── defects.csv                     # Detected issues per response
 ├── cost_summary.txt                # Token counts and estimated costs
 ├── execution_summary.txt           # Execution logs and timing metrics
@@ -433,10 +433,10 @@ results/
 └── regression_report.html          # Comparison to baseline (if applicable)
 
 # Example raw_results.csv columns:
-# prompt_id,model,response,prompt_tokens,completion_tokens,execution_time_ms
+# prompt_id,model,response,prompt_tokens,response_tokens,timestamp
 
 # Example scored_results.csv columns:
-# prompt_id,model,response,accuracy_score,reasoning_score,tone_score,completeness_score,overall_score
+# prompt_id,model,response,score_accuracy,score_reasoning,score_tone,score_completeness,overall_score
 
 # Example defects.csv columns:
 # prompt_id,model,defect_type,severity,description,evidence
@@ -446,7 +446,7 @@ results/
 
 ```
 ai-evaluation-qa/
-├── evaluation/                     # Core evaluation library (84% coverage)
+├── evaluation/                     # Core evaluation library
 │   ├── __init__.py
 │   ├── clients/
 │   │   ├── __init__.py
@@ -478,7 +478,7 @@ ai-evaluation-qa/
 │   ├── data_validator.py           # Data cleaning and validation
 │   └── setup.sh                    # Environment setup automation
 │
-├── tests/                          # Test suite (84% coverage, 140+ tests)
+├── tests/                          # Test suite (100% coverage policy)
 │   ├── test_evaluation_pipeline.py
 │   ├── test_scoring_engine.py
 │   ├── test_defect_detector.py
@@ -554,7 +554,7 @@ Azure OpenAI:
 - Prevents re-execution of completed prompts
 
 ### 4. Scoring Phase (2-5 seconds per 100 results)
-Responses scored across four dimensions using heuristic rules:
+Responses scored across four criteria using heuristic rules:
 
 **Accuracy** (0-5 scale):
 - +0.5: Evidence attribution ("according to...", "research shows...")
@@ -589,11 +589,12 @@ Identifies and categorizes issues:
 
 ### 6. Cost Tracking Phase (Instant)
 - Token counting via `tiktoken` library
-- Cost estimation based on current pricing:
+- Cost estimation based on current pricing (June 2026):
   ```
-  OpenAI GPT-4 Turbo:     $0.01/1K prompt tokens, $0.03/1K completion
-  OpenAI GPT-3.5 Turbo:   $0.0005/1K prompt tokens, $0.0015/1K completion
-  Anthropic Claude Opus:  $0.003/1K prompt tokens, $0.015/1K completion (prices as of June 2026)
+  OpenAI GPT-4 Turbo Preview: $0.01/1K prompt tokens, $0.03/1K completion
+  OpenAI GPT-3.5 Turbo:       $0.0005/1K prompt tokens, $0.0015/1K completion
+  Anthropic Claude Opus 4.6:  $0.015/1K prompt tokens, $0.075/1K completion
+  Anthropic Claude Sonnet 4.6: $0.003/1K prompt tokens, $0.015/1K completion
   ```
 - Provides cost breakdown by model and run
 
@@ -619,7 +620,7 @@ Generates multiple output formats:
 
 ## Performance Benchmarks
 
-**Test Configuration**: 1000 prompts, 5 concurrent workers, GPT-4 Turbo
+**Test Configuration**: 1000 prompts, 5 concurrent workers, GPT-4 Turbo Preview
 
 | Stage | Duration | Notes |
 |-------|----------|-------|
@@ -657,8 +658,8 @@ make lint              # Run linting (Black, isort, Flake8, mypy)
 make lint-fix          # Auto-fix formatting issues
 ```
 
-**Coverage**: 100% (v2.4.5)
-**Test Count**: 140+ tests across 8 modules
+**Coverage**: 100% policy
+**Test Count**: 140+ tests across core modules
 **CI/CD**: GitHub Actions (test, lint, security scan) on every push
 
 ## Troubleshooting
@@ -680,7 +681,7 @@ make lint-fix          # Auto-fix formatting issues
 | Error | Cause | Solution |
 |-------|-------|----------|
 | `No valid responses to score` | All API calls failed or responses are empty | Check prompt JSON format. Run `ai-eval lint-prompts` to validate. Ensure API keys are active. |
-| `Rubric dimension missing` | Scoring config incomplete | Verify all 4 dimensions (accuracy, reasoning, tone, completeness) are defined in `config/settings.yaml` under `scoring.dimensions`. |
+| `Rubric criterion missing` | Scoring config incomplete | Verify all 4 criteria (accuracy, reasoning, tone, completeness) are defined in `config/settings.yaml` under `scoring.criteria`. |
 | `Score calculation failed` | Invalid responses or NaN values | Check `raw_results.csv` for malformed responses. Ensure response text is valid UTF-8. |
 | `Regression detection failed` | Baseline file missing or incompatible | Verify baseline CSV path. Ensure baseline has same columns as current results. |
 
@@ -719,7 +720,7 @@ docker history ai-eval:latest
 ### Example 1: Single Model Evaluation
 
 ```
-Configuration: 100 prompts, GPT-4 Turbo
+Configuration: 100 prompts, GPT-4 Turbo Preview
 Execution results:
   100 prompts executed successfully
   Average tokens per prompt: 200 (prompt) + 150 (completion)
@@ -734,14 +735,14 @@ Cost calculation:
 ### Example 2: Multi-Model Comparison
 
 ```
-Configuration: 50 prompts, 3 models (GPT-4, Claude Opus, GPT-3.5)
+Configuration: 50 prompts, 3 models (GPT-4 Turbo Preview, Claude Opus 4.6, GPT-3.5 Turbo)
 Execution results:
-  GPT-4 Turbo:        150 × 50 = 7,500 prompt + 5,000 completion
-  Claude Opus:        150 × 50 = 7,500 prompt + 5,500 completion
-  GPT-3.5 Turbo:      150 × 50 = 7,500 prompt + 4,000 completion
+  GPT-4 Turbo Preview: 150 × 50 = 7,500 prompt + 5,000 completion ($0.075 + $0.15 = $0.225)
+  Claude Opus 4.6:     150 × 50 = 7,500 prompt + 5,500 completion ($0.1125 + $0.4125 = $0.525)
+  GPT-3.5 Turbo:       150 × 50 = 7,500 prompt + 4,000 completion ($0.00375 + $0.006 = $0.00975)
 
 Total tokens: 22,500 prompt + 14,500 completion
-Total cost: $0.22 + $0.08 + $0.07 = $0.37
+Total cost: ~$0.76
 ```
 
 **Cost Optimization Tips**:
@@ -756,7 +757,7 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for det
 
 - **Development Environment Setup**: Virtual environment, dependencies, pre-commit hooks
 - **Code Style**: PEP 8, type hints, 100+ character line limit
-- **Testing Requirements**: 84% code coverage target, unit + integration tests
+- **Testing Requirements**: 100% code coverage target, unit + integration tests
 - **Pull Request Process**: Fork, branch, test, document, submit PR with description
 - **Commit Message Convention**: `type(scope): description` (e.g., `fix(scoring): handle NaN values in heuristics`)
 
@@ -773,7 +774,7 @@ pip install -e .[dev]
 pytest tests/ --cov=evaluation
 
 # 4. Commit with conventional message
-git commit -m "fix(scoring): handle NaN values in accuracy dimension"
+git commit -m "fix(scoring): handle NaN values in accuracy criteria"
 
 # 5. Push and create PR
 git push origin fix/scoring-nan-bug
@@ -798,7 +799,7 @@ MIT License — See [LICENSE](LICENSE) file for full text.
 
 ---
 
-**Status**: Production / Stable (v2.5.0)
+**Status**: Production / Stable (v2.5.1)
 **Python**: 3.14+ | **License**: MIT | **Maintainer**: [@darshil0](https://github.com/darshil0)
 
 **Last Updated**: 2026-06-28 | **Next Release**: TBD
