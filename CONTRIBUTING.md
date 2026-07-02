@@ -35,8 +35,8 @@ pip install -e .[dev]     # Install development dependencies
 To maintain a high-quality, professional codebase, please adhere to these standards:
 
 * **Formatting**: Use [Black](https://github.com/psf/black) for code formatting and [isort](https://pycqa.github.io/isort/) for imports.
-* **Linting**: Ensure `flake8` passes without errors (configured to match Black's line-length configuration).
-* **Type Safety**: All new functions must include explicit type hints.
+* **Linting**: Ensure `flake8` passes without errors (configured to match Black's line-length configuration of 100 characters).
+* **Type Safety**: All new functions must include explicit type hints. Strict type checking is enforced via MyPy.
 * **Sanitization**: Use `DataSanitizer` in `evaluation/sanitizer.py` for any new user-controlled inputs or file outputs.
 * **Validation**: Any new core functionality or configuration changes must include corresponding validation logic in `config/`.
 * **Documentation**: All public classes and methods must have descriptive Google-style docstrings.
@@ -45,7 +45,7 @@ To maintain a high-quality, professional codebase, please adhere to these standa
 
 ## 🧪 Testing Standards
 
-We maintain a strict **100% Code Coverage** policy for all core modules.
+We maintain a strict **100% Code Coverage** policy for all core modules (`evaluation/`, `config/`, `scripts/`).
 
 ### Running Tests
 
@@ -54,7 +54,7 @@ We maintain a strict **100% Code Coverage** policy for all core modules.
 pytest tests/
 
 # Run with coverage report
-pytest --cov=evaluation --cov=config --cov-report=term-missing
+pytest --cov=evaluation --cov=config --cov=scripts --cov-report=term-missing
 
 # Using Makefile
 make test
