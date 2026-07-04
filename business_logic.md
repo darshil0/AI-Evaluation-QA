@@ -17,10 +17,11 @@ The framework uses deterministic rules to provide consistent scoring:
 
 ## 3. Defect Detection System
 Automated identification of common LLM failure modes:
-- **Hallucinations**: Factual inconsistencies.
+- **Hallucinations**: Factual inconsistencies and hallucination markers.
 - **Logical Flaws**: Reasoning gaps or contradictions.
-- **Redundancy**: Repetitive content patterns.
+- **Redundancy**: Repetitive content patterns and low unique word ratios.
 - **Incompleteness**: Truncated or insufficient responses.
+- **Refusal/Avoidance**: Identification of AI refusal patterns or avoidance of task fulfillment.
 
 ## 4. Cost and Performance Telemetry
 - **Token Tracking**: Precision counting for accurate cost estimation.
