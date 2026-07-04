@@ -18,7 +18,7 @@ The **AI Evaluation QA Framework** is a production-grade Python library for eval
 
 - 🚀 **Multi-Provider Support**: Seamlessly evaluate against OpenAI (GPT-4, GPT-3.5), Anthropic (Claude Opus, Sonnet, Haiku), and Azure OpenAI.
 - ⚖️ **Rubric-Based Scoring**: Score responses across Accuracy, Reasoning, Tone, and Completeness criteria on a 1–5 scale.
-- 🔍 **Automated Defect Detection**: Built-in detection for hallucinations (factual inconsistencies), logical flaws (reasoning gaps), redundancy (repetitive content), tone issues (inappropriate voice), and incomplete responses (insufficient coverage).
+- 🔍 **Automated Defect Detection**: Built-in detection for hallucinations (D02, D07), logical flaws (D01), redundancy (D05), tone issues (D03), incomplete responses (D04), and refusal/avoidance (D06).
 - 📊 **Rich Analytics & Dashboards**: Interactive HTML dashboards, executive summaries, trend analysis, and CSV exports with filtering and sorting.
 - 💰 **Cost Telemetry**: Precision token counting via `tiktoken` and estimated cost tracking per model and run (updated pricing: June 2026).
 - 🛡️ **Security & Validation**: Input/output sanitization (XSS prevention via `html.escape()`), filename safety controls (directory traversal prevention), and comprehensive pre-execution checks.
@@ -581,11 +581,12 @@ Identifies and categorizes issues:
 
 | Defect Type | Detection Method | Example |
 |-------------|------------------|---------|
-| **Hallucination** | Factual inconsistency check | Claims non-existent facts |
+| **Hallucination** | Factual inconsistency check & markers | Claims non-existent facts / "I believe" |
 | **Logical Flaw** | Reasoning chain validation | Contradictory statements |
-| **Redundancy** | Pattern matching for repetition | Same sentence repeated verbatim |
-| **Tone Issue** | Sentiment analysis (TextBlob) | Inappropriate voice for context |
-| **Incompleteness** | Coverage analysis | Cuts off mid-sentence |
+| **Redundancy** | Pattern matching & unique word ratio | Same sentence repeated verbatim |
+| **Tone Issue** | Sentiment & pattern analysis | Inappropriate voice for context |
+| **Incompleteness** | Coverage & length analysis | Cuts off mid-sentence |
+| **Refusal** | Pattern matching for AI refusals | "As an AI model, I cannot..." |
 
 ### 6. Cost Tracking Phase (Instant)
 - Token counting via `tiktoken` library
