@@ -6,8 +6,8 @@ import logging
 import math
 import os
 import re
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass, field
+from typing import Any, ClassVar, Dict, List, Optional, Tuple
 
 from evaluation.defect_detector import DefectDetector
 
@@ -19,12 +19,12 @@ class RubricCriterion:
     key: str
     weight: float
     type: str  # 'rule' or 'judge'
-    params: Dict[str, Any]
+    params: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class Rubric:
-    criteria: List[RubricCriterion]
+    criteria: List[RubricCriterion] = field(default_factory=list)
 
 
 @dataclass
@@ -41,9 +41,10 @@ class ScoreReport:
     prompt_id: Any
     prompt_text: str
     model: Optional[str]
+    response_text: str
     components: List[ScoreComponent]
     aggregated_score: float
-    metadata: Dict[str, Any]
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 class ScoringEngine:
@@ -51,29 +52,29 @@ class ScoringEngine:
     Core engine for scoring model responses against rubrics and heuristics.
     """
 
-    _NUMERIC_PATTERN = re.compile(r"[-+]?\d*\.\d+|\d+")
-    _LOGICAL_PATTERN = re.compile(
+    _NUMERIC_PATTERN: ClassVar[re.Pattern[str]] = re.compile(r"[-+]?\d*\.\d+|\d+")
+    _LOGICAL_PATTERN: ClassVar[re.Pattern[str]] = re.compile(
         r"\b(because|therefore|thus|hence|consequently|as a result|due to|since|so|furthermore|moreover|specifically|nevertheless|however|alternatively)\b",
         re.IGNORECASE,
     )
-    _POSITIVE_PATTERN = re.compile(
+    _POSITIVE_PATTERN: ClassVar[re.Pattern[str]] = re.compile(
         r"\b(understand|help|let me|i can|happy to|certainly|of course|delighted|pleasure|assist|welcome)\b",
         re.IGNORECASE,
     )
-    _NEGATIVE_PATTERN = re.compile(
+    _NEGATIVE_PATTERN: ClassVar[re.Pattern[str]] = re.compile(
         r"\b(obviously|you should have|just|simply|clearly you|wrong)\b", re.IGNORECASE
     )
-    _POLITE_PATTERN = re.compile(r"\b(please|thank you|appreciate)\b", re.IGNORECASE)
-    _LIST_MARKER_PATTERN = re.compile(r"(?:\d+\)|first|second|•|-)", re.IGNORECASE)
-    _UNCERTAIN_PATTERN = re.compile(
+    _POLITE_PATTERN: ClassVar[re.Pattern[str]] = re.compile(r"\b(please|thank you|appreciate)\b", re.IGNORECASE)
+    _LIST_MARKER_PATTERN: ClassVar[re.Pattern[str]] = re.compile(r"(?:\d+\)|first|second|•|-)", re.IGNORECASE)
+    _UNCERTAIN_PATTERN: ClassVar[re.Pattern[str]] = re.compile(
         r"\b(i don't know|i'm not sure|unclear|uncertain)\b", re.IGNORECASE
     )
-    _ACCURACY_BONUS_PATTERN = re.compile(
+    _ACCURACY_BONUS_PATTERN: ClassVar[re.Pattern[str]] = re.compile(
         r"\b(because|therefore|specifically|exactly|precisely|in fact|evidently|documented)\b",
         re.IGNORECASE,
     )
 
-    RUBRIC_CATEGORIES = {
+    RUBRIC_CATEGORIES: ClassVar[Dict[str, Dict[str, Any]]] = {
         "accuracy": {"weight": 0.40, "name": "Accuracy"},
         "reasoning": {"weight": 0.30, "name": "Reasoning"},
         "tone": {"weight": 0.15, "name": "Tone"},
@@ -82,11 +83,12 @@ class ScoringEngine:
 
     def __init__(self, rubric: Optional[Rubric] = None):
         if rubric is None:
-            criteria = [
-                RubricCriterion(key=key, weight=float(str(val["weight"])), type="rule", params={})
-                for key, val in self.RUBRIC_CATEGORIES.items()
-            ]
-            self.rubric = Rubric(criteria=criteria)
+            self.rubric = Rubric(
+                criteria=[
+                    RubricCriterion(key=key, weight=float(val["weight"]), type="rule")
+                    for key, val in self.RUBRIC_CATEGORIES.items()
+                ]
+            )
         else:
             self.rubric = rubric
 
@@ -104,22 +106,21 @@ class ScoringEngine:
         criteria: List[RubricCriterion] = []
         for key, value in criteria_cfg.items():
             if not isinstance(value, dict):
-                raise TypeError(f"Criterion config for '{key}' must be a dict.")  # pragma: no cover
+                raise TypeError(f"Criterion config for '{key}' must be a dict.")
             criterion_type = str(value.get("type", "rule"))
             weight = float(value.get("weight", 0.0))
-            params = value.get("params", {}).copy()
+            params = value.get("params", {})
+            if params is None:
+                params = {}
             if not isinstance(params, dict):
-                raise TypeError(f"Criterion params for '{key}' must be a dict.")  # pragma: no cover
+                raise TypeError(f"Criterion params for '{key}' must be a dict.")
 
-            # Capture min_score/max_score if present at the top level of the criterion
             if "min_score" in value and "min_val" not in params:
                 params["min_val"] = value["min_score"]
             if "max_score" in value and "max_val" not in params:
                 params["max_val"] = value["max_score"]
 
-            criteria.append(
-                RubricCriterion(key=key, weight=weight, type=criterion_type, params=params)
-            )
+            criteria.append(RubricCriterion(key=key, weight=weight, type=criterion_type, params=params))
 
         return cls(Rubric(criteria=criteria)) if criteria else cls()
 
@@ -129,26 +130,22 @@ class ScoringEngine:
 
         total_weight = sum(c.weight for c in self.rubric.criteria)
         if not math.isfinite(total_weight) or total_weight <= 0:
-            raise ValueError(
-                "Rubric weights must sum to a positive finite value."
-            )  # pragma: no cover
+            raise ValueError("Rubric weights must sum to a positive finite value.")
 
         for c in self.rubric.criteria:
             if not math.isfinite(c.weight):
-                raise ValueError(f"Weight must be finite: {c.key}")  # pragma: no cover
+                raise ValueError(f"Weight must be finite: {c.key}")
             if c.weight < 0:
-                raise ValueError(f"Weight must be non-negative: {c.key}")  # pragma: no cover
+                raise ValueError(f"Weight must be non-negative: {c.key}")
 
         if abs(total_weight - 1.0) > 1e-6:
-            logger.warning(
-                "Rubric weights sum to %s, not 1.0; scores will be normalized.", total_weight
-            )
+            logger.warning("Rubric weights sum to %s, not 1.0; scores will be normalized.", total_weight)
 
     def _normalize_value(
         self, val: Optional[float], min_val: Optional[float] = None, max_val: Optional[float] = None
     ) -> float:
         if val is None or not isinstance(val, (int, float)) or not math.isfinite(val):
-            return 0.0  # pragma: no cover
+            return 0.0
 
         val = float(val)
 
@@ -157,20 +154,18 @@ class ScoringEngine:
             return max(0.0, min(1.0, normalized))
 
         if val < 0:
-            return 0.0  # pragma: no cover
+            return 0.0
         if val <= 1.0:
             return val
         if val <= 5.0:
             return val / 5.0
         if val <= 10.0:
             return val / 10.0
-        if val <= 100.0:  # pragma: no cover
-            return val / 100.0  # pragma: no cover
-        return 1.0  # pragma: no cover
+        if val <= 100.0:
+            return val / 100.0
+        return 1.0
 
-    def _score_rule(
-        self, response_text: str, params: Dict[str, Any]
-    ) -> Tuple[Optional[float], str]:
+    def _score_rule(self, response_text: str, params: Dict[str, Any]) -> Tuple[Optional[float], str]:
         if not response_text:
             return None, "no response_text"
 
@@ -178,7 +173,7 @@ class ScoringEngine:
         if rule_name == "contains_terms":
             terms = params.get("terms", [])
             if not isinstance(terms, list):
-                raise TypeError("params['terms'] must be a list")  # pragma: no cover
+                raise TypeError("params['terms'] must be a list")
             min_match = max(1, int(params.get("min_match", 1)))
             matches = sum(1 for t in terms if str(t).lower() in response_text.lower())
             return (1.0 if matches >= min_match else 0.0), f"matched {matches}/{len(terms)} terms"
@@ -198,15 +193,11 @@ class ScoringEngine:
 
     def _extract_json_block(self, text: str) -> Optional[str]:
         match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL | re.IGNORECASE)
-        if match:
-            return match.group(1)
-        return None
+        return match.group(1) if match else None
 
-    def _score_judge(
-        self, response_text: str, params: Dict[str, Any]
-    ) -> Tuple[Optional[float], str]:
+    def _score_judge(self, response_text: str, params: Dict[str, Any]) -> Tuple[Optional[float], str]:
         if not response_text:
-            return None, "no response_text"  # pragma: no cover
+            return None, "no response_text"
 
         min_val = params.get("min_val")
         if min_val is not None:
@@ -224,45 +215,24 @@ class ScoringEngine:
                 if isinstance(parsed, dict) and key in parsed:
                     val = float(parsed[key])
                     return self._normalize_value(val, min_val, max_val), f"json key '{key}' parsed"
-            except (json.JSONDecodeError, ValueError, TypeError):  # pragma: no cover
+            except (json.JSONDecodeError, ValueError, TypeError):
                 pass
 
-        try:  # pragma: no cover
-            matches = self._NUMERIC_PATTERN.findall(response_text)
-            if matches:
+        matches = self._NUMERIC_PATTERN.findall(response_text)
+        if matches:
+            try:
                 val = float(matches[-1])
                 return self._normalize_value(val, min_val, max_val), "parsed last numeric"
-        except (ValueError, TypeError):  # pragma: no cover
-            pass  # pragma: no cover
+            except (ValueError, TypeError):
+                pass
 
-        return None, "no numeric found"  # pragma: no cover
+        return None, "no numeric found"
 
     def score_response(
         self, prompt_meta: Dict[str, Any], response_text: Optional[str] = None
     ) -> ScoreReport:
-        """
-        Scores a single model response against the rubric.
-
-        Preconditions:
-            - prompt_meta must be a dictionary containing at least the prompt and response.
-            - ScoringEngine must have a valid rubric initialized.
-
-        Postconditions:
-            - Returns a ScoreReport object containing detailed scoring breakdown.
-
-        Edge Cases:
-            - Empty response_text: Scores will reflect a failure to respond.
-            - Missing metadata: Uses defaults for prompt_id and model.
-
-        Failure Modes:
-            - TypeError: If prompt_meta is not a dict or response_text is not a str.
-            - ValueError: If the rubric is not initialized.
-        """
         if not isinstance(prompt_meta, dict):
-            raise TypeError(
-                f"prompt_meta must be dict, got {type(prompt_meta).__name__}. "
-                f"Expected: {{'id': str, 'response': str, ...}}"
-            )
+            raise TypeError(f"prompt_meta must be dict, got {type(prompt_meta).__name__}")
 
         if response_text is None:
             response_text = prompt_meta.get("model_response") or prompt_meta.get("response", "")
@@ -271,7 +241,7 @@ class ScoringEngine:
             raise TypeError(f"response_text must be str, got {type(response_text).__name__}")
 
         if not self.rubric or not self.rubric.criteria:
-            raise ValueError("Rubric not initialized or contains no criteria")  # pragma: no cover
+            raise ValueError("Rubric not initialized or contains no criteria")
 
         components: List[ScoreComponent] = []
         total_weight = sum(c.weight for c in self.rubric.criteria)
@@ -288,71 +258,53 @@ class ScoringEngine:
             try:
                 if crit.type == "rule":
                     raw, notes = self._score_rule(response_text, crit.params)
-                    if raw is None:  # pragma: no cover
+                    if raw is None:
                         if crit.key == "accuracy":
                             raw = self.score_accuracy(response_text, prompt_text) / 5.0
-                        elif crit.key == "reasoning":  # pragma: no cover
+                        elif crit.key == "reasoning":
                             raw = self.score_reasoning(response_text, prompt_text) / 5.0
-                        elif crit.key == "tone":  # pragma: no cover
+                        elif crit.key == "tone":
                             raw = self.score_tone(response_text, prompt_text) / 5.0
-                        elif crit.key == "completeness":  # pragma: no cover
+                        elif crit.key == "completeness":
                             raw = self.score_completeness(response_text, prompt_text) / 5.0
-                elif crit.type == "judge":  # pragma: no cover
-                    raw, notes = self._score_judge(response_text, crit.params)  # pragma: no cover
-                else:  # pragma: no cover
-                    notes = f"unsupported criterion type: {crit.type}"  # pragma: no cover
-            except Exception as e:  # pragma: no cover
-                notes = f"exception during scoring: {e}"  # pragma: no cover
+                elif crit.type == "judge":
+                    raw, notes = self._score_judge(response_text, crit.params)
+                else:
+                    notes = f"unsupported criterion type: {crit.type}"
+            except Exception as e:
+                notes = f"exception during scoring: {e}"
 
             normalized = self._normalize_value(raw) if raw is not None else 0.0
-            components.append(
-                ScoreComponent(
-                    key=crit.key,
-                    raw=raw,
-                    normalized=normalized,
-                    weight=crit.weight,
-                    notes=notes,
-                )
-            )
+            components.append(ScoreComponent(crit.key, raw, normalized, crit.weight, notes))
 
         weighted_sum = sum((c.normalized or 0.0) * c.weight for c in components)
         aggregated_score = max(0.0, min(1.0, weighted_sum / total_weight if total_weight else 0.0))
 
-        report = ScoreReport(
+        return ScoreReport(
             prompt_id=prompt_meta.get("id") or prompt_meta.get("prompt_id"),
             prompt_text=prompt_text,
             model=prompt_meta.get("model"),
+            response_text=response_text,
             components=components,
             aggregated_score=aggregated_score,
             metadata={"prompt_id": prompt_meta.get("id"), "model": prompt_meta.get("model")},
         )
 
-        return report
-
     def report_to_dict(self, report: ScoreReport, include_defects: bool = False) -> Dict[str, Any]:
-        """
-        Converts a ScoreReport object to a flattened dictionary.
-
-        Preconditions:
-            - report must be a valid ScoreReport object.
-
-        Postconditions:
-            - Returns a dictionary with flattened score components and aggregated metrics.
-        """
         out: Dict[str, Any] = {
             "prompt_id": report.prompt_id,
             "prompt_text": report.prompt_text,
             "model": report.model,
+            "response": report.response_text,
             "aggregated_score": report.aggregated_score,
             "overall_score": report.aggregated_score * 5.0,
         }
+
         for comp in report.components:
             prefix = f"score_{comp.key}"
             out[prefix] = comp.normalized
             out[f"{prefix}_raw"] = comp.raw
             out[f"{prefix}_notes"] = comp.notes
-
-            # Also include 1-5 scale scores for backward compatibility
             score_1_to_5 = (comp.normalized or 0.0) * 5.0
             out[comp.key] = score_1_to_5
             out[f"{comp.key}_score"] = score_1_to_5
@@ -360,12 +312,7 @@ class ScoringEngine:
         out.update(report.metadata or {})
 
         if include_defects:
-            # We need the response text to detect defects.
-            # In some cases we might not have it in the report object directly
-            # but it might be in metadata or we might have passed it.
-            # For simplicity, if it's missing, defect detection will be limited.
-            response_text = report.metadata.get("response") or ""
-            defects = self._detect_defects(response_text, out)
+            defects = self._detect_defects(report.response_text, out)
             out["defects"] = ",".join(defects) if defects else ""
 
         return out
@@ -382,7 +329,6 @@ class ScoringEngine:
             return 1
         if self._UNCERTAIN_PATTERN.search(response):
             return 2
-
         score = 3
         if len(response.split()) > 20:
             score += 1
@@ -393,7 +339,6 @@ class ScoringEngine:
     def score_reasoning(self, response: str, prompt: str) -> int:
         if not response or not response.strip():
             return 1
-
         score = 3
         logical_count = len(self._LOGICAL_PATTERN.findall(response))
         if logical_count >= 2:
@@ -407,7 +352,6 @@ class ScoringEngine:
     def score_tone(self, response: str, prompt: str) -> int:
         if not response or not response.strip():
             return 1
-
         score = 3
         if self._POSITIVE_PATTERN.search(response):
             score += 1
@@ -420,7 +364,6 @@ class ScoringEngine:
     def score_completeness(self, response: str, prompt: str) -> int:
         if not response or not response.strip():
             return 1
-
         word_count = len(response.split())
         if word_count < 10:
             score = 2
@@ -430,7 +373,6 @@ class ScoringEngine:
             score = 4
         else:
             score = 5
-
         if self._LIST_MARKER_PATTERN.search(response):
             score = min(5, score + 1)
         return max(1, score)
@@ -442,35 +384,20 @@ class ScoringEngine:
         return DefectDetector.detect_defects(response, scores)
 
     def _calculate_category_score(self, response: str, category: str, prompt: str) -> int:
-        if category == "accuracy":  # pragma: no cover
-            return self.score_accuracy(response, prompt)  # pragma: no cover
-        if category == "reasoning":  # pragma: no cover
-            return self.score_reasoning(response, prompt)  # pragma: no cover
-        if category == "tone":  # pragma: no cover
-            return self.score_tone(response, prompt)  # pragma: no cover
-        if category == "completeness":  # pragma: no cover
-            return self.score_completeness(response, prompt)  # pragma: no cover
-        return 3  # pragma: no cover
+        if category == "accuracy":
+            return self.score_accuracy(response, prompt)
+        if category == "reasoning":
+            return self.score_reasoning(response, prompt)
+        if category == "tone":
+            return self.score_tone(response, prompt)
+        if category == "completeness":
+            return self.score_completeness(response, prompt)
+        return 3
 
     def score_batch(self, responses: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """
-        Scores a batch of responses and returns a list of flattened dictionaries.
-
-        Preconditions:
-            - responses must be a list of dictionaries.
-
-        Postconditions:
-            - Returns a list of dictionaries with scoring results.
-        """
         scored_responses: List[Dict[str, Any]] = []
         for response_data in responses:
             report = self.score_response(response_data)
-            # Ensure response text is available for defect detection
-            if "response" not in report.metadata:  # pragma: no cover
-                report.metadata["response"] = response_data.get(
-                    "model_response"
-                ) or response_data.get("response", "")
-
             scored = self.report_to_dict(report, include_defects=True)
             scored_responses.append(scored)
         self.scores = scored_responses
@@ -478,40 +405,27 @@ class ScoringEngine:
 
     def load_results(self, filepath: str) -> List[Dict[str, Any]]:
         try:
-            with open(filepath, "r", encoding="utf-8") as f:
-                reader = csv.DictReader(f)  # pragma: no cover
-                return list(reader)  # pragma: no cover
-        except FileNotFoundError as e:
+            with open(filepath, "r", encoding="utf-8", newline="") as f:
+                reader = csv.DictReader(f)
+                return list(reader)
+        except FileNotFoundError:
             logger.error("File not found: %s", filepath)
-            raise e
-        except Exception as e:  # pragma: no cover
-            logger.error("Error loading results: %s", e)  # pragma: no cover
-            return []  # pragma: no cover
+            raise
+        except Exception as e:
+            logger.error("Error loading results: %s", e)
+            return []
 
-    def save_scores(self, scored_responses: Any, filepath: Optional[str] = None) -> None:
-        if isinstance(scored_responses, str) and filepath is None:
-            filepath = scored_responses
-            scored_responses = self.scores
-        elif filepath is None:
-            if isinstance(scored_responses, list):
-                raise ValueError("filepath must be provided if scored_responses is a list")
-            filepath = str(scored_responses)  # pragma: no cover
-            scored_responses = self.scores  # pragma: no cover
-
+    def save_scores(self, scored_responses: List[Dict[str, Any]], filepath: str) -> None:
         if not filepath:
-            raise ValueError("filepath is required")  # pragma: no cover
-
+            raise ValueError("filepath is required")
         if not scored_responses:
             return
 
-        directory = os.path.dirname(os.path.abspath(filepath))
-        if directory:  # pragma: no cover
-            os.makedirs(directory, exist_ok=True)
+        os.makedirs(os.path.dirname(os.path.abspath(filepath)), exist_ok=True)
 
         all_keys: set[str] = set()
         for r in scored_responses:
-            if isinstance(r, dict):  # pragma: no cover
-                all_keys.update(r.keys())
+            all_keys.update(r.keys())
 
         with open(filepath, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=sorted(all_keys))
@@ -526,7 +440,6 @@ class ScoringEngine:
         import pandas as pd
 
         df = pd.DataFrame(self.scores)
-
         print("\n" + "=" * 30)
         print("SCORING SUMMARY")
         print("=" * 30)
@@ -537,7 +450,7 @@ class ScoringEngine:
         success_rate = (df[score_col] >= threshold).sum() / len(df) * 100 if len(df) > 0 else 0
 
         if score_col == "aggregated_score":
-            avg_score *= 5.0  # pragma: no cover
+            avg_score *= 5.0
 
         print(f"Total Responses: {len(self.scores)}")
         print(f"Overall Average Score: {avg_score:.2f}/5.00")
@@ -545,16 +458,15 @@ class ScoringEngine:
 
         defect_counts: Dict[str, int] = {}
         for s in self.scores:
-            defects = str(s.get("defects", "")).split(",")
-            for d in defects:
+            for d in str(s.get("defects", "")).split(","):
                 if d:
                     defect_counts[d] = defect_counts.get(d, 0) + 1
 
-        if defect_counts:  # pragma: no cover
-            print("\nDefects Detected:")  # pragma: no cover
-            for d, count in defect_counts.items():  # pragma: no cover
-                print(f"- {d}: {count}")  # pragma: no cover
-        print("=" * 30 + "\n")  # pragma: no cover
+        if defect_counts:
+            print("\nDefects Detected:")
+            for d, count in defect_counts.items():
+                print(f"- {d}: {count}")
+        print("=" * 30 + "\n")
 
 
 def score_responses(
