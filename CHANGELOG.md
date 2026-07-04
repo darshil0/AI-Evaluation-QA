@@ -7,16 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.6.0] - 2026-07-05
 
+### Added
+- **Expanded Defect Detection**: Integrated new defect types and heuristic markers.
+  - Added **D06 (Refusal/Avoidance)** for identifying AI refusals.
+  - Added **D07 (Hallucination Warning)** for detecting uncertainty markers in responses.
+  - Improved **D05 (Redundancy)** with unique word ratio thresholds for better precision.
+
 ### Changed
 - **Dependency Refresh**: Significant update to all core and development dependencies to their latest 2026-standard versions.
   - Upgraded `openai` to >=2.44.0.
   - Upgraded `pandas` to >=3.0.0 and `numpy` to >=2.5.0.
+  - Upgraded `scipy` to >=1.18.0 and `matplotlib` to >=3.11.0.
   - Upgraded testing framework to `pytest` >=9.1.0 and `coverage` >=7.15.0.
-  - Updated development tools including `black` >=26.5.0 and `isort` >=8.0.0.
+  - Updated development tools including `black` >=26.5.0, `isort` >=8.0.0, and `click` >=8.4.0.
 - **Project Versioning**: Bumped framework version to 2.6.0.
+- **Scoring Normalization**: Refined `ScoringEngine` normalization logic to handle multi-range scores (1-5, 1-10, 1-100) more gracefully.
 
 ### Fixed
-- **Version Synchronization**: Ensured version strings are consistent across all configuration and documentation files.
+- **Version Synchronization**: Ensured version strings are consistent across all configuration and documentation files (`setup.py`, `pyproject.toml`, `main.py`, `README.md`, etc.).
+- **Async Safety**: Hardened `EvaluationErrorHandler` with `asyncio.get_running_loop()` guards to prevent `RuntimeError` in edge-case execution environments.
 
 ## [2.5.1] - 2026-07-02
 
