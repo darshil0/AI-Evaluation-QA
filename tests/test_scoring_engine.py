@@ -29,7 +29,13 @@ class TestScoringEngineCoverage:
             {
                 "scoring": {
                     "criteria": {
-                        "accuracy": {"type": "rule", "weight": 0.5, "params": {}},
+                        "accuracy": {
+                            "type": "rule",
+                            "weight": 0.5,
+                            "params": {},
+                            "min_score": 1,
+                            "max_score": 5,
+                        },
                         "judge_score": {
                             "type": "judge",
                             "weight": 0.5,
@@ -41,6 +47,9 @@ class TestScoringEngineCoverage:
         )
         assert isinstance(engine, ScoringEngine)
         assert len(engine.rubric.criteria) == 2
+        accuracy_crit = next(c for c in engine.rubric.criteria if c.key == "accuracy")
+        assert accuracy_crit.params["min_val"] == 1
+        assert accuracy_crit.params["max_val"] == 5
 
     def test_validate_rubric_rejects_empty(self):
         with pytest.raises(ValueError):
