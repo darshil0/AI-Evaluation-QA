@@ -30,3 +30,15 @@ def test_detect_defects_normalized_scores():
     }
     defects = DefectDetector.detect_defects("text", scores)
     assert "D01" in defects
+
+
+def test_detect_defects_refusal():
+    text = "As an AI model, I cannot fulfill this request."
+    defects = DefectDetector.detect_defects(text, {"reasoning": 5.0})
+    assert "D06" in defects
+
+
+def test_detect_defects_hallucination_warning():
+    text = "To the best of my knowledge, the earth is flat."
+    defects = DefectDetector.detect_defects(text, {"reasoning": 5.0})
+    assert "D07" in defects

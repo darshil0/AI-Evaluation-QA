@@ -139,6 +139,27 @@ class ReportGenerator:
         """
         stats = self.calculate_statistics(scored_responses)
 
+        # Try to generate plotly chart
+        plotly_html = ""
+        try:
+            import pandas as pd
+            import plotly.express as px
+
+            df = pd.DataFrame(scored_responses)
+            score_col = "overall_score" if "overall_score" in df.columns else "aggregated_score"
+            fig = px.histogram(
+                df,
+                x=score_col,
+                nbins=10,
+                title="Score Distribution",
+                labels={score_col: "Score"},
+                color_discrete_sequence=["#4CAF50"],
+            )
+            fig.update_layout(bargap=0.1)
+            plotly_html = fig.to_html(full_html=False, include_plotlyjs="cdn")
+        except Exception as e:
+            logger.warning(f"Plotly generation failed: {e}. Falling back to static report.")
+
         # Build the results table rows with escaped content
         table_rows = ""
         # Limit to first 100 results for the summary report to avoid huge HTML files
@@ -170,10 +191,12 @@ class ReportGenerator:
                 th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
                 th {{ background-color: #4CAF50; color: white; }}
                 tr:nth-child(even) {{ background-color: #f2f2f2; }}
+                .chart-container {{ margin-top: 30px; margin-bottom: 30px; }}
             </style>
         </head>
         <body>
             <h1>Evaluation Summary</h1>
+
             <h2>Overall Statistics</h2>
             <table>
                 <tr><th>Metric</th><th>Value</th></tr>
@@ -184,6 +207,10 @@ class ReportGenerator:
                 <tr><td>Mean Completeness</td><td>{stats.get('mean_completeness', 0):.2f}</td></tr>
                 <tr><td>Mean Overall</td><td>{stats.get('mean_overall', 0):.2f}</td></tr>
             </table>
+
+            <div class="chart-container">
+                {plotly_html}
+            </div>
 
             <h2>Sample Results (Top 100)</h2>
             <table>

@@ -53,11 +53,12 @@ class ScoringEngine:
 
     _NUMERIC_PATTERN = re.compile(r"[-+]?\d*\.\d+|\d+")
     _LOGICAL_PATTERN = re.compile(
-        r"\b(because|therefore|thus|hence|consequently|as a result|due to|since|so)\b",
+        r"\b(because|therefore|thus|hence|consequently|as a result|due to|since|so|furthermore|moreover|specifically|nevertheless|however|alternatively)\b",
         re.IGNORECASE,
     )
     _POSITIVE_PATTERN = re.compile(
-        r"\b(understand|help|let me|i can|happy to|certainly|of course)\b", re.IGNORECASE
+        r"\b(understand|help|let me|i can|happy to|certainly|of course|delighted|pleasure|assist|welcome)\b",
+        re.IGNORECASE,
     )
     _NEGATIVE_PATTERN = re.compile(
         r"\b(obviously|you should have|just|simply|clearly you|wrong)\b", re.IGNORECASE
@@ -68,7 +69,8 @@ class ScoringEngine:
         r"\b(i don't know|i'm not sure|unclear|uncertain)\b", re.IGNORECASE
     )
     _ACCURACY_BONUS_PATTERN = re.compile(
-        r"\b(because|therefore|specifically|exactly)\b", re.IGNORECASE
+        r"\b(because|therefore|specifically|exactly|precisely|in fact|evidently|documented)\b",
+        re.IGNORECASE,
     )
 
     RUBRIC_CATEGORIES = {
@@ -105,9 +107,16 @@ class ScoringEngine:
                 raise TypeError(f"Criterion config for '{key}' must be a dict.")  # pragma: no cover
             criterion_type = str(value.get("type", "rule"))
             weight = float(value.get("weight", 0.0))
-            params = value.get("params", {})
+            params = value.get("params", {}).copy()
             if not isinstance(params, dict):
                 raise TypeError(f"Criterion params for '{key}' must be a dict.")  # pragma: no cover
+
+            # Capture min_score/max_score if present at the top level of the criterion
+            if "min_score" in value and "min_val" not in params:
+                params["min_val"] = value["min_score"]
+            if "max_score" in value and "max_val" not in params:
+                params["max_val"] = value["max_score"]
+
             criteria.append(
                 RubricCriterion(key=key, weight=weight, type=criterion_type, params=params)
             )
