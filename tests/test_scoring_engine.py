@@ -161,6 +161,7 @@ class TestScoringEngineCoverage:
             prompt_id=1,
             prompt_text="Q",
             model="m",
+            response_text="R",
             components=[ScoreComponent("accuracy", 1.0, 1.0, 0.4, "ok")],
             aggregated_score=1.0,
             metadata={"extra": "x"},
@@ -191,7 +192,7 @@ class TestScoringEngineCoverage:
         engine.scores = [{"accuracy": 5, "overall_score": 4.2, "defects": ""}]
         with tempfile.TemporaryDirectory() as tmpdir:
             path = os.path.join(tmpdir, "scores.csv")
-            engine.save_scores(path)
+            engine.save_scores(engine.scores, path)
             assert os.path.exists(path)
 
     def test_score_responses_function(self):
