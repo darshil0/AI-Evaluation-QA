@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2026-07-05
+
+### Changed
+- **Dependency Refresh**: Significant update to all core and development dependencies to their latest 2026-standard versions.
+  - Upgraded `openai` to >=2.44.0.
+  - Upgraded `pandas` to >=3.0.0 and `numpy` to >=2.5.0.
+  - Upgraded testing framework to `pytest` >=9.1.0 and `coverage` >=7.15.0.
+  - Updated development tools including `black` >=26.5.0 and `isort` >=8.0.0.
+- **Project Versioning**: Bumped framework version to 2.6.0.
+
+### Fixed
+- **Version Synchronization**: Ensured version strings are consistent across all configuration and documentation files.
+
 ## [2.5.1] - 2026-07-02
 
 ### Fixed
@@ -397,6 +410,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version Comparison Links
 
+[2.6.0]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.5.1...v2.6.0
+[2.5.1]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.6...v2.5.0
 [2.4.6]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.5...v2.4.6
 [2.4.5]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.4...v2.4.5
