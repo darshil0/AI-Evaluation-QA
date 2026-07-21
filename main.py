@@ -24,7 +24,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configure logging with rotation before any imports that might log
-log_file = os.getenv("EVAL_LOG_FILE", "evaluation.log")
+log_file = os.getenv("EVAL_LOG_FILE", "logs/evaluation.log")
 max_bytes = int(os.getenv("EVAL_LOG_MAX_BYTES", 10_000_000))  # 10 MB
 backup_count = int(os.getenv("EVAL_LOG_BACKUP_COUNT", 5))
 

@@ -132,8 +132,10 @@ class ReportGenerator:
             import plotly.express as px
 
             df = pd.DataFrame(scored_responses)
-            score_col = "overall_score" if "overall_score" in df.columns else (
-                "aggregated_score" if "aggregated_score" in df.columns else None
+            score_col = (
+                "overall_score"
+                if "overall_score" in df.columns
+                else ("aggregated_score" if "aggregated_score" in df.columns else None)
             )
             if score_col is not None and not df[score_col].dropna().empty:
                 fig = px.histogram(
@@ -253,7 +255,7 @@ class ReportGenerator:
         html_file = report_dir / "evaluation_summary.html"
         self.generate_html_report(scored_responses, str(html_file))
 
-        logger.info(f"All reports generated in %s", str(report_dir))
+        logger.info("All reports generated in %s", str(report_dir))
 
     async def generate_reports_async(self, data: Any) -> Dict[str, str]:
         # fixed: call the synchronous generate_reports (not missing name)
@@ -320,21 +322,32 @@ class ReportGenerator:
         # Ensure numeric
         try:
             import pandas as pd
+
             df_numeric = df.copy()
             if score_col in df_numeric.columns:
                 df_numeric[score_col] = pd.to_numeric(df_numeric[score_col], errors="coerce")
             avg_score = df_numeric[score_col].mean() if score_col in df_numeric.columns else 0.0
-            median_score = df_numeric[score_col].median() if score_col in df_numeric.columns else 0.0
+            median_score = (
+                df_numeric[score_col].median() if score_col in df_numeric.columns else 0.0
+            )
             std_dev = df_numeric[score_col].std() if score_col in df_numeric.columns else 0.0
 
             # Determine scaling and threshold
             is_0_1_scale = False
-            if score_col == "aggregated_score" or (avg_score is not None and avg_score <= 1.0):
+            if score_col == "aggregated_score":
+                is_0_1_scale = True
+            elif score_col == "overall_score":
+                is_0_1_scale = False
+            elif avg_score is not None and avg_score <= 1.0:
                 is_0_1_scale = True
 
             threshold = 0.7 if is_0_1_scale else 3.5
 
-            success_rate = (df_numeric[score_col] >= threshold).sum() / len(df_numeric) * 100 if len(df_numeric) > 0 else 0
+            success_rate = (
+                (df_numeric[score_col] >= threshold).sum() / len(df_numeric) * 100
+                if len(df_numeric) > 0
+                else 0
+            )
 
             if is_0_1_scale:
                 avg_score = float(avg_score * 5.0) if avg_score is not None else 0.0

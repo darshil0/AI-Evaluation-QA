@@ -145,4 +145,4 @@ cython_debug/
 # Evaluation artifacts
 reports/
 data/checkpoints/
-evaluation.log
+logs/*.log

@@ -7,7 +7,7 @@ import math
 import os
 import re
 from dataclasses import dataclass, field
-from typing import Any, ClassVar, Dict, List, Optional, Tuple
+from typing import Any, ClassVar, Dict, List, Optional, Tuple, Union
 
 from evaluation.defect_detector import DefectDetector
 
@@ -54,18 +54,24 @@ class ScoringEngine:
 
     _NUMERIC_PATTERN: ClassVar[re.Pattern[str]] = re.compile(r"[-+]?\d*\.\d+|\d+")
     _LOGICAL_PATTERN: ClassVar[re.Pattern[str]] = re.compile(
-        r"\b(because|therefore|thus|hence|consequently|as a result|due to|since|so|furthermore|moreover|specifically|nevertheless|however|alternatively)\b",
+        r"\b(because|therefore|thus|hence|consequently|as a result|due to|since|so|"
+        r"furthermore|moreover|specifically|nevertheless|however|alternatively)\b",
         re.IGNORECASE,
     )
     _POSITIVE_PATTERN: ClassVar[re.Pattern[str]] = re.compile(
-        r"\b(understand|help|let me|i can|happy to|certainly|of course|delighted|pleasure|assist|welcome)\b",
+        r"\b(understand|help|let me|i can|happy to|certainly|of course|"
+        r"delighted|pleasure|assist|welcome)\b",
         re.IGNORECASE,
     )
     _NEGATIVE_PATTERN: ClassVar[re.Pattern[str]] = re.compile(
         r"\b(obviously|you should have|just|simply|clearly you|wrong)\b", re.IGNORECASE
     )
-    _POLITE_PATTERN: ClassVar[re.Pattern[str]] = re.compile(r"\b(please|thank you|appreciate)\b", re.IGNORECASE)
-    _LIST_MARKER_PATTERN: ClassVar[re.Pattern[str]] = re.compile(r"(?:\d+\)|first|second|•|-)", re.IGNORECASE)
+    _POLITE_PATTERN: ClassVar[re.Pattern[str]] = re.compile(
+        r"\b(please|thank you|appreciate)\b", re.IGNORECASE
+    )
+    _LIST_MARKER_PATTERN: ClassVar[re.Pattern[str]] = re.compile(
+        r"(?:\d+\)|first|second|•|-)", re.IGNORECASE
+    )
     _UNCERTAIN_PATTERN: ClassVar[re.Pattern[str]] = re.compile(
         r"\b(i don't know|i'm not sure|unclear|uncertain)\b", re.IGNORECASE
     )
@@ -120,7 +126,9 @@ class ScoringEngine:
             if "max_score" in value and "max_val" not in params:
                 params["max_val"] = value["max_score"]
 
-            criteria.append(RubricCriterion(key=key, weight=weight, type=criterion_type, params=params))
+            criteria.append(
+                RubricCriterion(key=key, weight=weight, type=criterion_type, params=params)
+            )
 
         return cls(Rubric(criteria=criteria)) if criteria else cls()
 
@@ -139,7 +147,9 @@ class ScoringEngine:
                 raise ValueError(f"Weight must be non-negative: {c.key}")
 
         if abs(total_weight - 1.0) > 1e-6:
-            logger.warning("Rubric weights sum to %s, not 1.0; scores will be normalized.", total_weight)
+            logger.warning(
+                "Rubric weights sum to %s, not 1.0; scores will be normalized.", total_weight
+            )
 
     def _normalize_value(
         self, val: Optional[float], min_val: Optional[float] = None, max_val: Optional[float] = None
@@ -165,7 +175,9 @@ class ScoringEngine:
             return val / 100.0
         return 1.0
 
-    def _score_rule(self, response_text: str, params: Dict[str, Any]) -> Tuple[Optional[float], str]:
+    def _score_rule(
+        self, response_text: str, params: Dict[str, Any]
+    ) -> Tuple[Optional[float], str]:
         if not response_text:
             return None, "no response_text"
 
@@ -195,7 +207,9 @@ class ScoringEngine:
         match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL | re.IGNORECASE)
         return match.group(1) if match else None
 
-    def _score_judge(self, response_text: str, params: Dict[str, Any]) -> Tuple[Optional[float], str]:
+    def _score_judge(
+        self, response_text: str, params: Dict[str, Any]
+    ) -> Tuple[Optional[float], str]:
         if not response_text:
             return None, "no response_text"
 
@@ -415,22 +429,42 @@ class ScoringEngine:
             logger.error("Error loading results: %s", e)
             return []
 
-    def save_scores(self, scored_responses: List[Dict[str, Any]], filepath: str) -> None:
-        if not filepath:
+    def save_scores(
+        self,
+        scored_responses: Union[str, List[Dict[str, Any]]],
+        filepath: Optional[str] = None,
+    ) -> None:
+        """Save scored responses to a CSV file.
+
+        Supports both modern (responses, filepath) and legacy (filepath) signatures.
+        """
+        # Case 1: Called as save_scores(filepath) where scored_responses is a string
+        if isinstance(scored_responses, str):
+            actual_filepath = scored_responses
+            actual_responses = getattr(self, "scores", [])
+        # Case 2: Called as save_scores(responses, filepath)
+        elif isinstance(scored_responses, list) and filepath is not None:
+            actual_filepath = filepath
+            actual_responses = scored_responses
+        # Case 3: Invalid call (e.g. save_scores(responses) without filepath)
+        else:
+            raise ValueError("filepath must be provided")
+
+        if not actual_filepath:
             raise ValueError("filepath is required")
-        if not scored_responses:
+        if not actual_responses:
             return
 
-        os.makedirs(os.path.dirname(os.path.abspath(filepath)), exist_ok=True)
+        os.makedirs(os.path.dirname(os.path.abspath(actual_filepath)), exist_ok=True)
 
         all_keys: set[str] = set()
-        for r in scored_responses:
+        for r in actual_responses:
             all_keys.update(r.keys())
 
-        with open(filepath, "w", newline="", encoding="utf-8") as f:
+        with open(actual_filepath, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=sorted(all_keys))
             writer.writeheader()
-            writer.writerows(scored_responses)
+            writer.writerows(actual_responses)
 
     def print_summary(self) -> None:
         if not self.scores:

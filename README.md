@@ -5,7 +5,7 @@
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License Badge">
   <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg" alt="Test Coverage Badge">
   <img src="https://img.shields.io/badge/python-3.14-blue.svg" alt="Python Version Badge">
-  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/contributing-welcome-orange.svg" alt="Contributing Badge"></a>
+  <a href="./CONTRIBUTING.md"><img src="https://img.shields.io/badge/contributing-welcome-orange.svg" alt="Contributing Badge"></a>
 </p>
 
 ## Overview
@@ -39,7 +39,7 @@ The **AI Evaluation QA Framework** is a production-grade Python library for eval
 
 | Document | Purpose |
 |----------|---------|
-| [Contributing Guide](CONTRIBUTING.md) | Development setup, testing standards, PR guidelines, and code style (PEP 8, mypy strict, 100% coverage target) |
+| [Contributing Guide](./CONTRIBUTING.md) | Development setup, testing standards, PR guidelines, and code style (PEP 8, mypy strict, 100% coverage target) |
 | [Changelog & Release History](CHANGELOG.md) | Version history, fixes, and breaking changes (v2.6.0 current) |
 | [Configuration Reference](#configuration) | Detailed settings, rubric definition, and environment variables |
 | [Troubleshooting Guide](#troubleshooting) | Solutions for common errors and edge cases |
@@ -754,7 +754,7 @@ Total cost: ~$0.76
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on:
+Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines on:
 
 - **Development Environment Setup**: Virtual environment, dependencies, pre-commit hooks
 - **Code Style**: PEP 8, type hints, 100+ character line limit
