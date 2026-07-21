@@ -1,5 +1,4 @@
 import logging
-from collections import Counter
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -69,11 +68,7 @@ class DefectDetector:
             words = response_text.split()
 
             if len(words) > 20:
-                normalized_words = [
-                    w.strip(".,;:!?()[]{}\"'`").lower()
-                    for w in words
-                    if w.strip()
-                ]
+                normalized_words = [w.strip(".,;:!?()[]{}\"'`").lower() for w in words if w.strip()]
                 if normalized_words:
                     unique_ratio = len(set(normalized_words)) / len(normalized_words)
                     if unique_ratio < 0.5:

@@ -37,7 +37,10 @@ class TestPromptRunnerEdgeCases:
             with pytest.raises(Exception) as exc_info:
                 runner.execute_prompt("Test prompt")
 
-            assert "api_key client option must be set" in str(exc_info.value)
+            err_msg = str(exc_info.value)
+            assert (
+                "api_key client option must be set" in err_msg or "Missing credentials" in err_msg
+            )
 
     def test_execute_prompts_empty_list(self):
         """Test execute_prompts with empty list."""

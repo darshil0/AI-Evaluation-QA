@@ -245,6 +245,7 @@ class TestScoringEngineEdgeCases:
             prompt_id=1,
             prompt_text="Q",
             model="m",
+            response_text="A",
             components=[ScoreComponent("accuracy", 1.0, 1.0, 0.4, "ok")],
             aggregated_score=1.0,
             metadata={"extra": "x"},
