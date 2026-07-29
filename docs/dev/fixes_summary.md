@@ -1,6 +1,6 @@
 # Fixes & Improvements Summary
 
-This document summarizes the key architectural and functional fixes implemented in the **AI Evaluation QA Framework** (v2.6.0).
+This document summarizes the key architectural and functional fixes implemented in the **AI Evaluation QA Framework** (v2.6.1).
 
 ## 1. Reliability & Fault Tolerance
 - **Checkpointing**: Implemented mid-batch checkpointing to prevent progress loss.

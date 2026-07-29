@@ -60,7 +60,7 @@ except ImportError as e:
 
 
 @click.group()
-@click.version_option(version="2.6.0")
+@click.version_option(version="2.6.1")
 def cli() -> None:
     """AI Evaluation QA Framework CLI."""
 

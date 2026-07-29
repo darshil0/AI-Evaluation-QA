@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.1] - 2026-07-29
+
+### Added
+- **Interactive Report Coverage**: Implemented a comprehensive test suite `tests/test_report_generator_edge_cases.py` targeting 100% statement and branch coverage on `ReportGenerator`.
+- **Custom Score Fallback**: Hardened `ReportGenerator._generate_executive_summary` to support arbitrary numeric score columns by falling back to the first available column of the input DataFrame if neither `'aggregated_score'` nor `'overall_score'` is present.
+
+### Changed
+- **Folder Structure Reorganization**: Finalized clean-up and reorganization of the framework's internal packages and directories for better maintainability.
+- **Logging Standardization**: Centralized logging definitions and standards across all core modules.
+
+### Fixed
+- **KeyError Prevention**: Resolved key lookup issues in executive summary generation when dealing with custom scoring rubrics.
+- **Dependency Mock Patches**: Refined unit testing mocks for optional third-party libraries (e.g., `pandas`, `matplotlib`, `plotly`) to ensure tests run reliably in environments where these packages may be absent.
+
 ## [2.6.0] - 2026-07-05
 
 ### Added
@@ -419,6 +433,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version Comparison Links
 
+[2.6.1]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.6.0...v2.6.1
 [2.6.0]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.5.1...v2.6.0
 [2.5.1]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/darshil0/AI-Evaluation-QA/compare/v2.4.6...v2.5.0
