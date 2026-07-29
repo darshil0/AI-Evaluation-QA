@@ -318,7 +318,15 @@ class ReportGenerator:
         return reports
 
     def _generate_executive_summary(self, df: Any) -> Path:
-        score_col = "aggregated_score" if "aggregated_score" in df.columns else "overall_score"
+        score_col = (
+            "aggregated_score"
+            if "aggregated_score" in df.columns
+            else (
+                "overall_score"
+                if "overall_score" in df.columns
+                else (df.columns[0] if len(df.columns) > 0 else "overall_score")
+            )
+        )
         # Ensure numeric
         try:
             import pandas as pd
